@@ -22,11 +22,11 @@ func (b *EdtsBox) parse() (err error) {
 		}
 	}()
 
-	boxes, err := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+	boxes, err := readBoxes(b.File(), b.Start()+BoxHeaderSize, b.Size()-BoxHeaderSize)
 	log.PanicIf(err)
 
 	for _, box := range boxes {
-		switch box.Name {
+		switch box.Name() {
 		case "elst":
 			b.Elst = &ElstBox{Box: box}
 

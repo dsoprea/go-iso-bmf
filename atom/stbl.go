@@ -23,11 +23,11 @@ func (b *StblBox) parse() (err error) {
 		}
 	}()
 
-	boxes, err := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+	boxes, err := readBoxes(b.File(), b.Start()+BoxHeaderSize, b.Size()-BoxHeaderSize)
 	log.PanicIf(err)
 
 	for _, box := range boxes {
-		switch box.Name {
+		switch box.Name() {
 		case "stts":
 			b.Stts = &SttsBox{Box: box}
 
