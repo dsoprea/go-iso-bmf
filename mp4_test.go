@@ -16,12 +16,12 @@ func TestOpen_Mp4(t *testing.T) {
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	if s.Ftyp.Name != "ftyp" {
-		t.Fatalf("ftyp name not correct: [%s]", s.Ftyp.Name)
+	if s.Ftyp().Name() != "ftyp" {
+		t.Fatalf("ftyp name not correct: [%s]", s.Ftyp().Name())
 	}
 
-	if s.Ftyp.MajorBrand != "isom" {
-		t.Fatalf("ftyp MajorBrand is not correct: [%s]", s.Ftyp.MajorBrand)
+	if s.Ftyp().MajorBrand != "isom" {
+		t.Fatalf("ftyp MajorBrand is not correct: [%s]", s.Ftyp().MajorBrand)
 	}
 }
 
@@ -29,32 +29,32 @@ func TestOpen_Heic(t *testing.T) {
 	s, err := Open(testHeicFilepath)
 	log.PanicIf(err)
 
-	if s.Ftyp.Name != "ftyp" {
-		t.Fatalf("ftyp name not correct: [%s]", s.Ftyp.Name)
+	if s.Ftyp().Name() != "ftyp" {
+		t.Fatalf("ftyp name not correct: [%s]", s.Ftyp().Name())
 	}
 
-	if s.Ftyp.MajorBrand != "heic" {
-		t.Fatalf("ftyp MajorBrand is not correct: [%s]", s.Ftyp.MajorBrand)
+	if s.Ftyp().MajorBrand != "heic" {
+		t.Fatalf("ftyp MajorBrand is not correct: [%s]", s.Ftyp().MajorBrand)
 	}
 }
 
 func ExampleOpen() {
-	file, err := Open(testMp4Filepath)
+	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	fmt.Println(file.Ftyp.Name)
-	fmt.Println(file.Ftyp.MajorBrand)
-	fmt.Println(file.Ftyp.MinorVersion)
-	fmt.Println(file.Ftyp.CompatibleBrands)
+	fmt.Println(s.Ftyp().Name())
+	fmt.Println(s.Ftyp().MajorBrand)
+	fmt.Println(s.Ftyp().MinorVersion)
+	fmt.Println(s.Ftyp().CompatibleBrands)
 
-	fmt.Println(file.Moov.Name, file.Moov.Size)
-	fmt.Println(file.Moov.Mvhd.Name)
-	fmt.Println(file.Moov.Mvhd.Version)
-	fmt.Println(file.Moov.Mvhd.Volume)
+	fmt.Println(s.Moov().Name(), s.Moov().Size())
+	fmt.Println(s.Moov().Mvhd.Name())
+	fmt.Println(s.Moov().Mvhd.Version)
+	fmt.Println(s.Moov().Mvhd.Volume)
 
-	fmt.Println("trak size: ", file.Moov.Traks[0].Size)
-	fmt.Println("trak size: ", file.Moov.Traks[1].Size)
-	fmt.Println("mdat size: ", file.Mdat.Size)
+	fmt.Println("trak size: ", s.Moov().Traks[0].Size())
+	fmt.Println("trak size: ", s.Moov().Traks[1].Size())
+	fmt.Println("mdat size: ", s.Mdat().Size())
 
 	// Output:
 	// ftyp

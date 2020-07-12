@@ -20,6 +20,23 @@ type File struct {
 	isFragmented bool
 }
 
+// TODO(dustin): This are bridging accessors to keep the tests working while we transition to using indexing.
+//>>>>
+
+func (f *File) Ftyp() *FtypBox {
+	return f.ftyp
+}
+
+func (f *File) Moov() *MoovBox {
+	return f.moov
+}
+
+func (f *File) Mdat() *MdatBox {
+	return f.mdat
+}
+
+// <<<<
+
 func NewFile(rs io.ReadSeeker, size int64) *File {
 	return &File{
 		rs:   rs,
