@@ -18,6 +18,8 @@ type File struct {
 	size int64
 
 	isFragmented bool
+
+	index map[string]*Box
 }
 
 // TODO(dustin): This are bridging accessors to keep the tests working while we transition to using indexing.
@@ -33,6 +35,16 @@ func (f *File) Moov() *MoovBox {
 
 func (f *File) Mdat() *MdatBox {
 	return f.mdat
+}
+
+// GetChildBox returns the given child box or panics uncontrollably.
+func (f *File) GetChildBox(name string) CommonBox {
+	cb, found := f.index[name]
+	if found == false {
+		log.Panicf("child box not found: [%s]", name)
+	}
+
+	return cb
 }
 
 // <<<<
@@ -59,7 +71,9 @@ func (f *File) Parse() (err error) {
 		switch box.name {
 		case "ftyp":
 			f.ftyp = &FtypBox{Box: box}
-			f.ftyp.parse()
+
+			err := f.ftyp.parse()
+			log.PanicIf(err)
 
 		case "wide":
 			// fmt.Println("found wide")
@@ -70,11 +84,16 @@ func (f *File) Parse() (err error) {
 
 		case "moov":
 			f.moov = &MoovBox{Box: box}
-			f.moov.parse()
+
+			err := f.moov.parse()
+			log.PanicIf(err)
 
 			f.isFragmented = f.moov.IsFragmented
 		}
 	}
+
+	f.index = boxes.Index()
+
 	return nil
 }
 
@@ -86,7 +105,7 @@ func (f *File) readBoxAt(offset int64) (boxSize uint32, boxType string, err erro
 		}
 	}()
 
-	buf, err := f.readBytesAt(BoxHeaderSize, offset)
+	buf, err := f.readBytesAt(boxHeaderSize, offset)
 	log.PanicIf(err)
 
 	boxSize = binary.BigEndian.Uint32(buf[0:4])

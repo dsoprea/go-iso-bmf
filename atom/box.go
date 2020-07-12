@@ -5,10 +5,8 @@ import (
 )
 
 const (
-	// TODO(dustin): Stop exporting BoxHeaderSize
-
-	// BoxHeaderSize Size of box header.
-	BoxHeaderSize = int64(8)
+	// boxHeaderSize is the size of box header.
+	boxHeaderSize = int64(8)
 )
 
 // Box defines an Atom Box structure.
@@ -19,19 +17,19 @@ type Box struct {
 	file  *File
 }
 
-func (box Box) Name() string {
+func (box *Box) Name() string {
 	return box.name
 }
 
-func (box Box) Size() int64 {
+func (box *Box) Size() int64 {
 	return box.size
 }
 
-func (box Box) Start() int64 {
+func (box *Box) Start() int64 {
 	return box.start
 }
 
-func (box Box) File() *File {
+func (box *Box) File() *File {
 	return box.file
 }
 
@@ -42,12 +40,19 @@ func (box Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
 		}
 	}()
 
-	boxes, err = readBoxes(box.File(), box.Start()+BoxHeaderSize+int64(startDisplace), box.Size()-BoxHeaderSize)
+	start := box.Start() + boxHeaderSize + int64(startDisplace)
+	stop := box.Size() - boxHeaderSize
+
+	s := box.File()
+
+	boxes, err = readBoxes(s, start, stop)
+
 	log.PanicIf(err)
 
 	return boxes, err
 }
 
+// CommonBox is one parsed box.
 type CommonBox interface {
 	// TODO(dustin): Rename to Data()
 	readBoxData() (data []byte, err error)
@@ -66,11 +71,11 @@ func (b *Box) readBoxData() (data []byte, err error) {
 		}
 	}()
 
-	if b.size <= BoxHeaderSize {
+	if b.size <= boxHeaderSize {
 		return nil, nil
 	}
 
-	data, err = b.file.readBytesAt(b.size-BoxHeaderSize, b.start+BoxHeaderSize)
+	data, err = b.file.readBytesAt(b.size-boxHeaderSize, b.start+boxHeaderSize)
 	log.PanicIf(err)
 
 	return data, nil
@@ -79,6 +84,9 @@ func (b *Box) readBoxData() (data []byte, err error) {
 type Boxes []*Box
 
 func (boxes Boxes) Index() (index map[string]*Box) {
+
+	// TODO(dustin): !! Can there be duplicates (read: sequences of boxes that may have more than one of the same type).
+
 	index = make(map[string]*Box)
 
 	for _, box := range boxes {

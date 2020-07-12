@@ -30,7 +30,9 @@ func (b *FtypBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.MajorBrand, b.MinorVersion = string(data[0:4]), binary.BigEndian.Uint32(data[4:8])
+	b.MajorBrand = string(data[0:4])
+	b.MinorVersion = binary.BigEndian.Uint32(data[4:8])
+
 	if len(data) > 8 {
 		for i := 8; i < len(data); i += 4 {
 			b.CompatibleBrands = append(b.CompatibleBrands, string(data[i:i+4]))

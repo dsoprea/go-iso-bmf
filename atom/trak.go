@@ -53,11 +53,6 @@ func (b *TrakBox) parse() (err error) {
 	return nil
 }
 
-// func (b *TrakBox) Size() (sz int) {
-//     sz += b.Tkhd.Size
-// 	boxes := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
-// }
-
 type trakBoxFactory struct {
 }
 
