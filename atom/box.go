@@ -35,6 +35,19 @@ func (box Box) File() *File {
 	return box.file
 }
 
+func (box Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	boxes, err = readBoxes(box.File(), box.Start()+BoxHeaderSize+int64(startDisplace), box.Size()-BoxHeaderSize)
+	log.PanicIf(err)
+
+	return boxes, err
+}
+
 type CommonBox interface {
 	// TODO(dustin): Rename to Data()
 	readBoxData() (data []byte, err error)

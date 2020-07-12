@@ -36,7 +36,7 @@ func (b *MoovBox) parse() (err error) {
 		}
 	}()
 
-	boxes, err := readBoxes(b.File(), b.Start()+BoxHeaderSize, b.Size()-BoxHeaderSize)
+	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
 
 	for _, box := range boxes {

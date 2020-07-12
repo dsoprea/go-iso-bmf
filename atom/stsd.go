@@ -31,7 +31,8 @@ func (b *StsdBox) parse() (err error) {
 	b.Version = data[0]
 	b.Flags = binary.BigEndian.Uint32(data[0:4])
 
-	boxes, err := readBoxes(b.File(), b.Start()+BoxHeaderSize+8, b.Size()-BoxHeaderSize) // Skip extra 8 bytes.
+	// Skip extra 8 bytes.
+	boxes, err := b.Box.readBoxes(8)
 	log.PanicIf(err)
 
 	for _, box := range boxes {
