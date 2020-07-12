@@ -41,8 +41,9 @@ func (f *File) Parse() (err error) {
 		}
 	}()
 
-	// TODO(dustin): Move readBoxes to be a method of File?
-	boxes := readBoxes(f, int64(0), f.Size)
+	boxes, err := readBoxes(f, int64(0), f.Size)
+	log.PanicIf(err)
+
 	for _, box := range boxes {
 		switch box.Name {
 		case "ftyp":
@@ -63,26 +64,40 @@ func (f *File) Parse() (err error) {
 	return nil
 }
 
-// ReadBoxAt reads a box from an offset.
-func (f *File) ReadBoxAt(offset int64) (boxSize uint32, boxType string) {
-	buf := f.ReadBytesAt(BoxHeaderSize, offset)
+// readBoxAt reads a box from an offset.
+func (f *File) readBoxAt(offset int64) (boxSize uint32, boxType string, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	buf, err := f.readBytesAt(BoxHeaderSize, offset)
+	log.PanicIf(err)
+
 	boxSize = binary.BigEndian.Uint32(buf[0:4])
 	boxType = string(buf[4:8])
-	return boxSize, boxType
+
+	return boxSize, boxType, nil
 }
 
-// ReadBytesAt reads a box at n and offset.
-func (f *File) ReadBytesAt(n int64, offset int64) (word []byte) {
+// readBytesAt reads a box at n and offset.
+func (f *File) readBytesAt(n int64, offset int64) (word []byte, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
 
 	buf := make([]byte, n)
 
-	_, err := f.rs.Seek(offset, io.SeekStart)
+	_, err = f.rs.Seek(offset, io.SeekStart)
 	log.PanicIf(err)
 
 	_, err = f.rs.Read(buf)
 	log.PanicIf(err)
 
-	return buf
+	return buf, nil
 }
 
 // Box defines an Atom Box structure.
@@ -92,17 +107,46 @@ type Box struct {
 	File        *File
 }
 
-// ReadBoxData reads the box data from an atom box.
-func (b *Box) ReadBoxData() []byte {
-	if b.Size <= BoxHeaderSize {
-		return nil
-	}
-	return b.File.ReadBytesAt(b.Size-BoxHeaderSize, b.Start+BoxHeaderSize)
+type CommonBox interface {
+	// TODO(dustin): Rename to Data()
+	readBoxData() (data []byte, err error)
 }
 
-func readBoxes(f *File, start int64, n int64) (l []*Box) {
+type boxFactory interface {
+	New(box *Box) (cb CommonBox, err error)
+	Name() string
+}
+
+// ReadBoxData reads the box data from an atom box.
+func (b *Box) readBoxData() (data []byte, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	if b.Size <= BoxHeaderSize {
+		return nil, nil
+	}
+
+	data, err = b.File.readBytesAt(b.Size-BoxHeaderSize, b.Start+BoxHeaderSize)
+	log.PanicIf(err)
+
+	return data, nil
+}
+
+func readBoxes(f *File, start int64, n int64) (l []*Box, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	// TODO(dustin): Make this a common method?
+
 	for offset := start; offset < start+n; {
-		size, name := f.ReadBoxAt(offset)
+		size, name, err := f.readBoxAt(offset)
+		log.PanicIf(err)
 
 		b := &Box{
 			Name:  string(name),
@@ -114,5 +158,6 @@ func readBoxes(f *File, start int64, n int64) (l []*Box) {
 		l = append(l, b)
 		offset += int64(size)
 	}
-	return l
+
+	return l, nil
 }

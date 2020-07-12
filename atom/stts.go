@@ -1,6 +1,10 @@
 package atom
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+
+	"github.com/dsoprea/go-logging"
+)
 
 // SttsBox - Decoding Time to Sample Box
 // Box Type: stts
@@ -9,6 +13,7 @@ import "encoding/binary"
 // Quantity: Exactly one.
 type SttsBox struct {
 	*Box
+
 	Version      byte
 	Flags        uint32
 	EntryCount   uint32
@@ -16,8 +21,15 @@ type SttsBox struct {
 	SampleDeltas []uint32
 }
 
-func (b *SttsBox) parse() error {
-	data := b.ReadBoxData()
+func (b *SttsBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	data, err := b.readBoxData()
+	log.PanicIf(err)
 
 	b.Version = data[0]
 	b.Flags = binary.BigEndian.Uint32(data[0:4])
@@ -30,5 +42,6 @@ func (b *SttsBox) parse() error {
 		b.SampleCounts[i] = binary.BigEndian.Uint32(data[(8 + 8*i):(12 + 8*i)])
 		b.SampleDeltas[i] = binary.BigEndian.Uint32(data[(12 + 8*i):(16 + 8*i)])
 	}
+
 	return nil
 }

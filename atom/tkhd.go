@@ -2,6 +2,8 @@ package atom
 
 import (
 	"encoding/binary"
+
+	"github.com/dsoprea/go-logging"
 )
 
 // TkhdBox - Track Header Box
@@ -11,6 +13,7 @@ import (
 // Quantity: Exactly one.
 type TkhdBox struct {
 	*Box
+
 	Version          byte
 	Flags            uint32
 	CreationTime     uint32
@@ -24,8 +27,16 @@ type TkhdBox struct {
 	Width, Height    Fixed32
 }
 
-func (b *TkhdBox) parse() error {
-	data := b.ReadBoxData()
+func (b *TkhdBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	data, err := b.readBoxData()
+	log.PanicIf(err)
+
 	b.Version = data[0]
 	// b.Flags = [3]byte{data[1], data[2], data[3]}
 	b.Flags = binary.BigEndian.Uint32(data[0:4])
@@ -39,6 +50,7 @@ func (b *TkhdBox) parse() error {
 	b.Matrix = data[40:76]
 	b.Width = fixed32(data[76:80])
 	b.Height = fixed32(data[80:84])
+
 	return nil
 }
 

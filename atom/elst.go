@@ -2,6 +2,8 @@ package atom
 
 import (
 	"encoding/binary"
+
+	"github.com/dsoprea/go-logging"
 )
 
 // ElstBox - Edit List Box
@@ -11,6 +13,7 @@ import (
 // Quantity: Zero or one
 type ElstBox struct {
 	*Box
+
 	Version    uint32 // Version of this box.
 	EntryCount uint32 // Integer that gives the number of entries.
 	Entries    []elstEntry
@@ -23,8 +26,16 @@ type elstEntry struct {
 	MediaRateFraction uint16
 }
 
-func (b *ElstBox) parse() error {
-	data := b.ReadBoxData()
+func (b *ElstBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	data, err := b.readBoxData()
+	log.PanicIf(err)
+
 	b.Version = binary.BigEndian.Uint32(data[0:4])
 	b.EntryCount = binary.BigEndian.Uint32(data[4:8])
 	b.Entries = make([]elstEntry, b.EntryCount)
@@ -35,5 +46,6 @@ func (b *ElstBox) parse() error {
 		b.Entries[i].MediaRate = binary.BigEndian.Uint16(data[(16 + 12*i):(18 + 12*i)])
 		b.Entries[i].MediaRateFraction = binary.BigEndian.Uint16(data[(18 + 12*i):(20 + 12*i)])
 	}
+
 	return nil
 }

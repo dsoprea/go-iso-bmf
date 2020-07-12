@@ -1,7 +1,7 @@
 package atom
 
 import (
-	"fmt"
+	"github.com/dsoprea/go-logging"
 )
 
 // Flag constants.
@@ -22,38 +22,54 @@ const (
 // of the file, though this is not required.
 type MoovBox struct {
 	*Box
+
 	Mvhd  *MvhdBox
 	Traks []*TrakBox
 
 	IsFragmented bool // check for mvex box exists
 }
 
-func (b *MoovBox) parse() error {
-	// fmt.Println("read subboxes starting from ", b.Start, "with size: ", b.Size)
-	boxes := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+func (b *MoovBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	boxes, err := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+	log.PanicIf(err)
 
 	for _, box := range boxes {
 		switch box.Name {
 		case "mvhd":
 			b.Mvhd = &MvhdBox{Box: box}
-			b.Mvhd.parse()
+
+			err := b.Mvhd.parse()
+			log.PanicIf(err)
 
 		case "iods":
 			// fmt.Println("found iods")
 
 		case "trak":
 			trak := &TrakBox{Box: box}
-			trak.parse()
+
+			err := trak.parse()
+			log.PanicIf(err)
+
 			b.Traks = append(b.Traks, trak)
 
 		case "udta":
 			// fmt.Println("found udta")
 
 		case "mvex":
-			fmt.Println("found mvex")
+			// fmt.Println("found mvex")
+
+			// TODO(dustin): What is this?
+
 			b.IsFragmented = true
 		}
 
 	}
+
 	return nil
 }

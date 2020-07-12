@@ -1,9 +1,10 @@
 package atom
 
 import (
-	"encoding/binary"
 	"fmt"
 	"math"
+
+	"encoding/binary"
 )
 
 // GetDurationString Helper function to print a duration value in the form H:MM:SS.MS
@@ -22,6 +23,7 @@ func GetDurationString(duration uint32, timescale uint32) string {
 	msec = math.Floor(msec)
 
 	str := fmt.Sprintf("%02.0f:%02.0f:%02.0f:%.0f", hours, minutes, durationSec, msec)
+
 	return str
 }
 

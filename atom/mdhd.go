@@ -1,8 +1,11 @@
 package atom
 
 import (
-	"encoding/binary"
 	"fmt"
+
+	"encoding/binary"
+
+	"github.com/dsoprea/go-logging"
 )
 
 // MdhdBox - Media Header Box
@@ -15,6 +18,7 @@ import (
 // and relevant to characteristics of the media in a track.
 type MdhdBox struct {
 	*Box
+
 	Version          byte
 	Flags            uint32
 	CreationTime     uint32
@@ -25,8 +29,16 @@ type MdhdBox struct {
 	LanguageString   string
 }
 
-func (b *MdhdBox) parse() error {
-	data := b.ReadBoxData()
+func (b *MdhdBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	data, err := b.readBoxData()
+	log.PanicIf(err)
+
 	b.Version = data[0]
 	b.Flags = binary.BigEndian.Uint32(data[0:4])
 	b.CreationTime = binary.BigEndian.Uint32(data[4:8])
@@ -35,16 +47,16 @@ func (b *MdhdBox) parse() error {
 	b.Duration = binary.BigEndian.Uint32(data[16:20])
 	b.Language = binary.BigEndian.Uint16(data[20:22])
 	b.LanguageString = getLanguageString(b.Language)
+
 	return nil
 }
 
 func getLanguageString(language uint16) string {
 	var lang [3]uint16
+
 	lang[0] = (language >> 10) & 0x1F
 	lang[1] = (language >> 5) & 0x1F
 	lang[2] = (language) & 0x1F
-	return fmt.Sprintf("%s%s%s",
-		string(lang[0]+0x60),
-		string(lang[1]+0x60),
-		string(lang[2]+0x60))
+
+	return fmt.Sprintf("%s%s%s", string(lang[0]+0x60), string(lang[1]+0x60), string(lang[2]+0x60))
 }

@@ -1,5 +1,9 @@
 package atom
 
+import (
+	"github.com/dsoprea/go-logging"
+)
+
 // TrakBox - Track Box
 // Box Type: tkhd
 // Container: Movie Box (moov)
@@ -7,6 +11,7 @@ package atom
 // Quantity: One or more.
 type TrakBox struct {
 	*Box
+
 	// SamplesDuration
 	// SamplesSize
 	// SampleGroupsInfo
@@ -14,13 +19,21 @@ type TrakBox struct {
 	Tkhd *TkhdBox
 	Mdia *MdiaBox
 	Edts *EdtsBox
+
 	// chunks []Chunk
 	// samples []Sample
 }
 
-func (b *TrakBox) parse() error {
+func (b *TrakBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
 	// fmt.Println("read subboxes starting from ", b.Start, "with size: ", b.Size)
-	boxes := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+	boxes, err := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+	log.PanicIf(err)
 
 	for _, box := range boxes {
 		switch box.Name {
@@ -37,6 +50,7 @@ func (b *TrakBox) parse() error {
 			b.Edts.parse()
 		}
 	}
+
 	return nil
 }
 

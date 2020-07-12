@@ -2,6 +2,8 @@ package atom
 
 import (
 	"encoding/binary"
+
+	"github.com/dsoprea/go-logging"
 )
 
 // MvhdBox - Movie Header Box
@@ -14,6 +16,7 @@ import (
 // and relevant to the entire presentationconsidered as a whole.
 type MvhdBox struct {
 	*Box
+
 	Flags            uint32
 	Version          uint8
 	CreationTime     uint32
@@ -24,12 +27,21 @@ type MvhdBox struct {
 	Volume           Fixed16
 }
 
-func (b *MvhdBox) parse() error {
-	data := b.ReadBoxData()
+func (b *MvhdBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	data, err := b.readBoxData()
+	log.PanicIf(err)
+
 	b.Version = data[0]
 	b.Timescale = binary.BigEndian.Uint32(data[12:16])
 	b.Duration = binary.BigEndian.Uint32(data[16:20])
 	b.Rate = fixed32(data[20:24])
 	b.Volume = fixed16(data[24:26])
+
 	return nil
 }

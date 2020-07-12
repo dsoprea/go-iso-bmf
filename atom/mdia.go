@@ -1,5 +1,9 @@
 package atom
 
+import (
+	"github.com/dsoprea/go-logging"
+)
+
 // MdiaBox - Media Box
 // Box Type: mdia
 // Container: Track Box (trak)
@@ -9,28 +13,43 @@ package atom
 // about the media data within a track.
 type MdiaBox struct {
 	*Box
+
 	Hdlr *HdlrBox
 	Mdhd *MdhdBox
 	Minf *MinfBox
 }
 
-func (b *MdiaBox) parse() error {
-	boxes := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+func (b *MdiaBox) parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	boxes, err := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
+	log.PanicIf(err)
 
 	for _, box := range boxes {
 		switch box.Name {
 		case "hdlr":
 			b.Hdlr = &HdlrBox{Box: box}
-			b.Hdlr.parse()
+
+			err := b.Hdlr.parse()
+			log.PanicIf(err)
 
 		case "mdhd":
 			b.Mdhd = &MdhdBox{Box: box}
-			b.Mdhd.parse()
+
+			err := b.Mdhd.parse()
+			log.PanicIf(err)
 
 		case "minf":
 			b.Minf = &MinfBox{Box: box}
-			b.Minf.parse()
+
+			err := b.Minf.parse()
+			log.PanicIf(err)
 		}
 	}
+
 	return nil
 }
