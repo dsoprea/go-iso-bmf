@@ -22,7 +22,7 @@ Movie:
   fragments:    {{.IsFragmented}}
   timescale:    {{.Moov.Mvhd.Timescale}}
 
-Found {{len .Moov.Traks}} Tracks 
+Found {{len .Moov.Traks}} Tracks
 {{range $trak := .Moov.Traks}}
 Track: {{$trak.Tkhd.TrackID}}
   flags:    {{$trak.Tkhd.Flags}} {{getFlags $trak.Tkhd.Flags}}
@@ -65,8 +65,6 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
-
-	defer f.Close()
 
 	funcMap := template.FuncMap{
 		"getDurationString": atom.GetDurationString,

@@ -1,23 +1,33 @@
 package mp4
 
 import (
-	"fmt"
 	"os"
+
+	"github.com/dsoprea/go-logging"
 
 	"github.com/alfg/mp4/atom"
 )
 
 // Open opens a file and returns a &File{}.
-func Open(path string) (f *atom.File, err error) {
-	file, err := os.Open(path)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return nil, err
-	}
+func Open(path string) (file *atom.File, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
 
-	f = &atom.File{
-		File: file,
-	}
+	f, err := os.Open(path)
+	log.PanicIf(err)
 
-	return f, f.Parse()
+	s, err := f.Stat()
+	log.PanicIf(err)
+
+	size := s.Size()
+
+	file = atom.NewFile(f, size)
+
+	err = file.Parse()
+	log.PanicIf(err)
+
+	return file, nil
 }

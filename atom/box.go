@@ -1,9 +1,11 @@
 package atom
 
 import (
+	"io"
+
 	"encoding/binary"
-	"fmt"
-	"os"
+
+	"github.com/dsoprea/go-logging"
 )
 
 const (
@@ -13,7 +15,9 @@ const (
 
 // File defines a file structure.
 type File struct {
-	*os.File
+	rs io.ReadSeeker
+
+	// TODO(dustin): Stop exporting.
 	Ftyp *FtypBox
 	Moov *MoovBox
 	Mdat *MdatBox
@@ -22,17 +26,22 @@ type File struct {
 	IsFragmented bool
 }
 
-// Parse reads an MP4 file for atom boxes.
-func (f *File) Parse() error {
-	info, err := f.Stat()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return err
+func NewFile(rs io.ReadSeeker, size int64) *File {
+	return &File{
+		rs:   rs,
+		Size: size,
 	}
+}
 
-	// fmt.Printf("Filesize: %v \n", info.Size())
-	f.Size = info.Size()
+// Parse reads an MP4 file for atom boxes.
+func (f *File) Parse() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
 
+	// TODO(dustin): Move readBoxes to be a method of File?
 	boxes := readBoxes(f, int64(0), f.Size)
 	for _, box := range boxes {
 		switch box.Name {
@@ -64,11 +73,15 @@ func (f *File) ReadBoxAt(offset int64) (boxSize uint32, boxType string) {
 
 // ReadBytesAt reads a box at n and offset.
 func (f *File) ReadBytesAt(n int64, offset int64) (word []byte) {
+
 	buf := make([]byte, n)
-	if _, error := f.ReadAt(buf, offset); error != nil {
-		fmt.Println(error)
-		return
-	}
+
+	_, err := f.rs.Seek(offset, io.SeekStart)
+	log.PanicIf(err)
+
+	_, err = f.rs.Read(buf)
+	log.PanicIf(err)
+
 	return buf
 }
 
