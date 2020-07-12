@@ -53,3 +53,38 @@ func (b *MinfBox) parse() (err error) {
 	}
 	return nil
 }
+
+type minfBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (minfBoxFactory) Name() string {
+	return "minf"
+}
+
+// New returns a new value instance.
+func (minfBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	minfBox := &MinfBox{
+		Box: box,
+	}
+
+	err = minfBox.parse()
+	log.PanicIf(err)
+
+	return minfBox, nil
+}
+
+var (
+	_ boxFactory = minfBoxFactory{}
+	_ CommonBox  = MinfBox{}
+)
+
+func init() {
+	registerAtom(minfBoxFactory{})
+}

@@ -49,3 +49,38 @@ func (b *ElstBox) parse() (err error) {
 
 	return nil
 }
+
+type elstBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (elstBoxFactory) Name() string {
+	return "elst"
+}
+
+// New returns a new value instance.
+func (elstBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	elstBox := &ElstBox{
+		Box: box,
+	}
+
+	err = elstBox.parse()
+	log.PanicIf(err)
+
+	return elstBox, nil
+}
+
+var (
+	_ boxFactory = elstBoxFactory{}
+	_ CommonBox  = ElstBox{}
+)
+
+func init() {
+	registerAtom(elstBoxFactory{})
+}

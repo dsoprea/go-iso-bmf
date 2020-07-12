@@ -45,3 +45,38 @@ func (b *SttsBox) parse() (err error) {
 
 	return nil
 }
+
+type sttsBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (sttsBoxFactory) Name() string {
+	return "stts"
+}
+
+// New returns a new value instance.
+func (sttsBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	sttsBox := &SttsBox{
+		Box: box,
+	}
+
+	err = sttsBox.parse()
+	log.PanicIf(err)
+
+	return sttsBox, nil
+}
+
+var (
+	_ boxFactory = sttsBoxFactory{}
+	_ CommonBox  = SttsBox{}
+)
+
+func init() {
+	registerAtom(sttsBoxFactory{})
+}

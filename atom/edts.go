@@ -37,3 +37,38 @@ func (b *EdtsBox) parse() (err error) {
 
 	return nil
 }
+
+type edtsBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (edtsBoxFactory) Name() string {
+	return "edts"
+}
+
+// New returns a new value instance.
+func (edtsBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	edtsBox := &EdtsBox{
+		Box: box,
+	}
+
+	err = edtsBox.parse()
+	log.PanicIf(err)
+
+	return edtsBox, nil
+}
+
+var (
+	_ boxFactory = edtsBoxFactory{}
+	_ CommonBox  = EdtsBox{}
+)
+
+func init() {
+	registerAtom(edtsBoxFactory{})
+}

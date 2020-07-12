@@ -47,3 +47,38 @@ func (b *StsdBox) parse() (err error) {
 
 	return nil
 }
+
+type stsdBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (stsdBoxFactory) Name() string {
+	return "stsd"
+}
+
+// New returns a new value instance.
+func (stsdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	stsdBox := &StsdBox{
+		Box: box,
+	}
+
+	err = stsdBox.parse()
+	log.PanicIf(err)
+
+	return stsdBox, nil
+}
+
+var (
+	_ boxFactory = stsdBoxFactory{}
+	_ CommonBox  = StsdBox{}
+)
+
+func init() {
+	registerAtom(stsdBoxFactory{})
+}

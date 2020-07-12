@@ -6,7 +6,8 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// FtypBox - File Type Box
+// FtypBox is a file-type box.
+//
 // Box Type: ftyp
 // Container: File
 // Mandatory: Yes
@@ -37,4 +38,39 @@ func (b *FtypBox) parse() (err error) {
 	}
 
 	return nil
+}
+
+type ftypBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (ftypBoxFactory) Name() string {
+	return "ftyp"
+}
+
+// New returns a new value instance.
+func (ftypBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	ftypBox := &FtypBox{
+		Box: box,
+	}
+
+	err = ftypBox.parse()
+	log.PanicIf(err)
+
+	return ftypBox, nil
+}
+
+var (
+	_ boxFactory = ftypBoxFactory{}
+	_ CommonBox  = FtypBox{}
+)
+
+func init() {
+	registerAtom(ftypBoxFactory{})
 }

@@ -37,3 +37,38 @@ func (b *HdlrBox) parse() (err error) {
 
 	return nil
 }
+
+type hdlrBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (hdlrBoxFactory) Name() string {
+	return "hdlr"
+}
+
+// New returns a new value instance.
+func (hdlrBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	hdlrBox := &HdlrBox{
+		Box: box,
+	}
+
+	err = hdlrBox.parse()
+	log.PanicIf(err)
+
+	return hdlrBox, nil
+}
+
+var (
+	_ boxFactory = hdlrBoxFactory{}
+	_ CommonBox  = HdlrBox{}
+)
+
+func init() {
+	registerAtom(hdlrBoxFactory{})
+}

@@ -73,3 +73,38 @@ func (b *MoovBox) parse() (err error) {
 
 	return nil
 }
+
+type moovBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (moovBoxFactory) Name() string {
+	return "moov"
+}
+
+// New returns a new value instance.
+func (moovBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	moovBox := &MoovBox{
+		Box: box,
+	}
+
+	err = moovBox.parse()
+	log.PanicIf(err)
+
+	return moovBox, nil
+}
+
+var (
+	_ boxFactory = moovBoxFactory{}
+	_ CommonBox  = MoovBox{}
+)
+
+func init() {
+	registerAtom(moovBoxFactory{})
+}

@@ -41,3 +41,38 @@ func (b *HmhdBox) parse() (err error) {
 
 	return nil
 }
+
+type hmhdBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (hmhdBoxFactory) Name() string {
+	return "hmhd"
+}
+
+// New returns a new value instance.
+func (hmhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	hmhdBox := &HmhdBox{
+		Box: box,
+	}
+
+	err = hmhdBox.parse()
+	log.PanicIf(err)
+
+	return hmhdBox, nil
+}
+
+var (
+	_ boxFactory = hmhdBoxFactory{}
+	_ CommonBox  = HmhdBox{}
+)
+
+func init() {
+	registerAtom(hmhdBoxFactory{})
+}

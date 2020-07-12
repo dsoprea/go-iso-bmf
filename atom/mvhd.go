@@ -45,3 +45,38 @@ func (b *MvhdBox) parse() (err error) {
 
 	return nil
 }
+
+type mvhdBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (mvhdBoxFactory) Name() string {
+	return "mvhd"
+}
+
+// New returns a new value instance.
+func (mvhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	mvhdBox := &MvhdBox{
+		Box: box,
+	}
+
+	err = mvhdBox.parse()
+	log.PanicIf(err)
+
+	return mvhdBox, nil
+}
+
+var (
+	_ boxFactory = mvhdBoxFactory{}
+	_ CommonBox  = MvhdBox{}
+)
+
+func init() {
+	registerAtom(mvhdBoxFactory{})
+}

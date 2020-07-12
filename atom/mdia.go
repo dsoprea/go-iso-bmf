@@ -53,3 +53,38 @@ func (b *MdiaBox) parse() (err error) {
 
 	return nil
 }
+
+type mdiaBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (mdiaBoxFactory) Name() string {
+	return "mdia"
+}
+
+// New returns a new value instance.
+func (mdiaBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	mdiaBox := &MdiaBox{
+		Box: box,
+	}
+
+	err = mdiaBox.parse()
+	log.PanicIf(err)
+
+	return mdiaBox, nil
+}
+
+var (
+	_ boxFactory = mdiaBoxFactory{}
+	_ CommonBox  = MdiaBox{}
+)
+
+func init() {
+	registerAtom(mdiaBoxFactory{})
+}

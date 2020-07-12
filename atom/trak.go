@@ -57,3 +57,38 @@ func (b *TrakBox) parse() (err error) {
 //     sz += b.Tkhd.Size
 // 	boxes := readBoxes(b.File, b.Start+BoxHeaderSize, b.Size-BoxHeaderSize)
 // }
+
+type trakBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (trakBoxFactory) Name() string {
+	return "trak"
+}
+
+// New returns a new value instance.
+func (trakBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	trakBox := &TrakBox{
+		Box: box,
+	}
+
+	err = trakBox.parse()
+	log.PanicIf(err)
+
+	return trakBox, nil
+}
+
+var (
+	_ boxFactory = trakBoxFactory{}
+	_ CommonBox  = TrakBox{}
+)
+
+func init() {
+	registerAtom(trakBoxFactory{})
+}

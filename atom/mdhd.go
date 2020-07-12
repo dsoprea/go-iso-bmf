@@ -52,6 +52,9 @@ func (b *MdhdBox) parse() (err error) {
 }
 
 func getLanguageString(language uint16) string {
+
+	// TODO(dustin): Make this a method?
+
 	var lang [3]uint16
 
 	lang[0] = (language >> 10) & 0x1F
@@ -59,4 +62,39 @@ func getLanguageString(language uint16) string {
 	lang[2] = (language) & 0x1F
 
 	return fmt.Sprintf("%s%s%s", string(lang[0]+0x60), string(lang[1]+0x60), string(lang[2]+0x60))
+}
+
+type mdhdBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (mdhdBoxFactory) Name() string {
+	return "mdhd"
+}
+
+// New returns a new value instance.
+func (mdhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	mdhdBox := &MdhdBox{
+		Box: box,
+	}
+
+	err = mdhdBox.parse()
+	log.PanicIf(err)
+
+	return mdhdBox, nil
+}
+
+var (
+	_ boxFactory = mdhdBoxFactory{}
+	_ CommonBox  = MdhdBox{}
+)
+
+func init() {
+	registerAtom(mdhdBoxFactory{})
 }

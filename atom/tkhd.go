@@ -63,3 +63,38 @@ func (b *TkhdBox) GetWidth() Fixed32 {
 func (b *TkhdBox) GetHeight() Fixed32 {
 	return b.Height / (1 << 16)
 }
+
+type tkhdBoxFactory struct {
+}
+
+// Name returns the name of the type.
+func (tkhdBoxFactory) Name() string {
+	return "tkhd"
+}
+
+// New returns a new value instance.
+func (tkhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	tkhdBox := &TkhdBox{
+		Box: box,
+	}
+
+	err = tkhdBox.parse()
+	log.PanicIf(err)
+
+	return tkhdBox, nil
+}
+
+var (
+	_ boxFactory = tkhdBoxFactory{}
+	_ CommonBox  = TkhdBox{}
+)
+
+func init() {
+	registerAtom(tkhdBoxFactory{})
+}

@@ -32,10 +32,12 @@ func (b *Avc1Box) parse() (err error) {
 type avc1BoxFactory struct {
 }
 
+// Name returns the name of the type.
 func (avc1BoxFactory) Name() string {
 	return "avc1"
 }
 
+// New returns a new value instance.
 func (avc1BoxFactory) New(box *Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
