@@ -114,15 +114,6 @@ func (boxes Boxes) Index() (index LoadedBoxIndex) {
 	return index
 }
 
-// UnsupportedBoxIndex provides a GetChildBoxes() method that always panics due
-// to lack of support.
-type UnsupportedBoxIndex struct{}
-
-// GetChildBox returns the given child box or panics uncontrollably.
-func (UnsupportedBoxIndex) GetChildBoxes(name string) (CommonBox, error) {
-	return nil, ErrNoChildren
-}
-
 func readBoxes(f *File, start int64, n int64) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {

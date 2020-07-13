@@ -27,6 +27,7 @@ type CommonBox interface {
 
 // BoxChildIndexer is a box that has children.
 type BoxChildIndexer interface {
+	// GetChildBoxes returns all found child boxes of the given type.
 	GetChildBoxes(name string) (boxes []CommonBox, err error)
 }
 
