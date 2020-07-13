@@ -1,6 +1,8 @@
 package atom
 
 import (
+	"errors"
+
 	"github.com/dsoprea/go-logging"
 )
 
@@ -15,22 +17,26 @@ type Box struct {
 	size  int64
 	start int64
 	file  *File
+
+	// UnsupportedBoxIndex will set the base Box implementation as not
+	// supporting children by default. We need this so that Box satisfies the
+	// CommonBox interface by default.
+	UnsupportedBoxIndex
 }
 
+// Name returns the box name.
 func (box *Box) Name() string {
 	return box.name
 }
 
+// Size returns the box size.
 func (box *Box) Size() int64 {
 	return box.size
 }
 
+// Start returns the box start offset.
 func (box *Box) Start() int64 {
 	return box.start
-}
-
-func (box *Box) File() *File {
-	return box.file
 }
 
 func (box Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
@@ -43,23 +49,45 @@ func (box Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
 	start := box.Start() + boxHeaderSize + int64(startDisplace)
 	stop := box.Size() - boxHeaderSize
 
-	s := box.File()
-
-	boxes, err = readBoxes(s, start, stop)
+	boxes, err = readBoxes(box.file, start, stop)
 
 	log.PanicIf(err)
 
 	return boxes, err
 }
 
+var (
+	// ErrNoChildren indicates that the given box does not support children.
+	ErrNoChildren = errors.New("box does not support children")
+)
+
 // CommonBox is one parsed box.
 type CommonBox interface {
 	// TODO(dustin): Rename to Data()
+	// readBoxData returns the bytes that were encapsulated in this box.
 	readBoxData() (data []byte, err error)
+
+	// GetChildBox returns the given child box or panics. If box does not
+	// support children this should return ErrNoChildren.
+	GetChildBox(name string) (cb CommonBox, err error)
+}
+
+// MustGetChildBox is a simple wrapper that panics if the child box could not be
+// gotten.
+func MustGetChildBox(cb CommonBox, name string) (ccb CommonBox) {
+	ccb, err := cb.GetChildBox(name)
+	log.PanicIf(err)
+
+	return ccb
 }
 
 type boxFactory interface {
+	// New reads, parses, loads, and returns the value struct given the common
+	// box info.
 	New(box *Box) (cb CommonBox, err error)
+
+	// Name returns the name of the box-type that this factory knows how to
+	// parse.
 	Name() string
 }
 
@@ -81,13 +109,44 @@ func (b *Box) readBoxData() (data []byte, err error) {
 	return data, nil
 }
 
+// Boxes is a slice of boxes.
 type Boxes []*Box
 
-func (boxes Boxes) Index() (index map[string]*Box) {
+// LoadedBoxIndex provides a GetChildBox() method that returns a child box if
+// present or panics with a descriptive error.
+type LoadedBoxIndex map[string]*Box
 
-	// TODO(dustin): !! Can there be duplicates (read: sequences of boxes that may have more than one of the same type).
+// GetChildBox returns the given child box or panics. If box does not support
+// children this should return ErrNoChildren.
+func (lbi LoadedBoxIndex) GetChildBox(name string) (cb CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
 
-	index = make(map[string]*Box)
+	cb, found := lbi[name]
+	if found == false {
+		log.Panicf("child box not found: [%s]", name)
+	}
+
+	return cb, nil
+}
+
+// UnsupportedBoxIndex provides a GetChildBox() method that always panics.
+type UnsupportedBoxIndex struct{}
+
+// GetChildBox returns the given child box or panics uncontrollably.
+func (UnsupportedBoxIndex) GetChildBox(name string) (cb CommonBox, err error) {
+	return nil, ErrNoChildren
+}
+
+// Index returns a dictionary of boxes, keyed by name.
+func (boxes Boxes) Index() (index LoadedBoxIndex) {
+
+	// TODO(dustin): !! Can there be duplicates (read: sequences of boxes that may have more than one of the same type)?
+
+	index = make(LoadedBoxIndex)
 
 	for _, box := range boxes {
 		index[box.name] = box

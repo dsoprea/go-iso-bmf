@@ -17,6 +17,8 @@ type MdiaBox struct {
 	Hdlr *HdlrBox
 	Mdhd *MdhdBox
 	Minf *MinfBox
+
+	LoadedBoxIndex
 }
 
 func (b *MdiaBox) parse() (err error) {
@@ -50,6 +52,8 @@ func (b *MdiaBox) parse() (err error) {
 			log.PanicIf(err)
 		}
 	}
+
+	b.LoadedBoxIndex = boxes.Index()
 
 	return nil
 }

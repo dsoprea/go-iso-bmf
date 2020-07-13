@@ -19,7 +19,7 @@ type File struct {
 
 	isFragmented bool
 
-	index map[string]*Box
+	LoadedBoxIndex
 }
 
 // TODO(dustin): This are bridging accessors to keep the tests working while we transition to using indexing.
@@ -35,16 +35,6 @@ func (f *File) Moov() *MoovBox {
 
 func (f *File) Mdat() *MdatBox {
 	return f.mdat
-}
-
-// GetChildBox returns the given child box or panics uncontrollably.
-func (f *File) GetChildBox(name string) CommonBox {
-	cb, found := f.index[name]
-	if found == false {
-		log.Panicf("child box not found: [%s]", name)
-	}
-
-	return cb
 }
 
 // <<<<
@@ -92,7 +82,7 @@ func (f *File) Parse() (err error) {
 		}
 	}
 
-	f.index = boxes.Index()
+	f.LoadedBoxIndex = boxes.Index()
 
 	return nil
 }

@@ -22,6 +22,8 @@ type TrakBox struct {
 
 	// chunks []Chunk
 	// samples []Sample
+
+	LoadedBoxIndex
 }
 
 func (b *TrakBox) parse() (err error) {
@@ -49,6 +51,8 @@ func (b *TrakBox) parse() (err error) {
 			b.Edts.parse()
 		}
 	}
+
+	b.LoadedBoxIndex = boxes.Index()
 
 	return nil
 }

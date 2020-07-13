@@ -13,6 +13,8 @@ type EdtsBox struct {
 	*Box
 
 	Elst *ElstBox
+
+	LoadedBoxIndex
 }
 
 func (b *EdtsBox) parse() (err error) {
@@ -34,6 +36,8 @@ func (b *EdtsBox) parse() (err error) {
 			log.PanicIf(err)
 		}
 	}
+
+	b.LoadedBoxIndex = boxes.Index()
 
 	return nil
 }

@@ -13,9 +13,12 @@ import (
 // Quantity: Exactly one.
 type StsdBox struct {
 	*Box
+
 	Version byte
 	Flags   uint32
 	Avc1    *Avc1Box
+
+	LoadedBoxIndex
 }
 
 func (b *StsdBox) parse() (err error) {
@@ -44,6 +47,8 @@ func (b *StsdBox) parse() (err error) {
 			log.PanicIf(err)
 		}
 	}
+
+	b.LoadedBoxIndex = boxes.Index()
 
 	return nil
 }

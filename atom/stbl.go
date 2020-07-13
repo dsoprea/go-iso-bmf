@@ -14,6 +14,8 @@ type StblBox struct {
 
 	Stts *SttsBox
 	Stsd *StsdBox
+
+	LoadedBoxIndex
 }
 
 func (b *StblBox) parse() (err error) {
@@ -41,6 +43,9 @@ func (b *StblBox) parse() (err error) {
 			log.PanicIf(err)
 		}
 	}
+
+	b.LoadedBoxIndex = boxes.Index()
+
 	return nil
 }
 

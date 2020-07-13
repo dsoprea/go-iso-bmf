@@ -27,6 +27,8 @@ type MoovBox struct {
 	Traks []*TrakBox
 
 	IsFragmented bool // check for mvex box exists
+
+	LoadedBoxIndex
 }
 
 func (b *MoovBox) parse() (err error) {
@@ -68,8 +70,9 @@ func (b *MoovBox) parse() (err error) {
 
 			b.IsFragmented = true
 		}
-
 	}
+
+	b.LoadedBoxIndex = boxes.Index()
 
 	return nil
 }

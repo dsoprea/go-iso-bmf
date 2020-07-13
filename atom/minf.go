@@ -18,6 +18,8 @@ type MinfBox struct {
 	Vmhd *VmhdBox
 	Stbl *StblBox
 	Hmhd *HmhdBox
+
+	LoadedBoxIndex
 }
 
 func (b *MinfBox) parse() (err error) {
@@ -51,6 +53,9 @@ func (b *MinfBox) parse() (err error) {
 			log.PanicIf(err)
 		}
 	}
+
+	b.LoadedBoxIndex = boxes.Index()
+
 	return nil
 }
 
