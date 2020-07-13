@@ -6,9 +6,14 @@ import (
 
 // Avc1Box defines the avc1 box structure.
 type Avc1Box struct {
-	*Box
+	Box
 
-	Version byte
+	version byte
+}
+
+// Version is the version.
+func (b Avc1Box) Version() byte {
+	return b.version
 }
 
 func (b *Avc1Box) parse() (err error) {
@@ -21,7 +26,7 @@ func (b *Avc1Box) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
+	b.version = data[0]
 
 	return nil
 }
@@ -35,7 +40,7 @@ func (avc1BoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (avc1BoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (avc1BoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -49,14 +54,14 @@ func (avc1BoxFactory) New(box *Box) (cb CommonBox, err error) {
 	data, err := avc1Box.readBoxData()
 	log.PanicIf(err)
 
-	avc1Box.Version = data[0]
+	avc1Box.version = data[0]
 
 	return avc1Box, nil
 }
 
 var (
 	_ boxFactory = avc1BoxFactory{}
-	_ CommonBox  = Avc1Box{}
+	_ CommonBox  = &Avc1Box{}
 )
 
 func init() {

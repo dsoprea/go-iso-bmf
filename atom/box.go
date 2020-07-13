@@ -24,26 +24,26 @@ type Box struct {
 }
 
 // InlineString returns an undecorated string of field names and values.
-func (box *Box) InlineString() string {
+func (box Box) InlineString() string {
 	return fmt.Sprintf("NAME=[%s] START=(%d) SIZE=(%d)", box.name, box.start, box.size)
 }
 
 // Name returns the box name.
-func (box *Box) Name() string {
+func (box Box) Name() string {
 	return box.name
 }
 
 // Size returns the box size.
-func (box *Box) Size() int64 {
+func (box Box) Size() int64 {
 	return box.size
 }
 
 // Start returns the box start offset.
-func (box *Box) Start() int64 {
+func (box Box) Start() int64 {
 	return box.start
 }
 
-func (box *Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
+func (box Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -61,18 +61,21 @@ func (box *Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
 }
 
 // ReadBoxData reads the box data from an atom box.
-func (b *Box) readBoxData() (data []byte, err error) {
+func (box Box) readBoxData() (data []byte, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
 
-	if b.size <= boxHeaderSize {
+	if box.size <= boxHeaderSize {
 		return nil, nil
 	}
 
-	data, err = b.file.readBytesAt(b.size-boxHeaderSize, b.start+boxHeaderSize)
+	data, err = box.file.readBytesAt(
+		box.size-boxHeaderSize,
+		box.start+boxHeaderSize)
+
 	log.PanicIf(err)
 
 	return data, nil
@@ -147,18 +150,19 @@ func readBoxes(f *File, start int64, n int64) (boxes Boxes, err error) {
 		size, name, err := f.readBoxAt(offset)
 		log.PanicIf(err)
 
-		b := &Box{
-			name:  name,
-			size:  int64(size),
-			file:  f,
-			start: offset,
-		}
-
 		bf := GetFactory(name)
 
 		if bf != nil {
 			// Construct the type-specific box.
-			c, err := bf.New(b)
+
+			box := Box{
+				name:  name,
+				size:  int64(size),
+				file:  f,
+				start: offset,
+			}
+
+			c, err := bf.New(box)
 			log.PanicIf(err)
 
 			boxes = append(boxes, c)

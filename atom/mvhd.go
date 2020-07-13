@@ -11,7 +11,7 @@ import (
 // This box defines overall information which is media-independent,
 // and relevant to the entire presentationconsidered as a whole.
 type MvhdBox struct {
-	*Box
+	Box
 
 	Flags            uint32
 	Version          uint8
@@ -51,7 +51,7 @@ func (mvhdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (mvhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (mvhdBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -70,7 +70,7 @@ func (mvhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = mvhdBoxFactory{}
-	_ CommonBox  = MvhdBox{}
+	_ CommonBox  = &MvhdBox{}
 )
 
 func init() {

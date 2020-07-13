@@ -11,7 +11,7 @@ import (
 
 // FtypBox is a file-type box.
 type FtypBox struct {
-	*Box
+	Box
 
 	// MajorBrand is a brand identifer.
 	MajorBrand string
@@ -25,31 +25,31 @@ type FtypBox struct {
 }
 
 // String returns a descriptive string.
-func (fb FtypBox) String() string {
+func (fb *FtypBox) String() string {
 	return fmt.Sprintf("ftyp<%s>", fb.InlineString())
 }
 
 // InlineString returns an undecorated string of field names and values.
-func (fb FtypBox) InlineString() string {
+func (fb *FtypBox) InlineString() string {
 	return fmt.Sprintf("%s MAJOR-BRAND=[%s] MINOR-VER=(%d) COMPAT-BRANDS=[%s]", fb.Box.InlineString(), fb.MajorBrand, fb.MinorVersion, strings.Join(fb.CompatibleBrands, ","))
 }
 
-func (b *FtypBox) parse() (err error) {
+func (fb *FtypBox) parse() (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
 
-	data, err := b.readBoxData()
+	data, err := fb.readBoxData()
 	log.PanicIf(err)
 
-	b.MajorBrand = string(data[0:4])
-	b.MinorVersion = binary.BigEndian.Uint32(data[4:8])
+	fb.MajorBrand = string(data[0:4])
+	fb.MinorVersion = binary.BigEndian.Uint32(data[4:8])
 
 	if len(data) > 8 {
 		for i := 8; i < len(data); i += 4 {
-			b.CompatibleBrands = append(b.CompatibleBrands, string(data[i:i+4]))
+			fb.CompatibleBrands = append(fb.CompatibleBrands, string(data[i:i+4]))
 		}
 	}
 
@@ -65,7 +65,7 @@ func (ftypBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (ftypBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (ftypBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -84,7 +84,7 @@ func (ftypBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = ftypBoxFactory{}
-	_ CommonBox  = FtypBox{}
+	_ CommonBox  = &FtypBox{}
 )
 
 func init() {

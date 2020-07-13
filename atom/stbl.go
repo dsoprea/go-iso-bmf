@@ -6,10 +6,7 @@ import (
 
 // StblBox is a "Sample Table" box.
 type StblBox struct {
-	*Box
-
-	Stts *SttsBox
-	Stsd *StsdBox
+	Box
 
 	LoadedBoxIndex
 }
@@ -38,7 +35,7 @@ func (stblBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (stblBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (stblBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -57,7 +54,7 @@ func (stblBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = stblBoxFactory{}
-	_ CommonBox  = StblBox{}
+	_ CommonBox  = &StblBox{}
 )
 
 func init() {

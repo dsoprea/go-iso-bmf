@@ -9,11 +9,7 @@ import (
 // This box contains all the objects that declare characteristics information of
 // the media in the track.
 type MinfBox struct {
-	*Box
-
-	Vmhd *VmhdBox
-	Stbl *StblBox
-	Hmhd *HmhdBox
+	Box
 
 	LoadedBoxIndex
 }
@@ -42,7 +38,7 @@ func (minfBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (minfBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (minfBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -61,7 +57,7 @@ func (minfBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = minfBoxFactory{}
-	_ CommonBox  = MinfBox{}
+	_ CommonBox  = &MinfBox{}
 )
 
 func init() {

@@ -8,7 +8,7 @@ import (
 
 // VmhdBox is the "Video Media Header" box.
 type VmhdBox struct {
-	*Box
+	Box
 
 	Version      byte
 	Flags        uint32
@@ -43,7 +43,7 @@ func (vmhdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (vmhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (vmhdBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -62,7 +62,7 @@ func (vmhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = vmhdBoxFactory{}
-	_ CommonBox  = VmhdBox{}
+	_ CommonBox  = &VmhdBox{}
 )
 
 func init() {

@@ -10,7 +10,7 @@ import (
 //
 // Contains general information, independent of the protocol, for hint tracks.
 type HmhdBox struct {
-	*Box
+	Box
 
 	Version    byte
 	MaxPDUSize uint16
@@ -47,7 +47,7 @@ func (hmhdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (hmhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (hmhdBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -66,7 +66,7 @@ func (hmhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = hmhdBoxFactory{}
-	_ CommonBox  = HmhdBox{}
+	_ CommonBox  = &HmhdBox{}
 )
 
 func init() {

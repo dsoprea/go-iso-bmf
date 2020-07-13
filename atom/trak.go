@@ -6,15 +6,11 @@ import (
 
 // TrakBox is a "Track" box.
 type TrakBox struct {
-	*Box
+	Box
 
 	// SamplesDuration
 	// SamplesSize
 	// SampleGroupsInfo
-
-	Tkhd *TkhdBox
-	Mdia *MdiaBox
-	Edts *EdtsBox
 
 	// chunks []Chunk
 	// samples []Sample
@@ -46,7 +42,7 @@ func (trakBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (trakBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (trakBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -65,7 +61,7 @@ func (trakBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = trakBoxFactory{}
-	_ CommonBox  = TrakBox{}
+	_ CommonBox  = &TrakBox{}
 )
 
 func init() {

@@ -8,7 +8,7 @@ import (
 
 // SttsBox is a "Decoding Time to Sample" box.
 type SttsBox struct {
-	*Box
+	Box
 
 	Version      byte
 	Flags        uint32
@@ -51,7 +51,7 @@ func (sttsBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (sttsBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (sttsBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -70,7 +70,7 @@ func (sttsBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = sttsBoxFactory{}
-	_ CommonBox  = SttsBox{}
+	_ CommonBox  = &SttsBox{}
 )
 
 func init() {

@@ -8,7 +8,7 @@ import (
 
 // TkhdBox is a "Track Header" box.
 type TkhdBox struct {
-	*Box
+	Box
 
 	Version          byte
 	Flags            uint32
@@ -69,7 +69,7 @@ func (tkhdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (tkhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (tkhdBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -88,7 +88,7 @@ func (tkhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = tkhdBoxFactory{}
-	_ CommonBox  = TkhdBox{}
+	_ CommonBox  = &TkhdBox{}
 )
 
 func init() {

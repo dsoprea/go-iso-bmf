@@ -11,7 +11,7 @@ import (
 // The media header declares overall information that is media-independent,
 // and relevant to characteristics of the media in a track.
 type MdhdBox struct {
-	*Box
+	Box
 
 	Version          byte
 	Flags            uint32
@@ -67,7 +67,7 @@ func (mdhdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (mdhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (mdhdBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -86,7 +86,7 @@ func (mdhdBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = mdhdBoxFactory{}
-	_ CommonBox  = MdhdBox{}
+	_ CommonBox  = &MdhdBox{}
 )
 
 func init() {

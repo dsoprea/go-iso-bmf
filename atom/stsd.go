@@ -8,11 +8,10 @@ import (
 
 // StsdBox is a "Sample Description" box.
 type StsdBox struct {
-	*Box
+	Box
 
 	Version byte
 	Flags   uint32
-	Avc1    *Avc1Box
 
 	LoadedBoxIndex
 }
@@ -48,7 +47,7 @@ func (stsdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (stsdBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (stsdBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -67,7 +66,7 @@ func (stsdBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = stsdBoxFactory{}
-	_ CommonBox  = StsdBox{}
+	_ CommonBox  = &StsdBox{}
 )
 
 func init() {

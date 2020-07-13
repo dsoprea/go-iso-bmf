@@ -17,10 +17,7 @@ const (
 // at the top-level of a file. Normally this box is close to the beginning or end
 // of the file, though this is not required.
 type MoovBox struct {
-	*Box
-
-	Mvhd  *MvhdBox
-	Traks []*TrakBox
+	Box
 
 	// check if mvex box exists
 	IsFragmented bool
@@ -52,7 +49,7 @@ func (moovBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (moovBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (moovBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -71,7 +68,7 @@ func (moovBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = moovBoxFactory{}
-	_ CommonBox  = MoovBox{}
+	_ CommonBox  = &MoovBox{}
 )
 
 func init() {

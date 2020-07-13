@@ -9,7 +9,7 @@ import (
 // A container box which can hold the actual media data for a presentation
 // (mdat).
 type MdatBox struct {
-	*Box
+	Box
 }
 
 type mdatBoxFactory struct {
@@ -21,7 +21,7 @@ func (mdatBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (mdatBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (mdatBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -37,7 +37,7 @@ func (mdatBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = mdatBoxFactory{}
-	_ CommonBox  = MdatBox{}
+	_ CommonBox  = &MdatBox{}
 )
 
 func init() {

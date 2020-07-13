@@ -9,7 +9,7 @@ import (
 // The media declaration container contains all the objects that declare information
 // about the media data within a track.
 type MdiaBox struct {
-	*Box
+	Box
 
 	Hdlr *HdlrBox
 	Mdhd *MdhdBox
@@ -42,7 +42,7 @@ func (mdiaBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (mdiaBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (mdiaBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -61,7 +61,7 @@ func (mdiaBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = mdiaBoxFactory{}
-	_ CommonBox  = MdiaBox{}
+	_ CommonBox  = &MdiaBox{}
 )
 
 func init() {

@@ -8,7 +8,7 @@ import (
 
 // ElstBox is a "Edit List" box.
 type ElstBox struct {
-	*Box
+	Box
 
 	Version    uint32 // Version of this box.
 	EntryCount uint32 // Integer that gives the number of entries.
@@ -55,7 +55,7 @@ func (elstBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (elstBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (elstBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -74,7 +74,7 @@ func (elstBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = elstBoxFactory{}
-	_ CommonBox  = ElstBox{}
+	_ CommonBox  = &ElstBox{}
 )
 
 func init() {

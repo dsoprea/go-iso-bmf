@@ -6,9 +6,7 @@ import (
 
 // EdtsBox is an "Edit" box.
 type EdtsBox struct {
-	*Box
-
-	Elst *ElstBox
+	Box
 
 	LoadedBoxIndex
 }
@@ -37,7 +35,7 @@ func (edtsBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (edtsBoxFactory) New(box *Box) (cb CommonBox, err error) {
+func (edtsBoxFactory) New(box Box) (cb CommonBox, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -56,7 +54,7 @@ func (edtsBoxFactory) New(box *Box) (cb CommonBox, err error) {
 
 var (
 	_ boxFactory = edtsBoxFactory{}
-	_ CommonBox  = EdtsBox{}
+	_ CommonBox  = &EdtsBox{}
 )
 
 func init() {
