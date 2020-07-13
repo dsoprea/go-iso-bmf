@@ -17,7 +17,12 @@ type HdlrBox struct {
 	Version byte
 	Flags   uint32
 	Handler string
-	Name    string
+
+	name string
+}
+
+func (b *HdlrBox) HdlrName() string {
+	return b.name
 }
 
 func (b *HdlrBox) parse() (err error) {
@@ -33,7 +38,7 @@ func (b *HdlrBox) parse() (err error) {
 	b.Version = data[0]
 	b.Flags = binary.BigEndian.Uint32(data[0:4])
 	b.Handler = string(data[8:12])
-	b.Name = string(data[24 : b.Size()-boxHeaderSize])
+	b.name = string(data[24 : b.Size()-boxHeaderSize])
 
 	return nil
 }

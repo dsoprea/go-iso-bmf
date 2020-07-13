@@ -36,21 +36,21 @@ func (b *TrakBox) parse() (err error) {
 	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
 
-	for _, box := range boxes {
-		switch box.Name() {
-		case "tkhd":
-			b.Tkhd = &TkhdBox{Box: box}
-			b.Tkhd.parse()
+	// for _, box := range boxes {
+	// 	switch box.Name() {
+	// 	case "tkhd":
+	// 		b.Tkhd = &TkhdBox{Box: box}
+	// 		b.Tkhd.parse()
 
-		case "mdia":
-			b.Mdia = &MdiaBox{Box: box}
-			b.Mdia.parse()
+	// 	case "mdia":
+	// 		b.Mdia = &MdiaBox{Box: box}
+	// 		b.Mdia.parse()
 
-		case "edts":
-			b.Edts = &EdtsBox{Box: box}
-			b.Edts.parse()
-		}
-	}
+	// 	case "edts":
+	// 		b.Edts = &EdtsBox{Box: box}
+	// 		b.Edts.parse()
+	// 	}
+	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

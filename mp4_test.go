@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/dsoprea/go-logging"
+
+	"github.com/dsoprea/go-mp4/atom"
 )
 
 const (
@@ -16,12 +18,14 @@ func TestOpen_Mp4(t *testing.T) {
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	if s.Ftyp().Name() != "ftyp" {
-		t.Fatalf("ftyp name not correct: [%s]", s.Ftyp().Name())
+	ftyp := atom.MustGetChildBox(s, "ftyp").(*atom.FtypBox)
+
+	if ftyp.Name() != "ftyp" {
+		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
 	}
 
-	if s.Ftyp().MajorBrand != "isom" {
-		t.Fatalf("ftyp MajorBrand is not correct: [%s]", s.Ftyp().MajorBrand)
+	if ftyp.MajorBrand != "isom" {
+		t.Fatalf("ftyp MajorBrand is not correct: [%s]", ftyp.MajorBrand)
 	}
 }
 
@@ -29,12 +33,14 @@ func TestOpen_Heic(t *testing.T) {
 	s, err := Open(testHeicFilepath)
 	log.PanicIf(err)
 
-	if s.Ftyp().Name() != "ftyp" {
-		t.Fatalf("ftyp name not correct: [%s]", s.Ftyp().Name())
+	ftyp := atom.MustGetChildBox(s, "ftyp").(*atom.FtypBox)
+
+	if ftyp.Name() != "ftyp" {
+		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
 	}
 
-	if s.Ftyp().MajorBrand != "heic" {
-		t.Fatalf("ftyp MajorBrand is not correct: [%s]", s.Ftyp().MajorBrand)
+	if ftyp.MajorBrand != "heic" {
+		t.Fatalf("ftyp MajorBrand is not correct: [%s]", ftyp.MajorBrand)
 	}
 }
 
@@ -42,19 +48,30 @@ func ExampleOpen() {
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	fmt.Println(s.Ftyp().Name())
-	fmt.Println(s.Ftyp().MajorBrand)
-	fmt.Println(s.Ftyp().MinorVersion)
-	fmt.Println(s.Ftyp().CompatibleBrands)
+	ftyp := atom.MustGetChildBox(s, "ftyp").(*atom.FtypBox)
 
-	fmt.Println(s.Moov().Name(), s.Moov().Size())
-	fmt.Println(s.Moov().Mvhd.Name())
-	fmt.Println(s.Moov().Mvhd.Version)
-	fmt.Println(s.Moov().Mvhd.Volume)
+	fmt.Println(ftyp.Name())
+	fmt.Println(ftyp.MajorBrand)
+	fmt.Println(ftyp.MinorVersion)
+	fmt.Println(ftyp.CompatibleBrands)
 
-	fmt.Println("trak size: ", s.Moov().Traks[0].Size())
-	fmt.Println("trak size: ", s.Moov().Traks[1].Size())
-	fmt.Println("mdat size: ", s.Mdat().Size())
+	moov := atom.MustGetChildBox(s, "moov").(*atom.MoovBox)
+
+	fmt.Println(moov.Name(), moov.Size())
+
+	mvhd := atom.MustGetChildBox(moov, "mvhd").(*atom.MvhdBox)
+
+	fmt.Println(mvhd.Name())
+	fmt.Println(mvhd.Version)
+	fmt.Println(mvhd.Volume)
+
+	// TODO(dustin): !! Finish this. A sequence of box types may include the same box-type multiple times. We need to update the index to have slices instead of single values. Then, we can update this to access that slice.
+	// fmt.Println("trak size: ", moov.Traks[0].Size())
+	// fmt.Println("trak size: ", moov.Traks[1].Size())
+
+	mdat := atom.MustGetChildBox(s, "mdat").(*atom.MdatBox)
+
+	fmt.Println("mdat size: ", mdat.Size())
 
 	// Output:
 	// ftyp

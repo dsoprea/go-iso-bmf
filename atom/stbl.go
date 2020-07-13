@@ -28,21 +28,21 @@ func (b *StblBox) parse() (err error) {
 	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
 
-	for _, box := range boxes {
-		switch box.Name() {
-		case "stts":
-			b.Stts = &SttsBox{Box: box}
+	// for _, box := range boxes {
+	// 	switch box.Name() {
+	// 	case "stts":
+	// 		b.Stts = &SttsBox{Box: box}
 
-			err := b.Stts.parse()
-			log.PanicIf(err)
+	// 		err := b.Stts.parse()
+	// 		log.PanicIf(err)
 
-		case "stsd":
-			b.Stsd = &StsdBox{Box: box}
+	// 	case "stsd":
+	// 		b.Stsd = &StsdBox{Box: box}
 
-			err := b.Stsd.parse()
-			log.PanicIf(err)
-		}
-	}
+	// 		err := b.Stsd.parse()
+	// 		log.PanicIf(err)
+	// 	}
+	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

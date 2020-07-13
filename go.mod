@@ -1,4 +1,4 @@
-module github.com/alfg/mp4
+module github.com/dsoprea/go-mp4
 
 go 1.12
 

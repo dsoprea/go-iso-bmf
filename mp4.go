@@ -5,7 +5,7 @@ import (
 
 	"github.com/dsoprea/go-logging"
 
-	"github.com/alfg/mp4/atom"
+	"github.com/dsoprea/go-mp4/atom"
 )
 
 // Open opens a file and returns a &File{}.

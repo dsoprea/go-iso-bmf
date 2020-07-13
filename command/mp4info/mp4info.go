@@ -8,8 +8,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/alfg/mp4"
-	"github.com/alfg/mp4/atom"
+	"github.com/dsoprea/go-mp4"
+	"github.com/dsoprea/go-mp4/atom"
 )
 
 const tmpl = `

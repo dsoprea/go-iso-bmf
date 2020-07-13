@@ -27,15 +27,17 @@ func (b *EdtsBox) parse() (err error) {
 	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
 
-	for _, box := range boxes {
-		switch box.Name() {
-		case "elst":
-			b.Elst = &ElstBox{Box: box}
+	// for _, box := range boxes {
+	// 	switch box.Name() {
+	// 	case "elst":
+	// 		b.Elst = &ElstBox{
+	// 			CommonBox: box,
+	// 		}
 
-			err := b.Elst.parse()
-			log.PanicIf(err)
-		}
-	}
+	// 		err := b.Elst.parse()
+	// 		log.PanicIf(err)
+	// 	}
+	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

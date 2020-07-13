@@ -38,15 +38,15 @@ func (b *StsdBox) parse() (err error) {
 	boxes, err := b.Box.readBoxes(8)
 	log.PanicIf(err)
 
-	for _, box := range boxes {
-		switch box.Name() {
-		case "avc1":
-			b.Avc1 = &Avc1Box{Box: box}
+	// for _, box := range boxes {
+	// 	switch box.Name() {
+	// 	case "avc1":
+	// 		b.Avc1 = &Avc1Box{Box: box}
 
-			err := b.Avc1.parse()
-			log.PanicIf(err)
-		}
-	}
+	// 		err := b.Avc1.parse()
+	// 		log.PanicIf(err)
+	// 	}
+	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

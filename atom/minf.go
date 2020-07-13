@@ -32,27 +32,27 @@ func (b *MinfBox) parse() (err error) {
 	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
 
-	for _, box := range boxes {
-		switch box.Name() {
-		case "vmhd":
-			b.Vmhd = &VmhdBox{Box: box}
+	// for _, box := range boxes {
+	// 	switch box.Name() {
+	// 	case "vmhd":
+	// 		b.Vmhd = &VmhdBox{Box: box}
 
-			err := b.Vmhd.parse()
-			log.PanicIf(err)
+	// 		err := b.Vmhd.parse()
+	// 		log.PanicIf(err)
 
-		case "stbl":
-			b.Stbl = &StblBox{Box: box}
+	// 	case "stbl":
+	// 		b.Stbl = &StblBox{Box: box}
 
-			err := b.Stbl.parse()
-			log.PanicIf(err)
+	// 		err := b.Stbl.parse()
+	// 		log.PanicIf(err)
 
-		case "hmhd":
-			b.Hmhd = &HmhdBox{Box: box}
+	// 	case "hmhd":
+	// 		b.Hmhd = &HmhdBox{Box: box}
 
-			err := b.Hmhd.parse()
-			log.PanicIf(err)
-		}
-	}
+	// 		err := b.Hmhd.parse()
+	// 		log.PanicIf(err)
+	// 	}
+	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

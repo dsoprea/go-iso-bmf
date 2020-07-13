@@ -41,36 +41,36 @@ func (b *MoovBox) parse() (err error) {
 	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
 
-	for _, box := range boxes {
-		switch box.Name() {
-		case "mvhd":
-			b.Mvhd = &MvhdBox{Box: box}
+	// for _, box := range boxes {
+	// 	switch box.Name() {
+	// 	case "mvhd":
+	// 		b.Mvhd = &MvhdBox{Box: box}
 
-			err := b.Mvhd.parse()
-			log.PanicIf(err)
+	// 		err := b.Mvhd.parse()
+	// 		log.PanicIf(err)
 
-		case "iods":
-			// fmt.Println("found iods")
+	// 	case "iods":
+	// 		// fmt.Println("found iods")
 
-		case "trak":
-			trak := &TrakBox{Box: box}
+	// 	case "trak":
+	// 		trak := &TrakBox{Box: box}
 
-			err := trak.parse()
-			log.PanicIf(err)
+	// 		err := trak.parse()
+	// 		log.PanicIf(err)
 
-			b.Traks = append(b.Traks, trak)
+	// 		b.Traks = append(b.Traks, trak)
 
-		case "udta":
-			// fmt.Println("found udta")
+	// 	case "udta":
+	// 		// fmt.Println("found udta")
 
-		case "mvex":
-			// fmt.Println("found mvex")
+	// 	case "mvex":
+	// 		// fmt.Println("found mvex")
 
-			// TODO(dustin): What is this?
+	// 		// TODO(dustin): What is this?
 
-			b.IsFragmented = true
-		}
-	}
+	// 		b.IsFragmented = true
+	// 	}
+	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 
