@@ -1,6 +1,9 @@
 package atom
 
 import (
+	"fmt"
+	"strings"
+
 	"encoding/binary"
 
 	"github.com/dsoprea/go-logging"
@@ -19,6 +22,16 @@ type FtypBox struct {
 
 	// CompatibleBrands is a list of brands.
 	CompatibleBrands []string
+}
+
+// String returns a descriptive string.
+func (fb FtypBox) String() string {
+	return fmt.Sprintf("ftyp<%s>", fb.InlineString())
+}
+
+// InlineString returns an undecorated string of field names and values.
+func (fb FtypBox) InlineString() string {
+	return fmt.Sprintf("%s MAJOR-BRAND=[%s] MINOR-VER=(%d) COMPAT-BRANDS=[%s]", fb.Box.InlineString(), fb.MajorBrand, fb.MinorVersion, strings.Join(fb.CompatibleBrands, ","))
 }
 
 func (b *FtypBox) parse() (err error) {

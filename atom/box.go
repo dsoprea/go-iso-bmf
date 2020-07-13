@@ -1,6 +1,8 @@
 package atom
 
 import (
+	"fmt"
+
 	"github.com/dsoprea/go-logging"
 )
 
@@ -19,6 +21,11 @@ type Box struct {
 	size  int64
 	start int64
 	file  *File
+}
+
+// InlineString returns an undecorated string of field names and values.
+func (box *Box) InlineString() string {
+	return fmt.Sprintf("NAME=[%s] START=(%d) SIZE=(%d)", box.name, box.start, box.size)
 }
 
 // Name returns the box name.
@@ -75,7 +82,7 @@ func (b *Box) readBoxData() (data []byte, err error) {
 // present or panics with a descriptive error.
 type LoadedBoxIndex map[string][]CommonBox
 
-// GetChildBox returns the given child box or panics. If box does not support
+// GetChildBoxes returns the given child box or panics. If box does not support
 // children this should return ErrNoChildren.
 func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err error) {
 	defer func() {
@@ -90,6 +97,19 @@ func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err err
 	}
 
 	return boxes, nil
+}
+
+// ChildrenTypes returns a slice with the names of all children with registered
+// types.
+func (lbi LoadedBoxIndex) ChildrenTypes() (names []string) {
+	names = make([]string, len(lbi))
+	i := 0
+	for name, _ := range lbi {
+		names[i] = name
+		i++
+	}
+
+	return names
 }
 
 // Boxes is a slice of boxes that have been parsed and are ready to be acted on.

@@ -23,12 +23,19 @@ type CommonBox interface {
 
 	// Name returns the name of the box-type.
 	Name() string
+
+	// InlineString returns an undecorated string of field names and values.
+	InlineString() string
 }
 
 // BoxChildIndexer is a box that has children.
 type BoxChildIndexer interface {
 	// GetChildBoxes returns all found child boxes of the given type.
 	GetChildBoxes(name string) (boxes []CommonBox, err error)
+
+	// ChildrenTypes returns the names of the types of the children that were
+	// found. Only registered types are recognized.
+	ChildrenTypes() (names []string)
 }
 
 // ChildBoxes is a simple wrapper that gets all children of the given type or

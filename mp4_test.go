@@ -28,6 +28,8 @@ func TestOpen_Mp4(t *testing.T) {
 	if ftyp.MajorBrand != "isom" {
 		t.Fatalf("ftyp MajorBrand is not correct: [%s]", ftyp.MajorBrand)
 	}
+
+	atom.Dump(s)
 }
 
 func TestOpen_Heic(t *testing.T) {
