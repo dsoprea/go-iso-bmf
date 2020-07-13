@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"fmt"
-
 	"encoding/binary"
 
 	"github.com/dsoprea/go-logging"
@@ -51,13 +49,13 @@ func getLanguageString(language uint16) string {
 
 	// TODO(dustin): Make this a method?
 
-	var lang [3]uint16
+	var lang [3]uint8
 
-	lang[0] = (language >> 10) & 0x1F
-	lang[1] = (language >> 5) & 0x1F
-	lang[2] = (language) & 0x1F
+	lang[0] = uint8((language >> 10) & 0x1F)
+	lang[1] = uint8((language >> 5) & 0x1F)
+	lang[2] = uint8((language) & 0x1F)
 
-	return fmt.Sprintf("%s%s%s", string(lang[0]+0x60), string(lang[1]+0x60), string(lang[2]+0x60))
+	return string([]byte{lang[0] + 0x60, lang[1] + 0x60, lang[2] + 0x60})
 }
 
 type mdhdBoxFactory struct {
