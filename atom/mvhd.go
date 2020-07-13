@@ -13,14 +13,38 @@ import (
 type MvhdBox struct {
 	Box
 
-	Flags            uint32
-	Version          uint8
-	CreationTime     uint32
-	ModificationTime uint32
-	Timescale        uint32
-	Duration         uint32
-	Rate             Fixed32
-	Volume           Fixed16
+	flags   uint32
+	version uint8
+	// creationTime     uint32
+	// modificationTime uint32
+	timescale uint32
+	duration  uint32
+	rate      Fixed32
+	volume    Fixed16
+}
+
+func (mb *MvhdBox) Flags() uint32 {
+	return mb.flags
+}
+
+func (mb *MvhdBox) Version() uint8 {
+	return mb.version
+}
+
+func (mb *MvhdBox) Timescale() uint32 {
+	return mb.timescale
+}
+
+func (mb *MvhdBox) Duration() uint32 {
+	return mb.duration
+}
+
+func (mb *MvhdBox) Rate() Fixed32 {
+	return mb.rate
+}
+
+func (mb *MvhdBox) Volume() Fixed16 {
+	return mb.volume
 }
 
 func (b *MvhdBox) parse() (err error) {
@@ -33,11 +57,11 @@ func (b *MvhdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	b.Timescale = binary.BigEndian.Uint32(data[12:16])
-	b.Duration = binary.BigEndian.Uint32(data[16:20])
-	b.Rate = fixed32(data[20:24])
-	b.Volume = fixed16(data[24:26])
+	b.version = data[0]
+	b.timescale = binary.BigEndian.Uint32(data[12:16])
+	b.duration = binary.BigEndian.Uint32(data[16:20])
+	b.rate = fixed32(data[20:24])
+	b.volume = fixed16(data[24:26])
 
 	return nil
 }

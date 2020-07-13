@@ -11,10 +11,6 @@ import (
 type MdiaBox struct {
 	Box
 
-	Hdlr *HdlrBox
-	Mdhd *MdhdBox
-	Minf *MinfBox
-
 	LoadedBoxIndex
 }
 

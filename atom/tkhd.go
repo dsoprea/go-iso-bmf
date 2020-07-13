@@ -10,17 +10,68 @@ import (
 type TkhdBox struct {
 	Box
 
-	Version          byte
-	Flags            uint32
-	CreationTime     uint32
-	ModificationTime uint32
-	TrackID          uint32
-	Duration         uint32
-	Layer            uint16
-	AlternateGroup   uint16
-	Volume           Fixed16
-	Matrix           []byte
-	Width, Height    Fixed32
+	version          byte
+	flags            uint32
+	creationTime     uint32
+	modificationTime uint32
+	trackID          uint32
+	duration         uint32
+	layer            uint16
+	alternateGroup   uint16
+	volume           Fixed16
+	matrix           []byte
+	width            Fixed32
+	height           Fixed32
+}
+
+func (tb *TkhdBox) Version() byte {
+	return tb.version
+}
+
+func (tb *TkhdBox) Flags() uint32 {
+	return tb.flags
+}
+
+func (tb *TkhdBox) CreationTime() uint32 {
+	return tb.creationTime
+}
+
+func (tb *TkhdBox) ModificationTime() uint32 {
+	return tb.modificationTime
+}
+
+func (tb *TkhdBox) TrackID() uint32 {
+	return tb.trackID
+}
+
+func (tb *TkhdBox) Duration() uint32 {
+	return tb.duration
+}
+
+func (tb *TkhdBox) Layer() uint16 {
+	return tb.layer
+}
+
+func (tb *TkhdBox) AlternateGroup() uint16 {
+	return tb.alternateGroup
+}
+
+func (tb *TkhdBox) Volume() Fixed16 {
+	return tb.volume
+}
+
+func (tb *TkhdBox) Matrix() []byte {
+	return tb.matrix
+}
+
+// Width returns a calculated tkhd width.
+func (b *TkhdBox) Width() Fixed32 {
+	return b.width / (1 << 16)
+}
+
+// Height returns a calculated tkhd height.
+func (b *TkhdBox) Height() Fixed32 {
+	return b.height / (1 << 16)
 }
 
 func (b *TkhdBox) parse() (err error) {
@@ -33,31 +84,20 @@ func (b *TkhdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	// b.Flags = [3]byte{data[1], data[2], data[3]}
-	b.Flags = binary.BigEndian.Uint32(data[0:4])
-	b.CreationTime = binary.BigEndian.Uint32(data[4:8])
-	b.ModificationTime = binary.BigEndian.Uint32(data[8:12])
-	b.TrackID = binary.BigEndian.Uint32(data[12:16])
-	b.Duration = binary.BigEndian.Uint32(data[20:24])
-	b.Layer = binary.BigEndian.Uint16(data[32:34])
-	b.AlternateGroup = binary.BigEndian.Uint16(data[34:36])
-	b.Volume = fixed16(data[36:38])
-	b.Matrix = data[40:76]
-	b.Width = fixed32(data[76:80])
-	b.Height = fixed32(data[80:84])
+	b.version = data[0]
+	b.flags = binary.BigEndian.Uint32(data[0:4])
+	b.creationTime = binary.BigEndian.Uint32(data[4:8])
+	b.modificationTime = binary.BigEndian.Uint32(data[8:12])
+	b.trackID = binary.BigEndian.Uint32(data[12:16])
+	b.duration = binary.BigEndian.Uint32(data[20:24])
+	b.layer = binary.BigEndian.Uint16(data[32:34])
+	b.alternateGroup = binary.BigEndian.Uint16(data[34:36])
+	b.volume = fixed16(data[36:38])
+	b.matrix = data[40:76]
+	b.width = fixed32(data[76:80])
+	b.height = fixed32(data[80:84])
 
 	return nil
-}
-
-// GetWidth returns a calculated tkhd width.
-func (b *TkhdBox) GetWidth() Fixed32 {
-	return b.Width / (1 << 16)
-}
-
-// GetHeight returns a calculated tkhd height.
-func (b *TkhdBox) GetHeight() Fixed32 {
-	return b.Height / (1 << 16)
 }
 
 type tkhdBoxFactory struct {

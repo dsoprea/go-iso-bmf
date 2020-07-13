@@ -10,10 +10,18 @@ import (
 type StsdBox struct {
 	Box
 
-	Version byte
-	Flags   uint32
+	version byte
+	flags   uint32
 
 	LoadedBoxIndex
+}
+
+func (sb *StsdBox) Version() byte {
+	return sb.version
+}
+
+func (sb *StsdBox) Flags() uint32 {
+	return sb.flags
 }
 
 func (b *StsdBox) parse() (err error) {
@@ -26,8 +34,8 @@ func (b *StsdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	b.Flags = binary.BigEndian.Uint32(data[0:4])
+	b.version = data[0]
+	b.flags = binary.BigEndian.Uint32(data[0:4])
 
 	// Skip extra 8 bytes.
 	boxes, err := b.Box.readBoxes(8)

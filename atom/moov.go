@@ -19,10 +19,14 @@ const (
 type MoovBox struct {
 	Box
 
-	// check if mvex box exists
-	IsFragmented bool
+	isFragmented bool
 
 	LoadedBoxIndex
+}
+
+// IsFragmented return true if mvex box is present.
+func (mv MoovBox) IsFragmented() bool {
+	return mv.isFragmented
 }
 
 func (b *MoovBox) parse() (err error) {
@@ -36,6 +40,8 @@ func (b *MoovBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.LoadedBoxIndex = boxes.Index()
+
+	_, b.isFragmented = b.LoadedBoxIndex["mvex"]
 
 	return nil
 }

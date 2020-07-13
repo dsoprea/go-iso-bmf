@@ -13,14 +13,46 @@ import (
 type MdhdBox struct {
 	Box
 
-	Version          byte
-	Flags            uint32
-	CreationTime     uint32
-	ModificationTime uint32
-	Timescale        uint32
-	Duration         uint32
-	Language         uint16
-	LanguageString   string
+	version          byte
+	flags            uint32
+	creationTime     uint32
+	modificationTime uint32
+	timescale        uint32
+	duration         uint32
+	language         uint16
+	languageString   string
+}
+
+func (mb *MdhdBox) Version() byte {
+	return mb.version
+}
+
+func (mb *MdhdBox) Flags() uint32 {
+	return mb.flags
+}
+
+func (mb *MdhdBox) CreationTime() uint32 {
+	return mb.creationTime
+}
+
+func (mb *MdhdBox) ModificationTime() uint32 {
+	return mb.modificationTime
+}
+
+func (mb *MdhdBox) Timescale() uint32 {
+	return mb.timescale
+}
+
+func (mb *MdhdBox) Duration() uint32 {
+	return mb.duration
+}
+
+func (mb *MdhdBox) Language() uint16 {
+	return mb.language
+}
+
+func (mb *MdhdBox) LanguageString() string {
+	return mb.languageString
 }
 
 func (b *MdhdBox) parse() (err error) {
@@ -33,29 +65,26 @@ func (b *MdhdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	b.Flags = binary.BigEndian.Uint32(data[0:4])
-	b.CreationTime = binary.BigEndian.Uint32(data[4:8])
-	b.ModificationTime = binary.BigEndian.Uint32(data[8:12])
-	b.Timescale = binary.BigEndian.Uint32(data[12:16])
-	b.Duration = binary.BigEndian.Uint32(data[16:20])
-	b.Language = binary.BigEndian.Uint16(data[20:22])
-	b.LanguageString = getLanguageString(b.Language)
+	b.version = data[0]
+	b.flags = binary.BigEndian.Uint32(data[0:4])
+	b.creationTime = binary.BigEndian.Uint32(data[4:8])
+	b.modificationTime = binary.BigEndian.Uint32(data[8:12])
+	b.timescale = binary.BigEndian.Uint32(data[12:16])
+	b.duration = binary.BigEndian.Uint32(data[16:20])
+	b.language = binary.BigEndian.Uint16(data[20:22])
+	b.languageString = b.getLanguageString()
 
 	return nil
 }
 
-func getLanguageString(language uint16) string {
+func (b *MdhdBox) getLanguageString() string {
+	var l [3]uint8
 
-	// TODO(dustin): Make this a method?
+	l[0] = uint8((b.language >> 10) & 0x1F)
+	l[1] = uint8((b.language >> 5) & 0x1F)
+	l[2] = uint8((b.language) & 0x1F)
 
-	var lang [3]uint8
-
-	lang[0] = uint8((language >> 10) & 0x1F)
-	lang[1] = uint8((language >> 5) & 0x1F)
-	lang[2] = uint8((language) & 0x1F)
-
-	return string([]byte{lang[0] + 0x60, lang[1] + 0x60, lang[2] + 0x60})
+	return string([]byte{l[0] + 0x60, l[1] + 0x60, l[2] + 0x60})
 }
 
 type mdhdBoxFactory struct {

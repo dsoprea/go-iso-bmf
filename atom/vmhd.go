@@ -10,10 +10,26 @@ import (
 type VmhdBox struct {
 	Box
 
-	Version      byte
-	Flags        uint32
-	GraphicsMode uint16
-	OpColor      uint16
+	version      byte
+	flags        uint32
+	graphicsMode uint16
+	opColor      uint16
+}
+
+func (vb *VmhdBox) Version() byte {
+	return vb.version
+}
+
+func (vb *VmhdBox) Flags() uint32 {
+	return vb.flags
+}
+
+func (vb *VmhdBox) GraphicsMode() uint16 {
+	return vb.graphicsMode
+}
+
+func (vb *VmhdBox) OpColor() uint16 {
+	return vb.opColor
 }
 
 func (b *VmhdBox) parse() (err error) {
@@ -26,10 +42,10 @@ func (b *VmhdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	b.Flags = binary.BigEndian.Uint32(data[0:4])
-	b.GraphicsMode = binary.BigEndian.Uint16(data[4:6])
-	b.OpColor = binary.BigEndian.Uint16(data[6:8])
+	b.version = data[0]
+	b.flags = binary.BigEndian.Uint32(data[0:4])
+	b.graphicsMode = binary.BigEndian.Uint16(data[4:6])
+	b.opColor = binary.BigEndian.Uint16(data[6:8])
 
 	return nil
 }

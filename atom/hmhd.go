@@ -12,11 +12,31 @@ import (
 type HmhdBox struct {
 	Box
 
-	Version    byte
-	MaxPDUSize uint16
-	AvgPDUSize uint16
-	MaxBitrate uint32
-	AvgBitrate uint32
+	version    byte
+	maxPDUSize uint16
+	avgPDUSize uint16
+	maxBitrate uint32
+	avgBitrate uint32
+}
+
+func (hb *HmhdBox) Version() byte {
+	return hb.version
+}
+
+func (hb *HmhdBox) MaxPDUSize() uint16 {
+	return hb.maxPDUSize
+}
+
+func (hb *HmhdBox) AvgPDUSize() uint16 {
+	return hb.avgPDUSize
+}
+
+func (hb *HmhdBox) MaxBitrate() uint32 {
+	return hb.maxBitrate
+}
+
+func (hb *HmhdBox) AvgBitrate() uint32 {
+	return hb.avgBitrate
 }
 
 func (b *HmhdBox) parse() (err error) {
@@ -29,11 +49,11 @@ func (b *HmhdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	b.MaxPDUSize = binary.BigEndian.Uint16(data[0:2])
-	b.AvgPDUSize = binary.BigEndian.Uint16(data[2:4])
-	b.MaxBitrate = binary.BigEndian.Uint32(data[4:8])
-	b.AvgBitrate = binary.BigEndian.Uint32(data[8:12])
+	b.version = data[0]
+	b.maxPDUSize = binary.BigEndian.Uint16(data[0:2])
+	b.avgPDUSize = binary.BigEndian.Uint16(data[2:4])
+	b.maxBitrate = binary.BigEndian.Uint32(data[4:8])
+	b.avgBitrate = binary.BigEndian.Uint32(data[8:12])
 
 	return nil
 }

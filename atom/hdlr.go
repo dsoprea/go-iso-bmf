@@ -10,15 +10,27 @@ import (
 type HdlrBox struct {
 	Box
 
-	Version byte
-	Flags   uint32
-	Handler string
+	version byte
+	flags   uint32
+	handler string
 
-	name string
+	hdlrName string
 }
 
-func (b *HdlrBox) HdlrName() string {
-	return b.name
+func (hb *HdlrBox) Version() byte {
+	return hb.version
+}
+
+func (hb *HdlrBox) Flags() uint32 {
+	return hb.flags
+}
+
+func (hb *HdlrBox) Handler() string {
+	return hb.handler
+}
+
+func (hb *HdlrBox) HdlrName() string {
+	return hb.hdlrName
 }
 
 func (b *HdlrBox) parse() (err error) {
@@ -31,10 +43,10 @@ func (b *HdlrBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	b.Flags = binary.BigEndian.Uint32(data[0:4])
-	b.Handler = string(data[8:12])
-	b.name = string(data[24 : b.Size()-boxHeaderSize])
+	b.version = data[0]
+	b.flags = binary.BigEndian.Uint32(data[0:4])
+	b.handler = string(data[8:12])
+	b.hdlrName = string(data[24 : b.Size()-boxHeaderSize])
 
 	return nil
 }

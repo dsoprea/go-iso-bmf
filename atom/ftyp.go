@@ -14,14 +14,30 @@ type FtypBox struct {
 	Box
 
 	// MajorBrand is a brand identifer.
-	MajorBrand string
+	majorBrand string
 
 	// MinorVersion is an informative integer for the minor version of the
 	// major brand.
-	MinorVersion uint32
+	minorVersion uint32
 
 	// CompatibleBrands is a list of brands.
-	CompatibleBrands []string
+	compatibleBrands []string
+}
+
+// MajorBrand is a brand identifer.
+func (fb *FtypBox) MajorBrand() string {
+	return fb.majorBrand
+}
+
+// MinorVersion is an informative integer for the minor version of the
+// major brand.
+func (fb *FtypBox) MinorVersion() uint32 {
+	return fb.minorVersion
+}
+
+// CompatibleBrands is a list of brands.
+func (fb *FtypBox) CompatibleBrands() []string {
+	return fb.compatibleBrands
 }
 
 // String returns a descriptive string.
@@ -31,7 +47,7 @@ func (fb *FtypBox) String() string {
 
 // InlineString returns an undecorated string of field names and values.
 func (fb *FtypBox) InlineString() string {
-	return fmt.Sprintf("%s MAJOR-BRAND=[%s] MINOR-VER=(%d) COMPAT-BRANDS=[%s]", fb.Box.InlineString(), fb.MajorBrand, fb.MinorVersion, strings.Join(fb.CompatibleBrands, ","))
+	return fmt.Sprintf("%s MAJOR-BRAND=[%s] MINOR-VER=(%d) COMPAT-BRANDS=[%s]", fb.Box.InlineString(), fb.majorBrand, fb.minorVersion, strings.Join(fb.compatibleBrands, ","))
 }
 
 func (fb *FtypBox) parse() (err error) {
@@ -44,12 +60,12 @@ func (fb *FtypBox) parse() (err error) {
 	data, err := fb.readBoxData()
 	log.PanicIf(err)
 
-	fb.MajorBrand = string(data[0:4])
-	fb.MinorVersion = binary.BigEndian.Uint32(data[4:8])
+	fb.majorBrand = string(data[0:4])
+	fb.minorVersion = binary.BigEndian.Uint32(data[4:8])
 
 	if len(data) > 8 {
 		for i := 8; i < len(data); i += 4 {
-			fb.CompatibleBrands = append(fb.CompatibleBrands, string(data[i:i+4]))
+			fb.compatibleBrands = append(fb.compatibleBrands, string(data[i:i+4]))
 		}
 	}
 

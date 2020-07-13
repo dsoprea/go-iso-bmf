@@ -10,16 +10,51 @@ import (
 type ElstBox struct {
 	Box
 
-	Version    uint32 // Version of this box.
-	EntryCount uint32 // Integer that gives the number of entries.
-	Entries    []elstEntry
+	version    uint32
+	entryCount uint32
+	entries    []elstEntry
+}
+
+// Version is the version of this box.
+func (eb *ElstBox) Version() uint32 {
+	return eb.version
+}
+
+// EntryCount is the number of entries.
+func (eb *ElstBox) EntryCount() uint32 {
+	return eb.entryCount
+}
+
+// Entries is the number of entries.
+func (eb *ElstBox) Entries() []elstEntry {
+	return eb.entries
 }
 
 type elstEntry struct {
-	SegmentDuration   uint32 // Duration of this edit segment.
-	MediaTime         uint32 // Starting time within the media of this edit segment.
-	MediaRate         uint16 // Relative rate at which to play the media corresponding to this segment.
-	MediaRateFraction uint16
+	segmentDuration   uint32 // Duration of this edit segment.
+	mediaTime         uint32 // Starting time within the media of this edit segment.
+	mediaRate         uint16 // Relative rate at which to play the media corresponding to this segment.
+	mediaRateFraction uint16
+}
+
+// SegmentDuration is the duration of this edit segment.
+func (ee elstEntry) SegmentDuration() uint32 {
+	return ee.segmentDuration
+}
+
+// MediaTime is the starting time within the media of this edit segment.
+func (ee elstEntry) MediaTime() uint32 {
+	return ee.mediaTime
+}
+
+// MediaRate is the relative rate at which to play the media corresponding to
+// this segment.
+func (ee elstEntry) MediaRate() uint16 {
+	return ee.mediaRate
+}
+
+func (ee elstEntry) MediaRateFraction() uint16 {
+	return ee.mediaRateFraction
 }
 
 func (b *ElstBox) parse() (err error) {
@@ -32,15 +67,15 @@ func (b *ElstBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = binary.BigEndian.Uint32(data[0:4])
-	b.EntryCount = binary.BigEndian.Uint32(data[4:8])
-	b.Entries = make([]elstEntry, b.EntryCount)
+	b.version = binary.BigEndian.Uint32(data[0:4])
+	b.entryCount = binary.BigEndian.Uint32(data[4:8])
+	b.entries = make([]elstEntry, b.entryCount)
 
-	for i := 0; i < len(b.Entries); i++ {
-		b.Entries[i].SegmentDuration = binary.BigEndian.Uint32(data[(8 + 12*i):(12 + 12*i)])
-		b.Entries[i].MediaTime = binary.BigEndian.Uint32(data[(12 + 12*i):(16 + 12*i)])
-		b.Entries[i].MediaRate = binary.BigEndian.Uint16(data[(16 + 12*i):(18 + 12*i)])
-		b.Entries[i].MediaRateFraction = binary.BigEndian.Uint16(data[(18 + 12*i):(20 + 12*i)])
+	for i := 0; i < len(b.entries); i++ {
+		b.entries[i].segmentDuration = binary.BigEndian.Uint32(data[(8 + 12*i):(12 + 12*i)])
+		b.entries[i].mediaTime = binary.BigEndian.Uint32(data[(12 + 12*i):(16 + 12*i)])
+		b.entries[i].mediaRate = binary.BigEndian.Uint16(data[(16 + 12*i):(18 + 12*i)])
+		b.entries[i].mediaRateFraction = binary.BigEndian.Uint16(data[(18 + 12*i):(20 + 12*i)])
 	}
 
 	return nil

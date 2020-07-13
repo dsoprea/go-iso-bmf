@@ -10,11 +10,31 @@ import (
 type SttsBox struct {
 	Box
 
-	Version      byte
-	Flags        uint32
-	EntryCount   uint32
-	SampleCounts []uint32
-	SampleDeltas []uint32
+	version      byte
+	flags        uint32
+	entryCount   uint32
+	sampleCounts []uint32
+	sampleDeltas []uint32
+}
+
+func (sb *SttsBox) Version() byte {
+	return sb.version
+}
+
+func (sb *SttsBox) Flags() uint32 {
+	return sb.flags
+}
+
+func (sb *SttsBox) EntryCount() uint32 {
+	return sb.entryCount
+}
+
+func (sb *SttsBox) SampleCounts() []uint32 {
+	return sb.sampleCounts
+}
+
+func (sb *SttsBox) SampleDeltas() []uint32 {
+	return sb.sampleDeltas
 }
 
 func (b *SttsBox) parse() (err error) {
@@ -27,16 +47,16 @@ func (b *SttsBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.Version = data[0]
-	b.Flags = binary.BigEndian.Uint32(data[0:4])
+	b.version = data[0]
+	b.flags = binary.BigEndian.Uint32(data[0:4])
 
 	count := binary.BigEndian.Uint32(data[4:8])
-	b.SampleCounts = make([]uint32, count)
-	b.SampleDeltas = make([]uint32, count)
+	b.sampleCounts = make([]uint32, count)
+	b.sampleDeltas = make([]uint32, count)
 
 	for i := 0; i < int(count); i++ {
-		b.SampleCounts[i] = binary.BigEndian.Uint32(data[(8 + 8*i):(12 + 8*i)])
-		b.SampleDeltas[i] = binary.BigEndian.Uint32(data[(12 + 8*i):(16 + 8*i)])
+		b.sampleCounts[i] = binary.BigEndian.Uint32(data[(8 + 8*i):(12 + 8*i)])
+		b.sampleDeltas[i] = binary.BigEndian.Uint32(data[(12 + 8*i):(16 + 8*i)])
 	}
 
 	return nil

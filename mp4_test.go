@@ -25,8 +25,8 @@ func TestOpen_Mp4(t *testing.T) {
 		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
 	}
 
-	if ftyp.MajorBrand != "isom" {
-		t.Fatalf("ftyp MajorBrand is not correct: [%s]", ftyp.MajorBrand)
+	if ftyp.MajorBrand() != "isom" {
+		t.Fatalf("ftyp MajorBrand is not correct: [%s]", ftyp.MajorBrand())
 	}
 }
 
@@ -41,8 +41,8 @@ func TestOpen_Heic(t *testing.T) {
 		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
 	}
 
-	if ftyp.MajorBrand != "heic" {
-		t.Fatalf("ftyp MajorBrand is not correct: [%s]", ftyp.MajorBrand)
+	if ftyp.MajorBrand() != "heic" {
+		t.Fatalf("ftyp MajorBrand is not correct: [%s]", ftyp.MajorBrand())
 	}
 }
 
@@ -54,9 +54,9 @@ func ExampleOpen() {
 	ftyp := ftypBoxes[0].(*atom.FtypBox)
 
 	fmt.Println(ftyp.Name())
-	fmt.Println(ftyp.MajorBrand)
-	fmt.Println(ftyp.MinorVersion)
-	fmt.Println(ftyp.CompatibleBrands)
+	fmt.Println(ftyp.MajorBrand())
+	fmt.Println(ftyp.MinorVersion())
+	fmt.Println(ftyp.CompatibleBrands())
 
 	moovBoxes := atom.ChildBoxes(s, "moov")
 	moov := moovBoxes[0].(*atom.MoovBox)
@@ -67,8 +67,8 @@ func ExampleOpen() {
 	mvhd := mvhdBoxes[0].(*atom.MvhdBox)
 
 	fmt.Println(mvhd.Name())
-	fmt.Println(mvhd.Version)
-	fmt.Println(mvhd.Volume)
+	fmt.Println(mvhd.Version())
+	fmt.Println(mvhd.Volume())
 
 	trakBoxes := atom.ChildBoxes(moov, "trak")
 	trak0 := trakBoxes[0].(*atom.TrakBox)
