@@ -6,11 +6,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// ElstBox - Edit List Box
-// Box Type: elst
-// Container: Edit Box (edts)
-// Mandatory: No
-// Quantity: Zero or one
+// ElstBox is a "Edit List" box.
 type ElstBox struct {
 	*Box
 

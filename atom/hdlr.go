@@ -6,11 +6,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// HdlrBox - Handler Reference Box
-// Box Type: hdlr
-// Container: Media Box (mdia) or Meta Box (meta)
-// Mandatory: Yes
-// Quantity: Exactly one
+// HdlrBox is a "Handler Reference" box.
 type HdlrBox struct {
 	*Box
 

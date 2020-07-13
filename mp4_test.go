@@ -18,7 +18,8 @@ func TestOpen_Mp4(t *testing.T) {
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	ftyp := atom.MustGetChildBox(s, "ftyp").(*atom.FtypBox)
+	ftypBoxes := atom.ChildBoxes(s, "ftyp")
+	ftyp := ftypBoxes[0].(*atom.FtypBox)
 
 	if ftyp.Name() != "ftyp" {
 		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
@@ -33,7 +34,8 @@ func TestOpen_Heic(t *testing.T) {
 	s, err := Open(testHeicFilepath)
 	log.PanicIf(err)
 
-	ftyp := atom.MustGetChildBox(s, "ftyp").(*atom.FtypBox)
+	ftypBoxes := atom.ChildBoxes(s, "ftyp")
+	ftyp := ftypBoxes[0].(*atom.FtypBox)
 
 	if ftyp.Name() != "ftyp" {
 		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
@@ -48,28 +50,35 @@ func ExampleOpen() {
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	ftyp := atom.MustGetChildBox(s, "ftyp").(*atom.FtypBox)
+	ftypBoxes := atom.ChildBoxes(s, "ftyp")
+	ftyp := ftypBoxes[0].(*atom.FtypBox)
 
 	fmt.Println(ftyp.Name())
 	fmt.Println(ftyp.MajorBrand)
 	fmt.Println(ftyp.MinorVersion)
 	fmt.Println(ftyp.CompatibleBrands)
 
-	moov := atom.MustGetChildBox(s, "moov").(*atom.MoovBox)
+	moovBoxes := atom.ChildBoxes(s, "moov")
+	moov := moovBoxes[0].(*atom.MoovBox)
 
 	fmt.Println(moov.Name(), moov.Size())
 
-	mvhd := atom.MustGetChildBox(moov, "mvhd").(*atom.MvhdBox)
+	mvhdBoxes := atom.ChildBoxes(moov, "mvhd")
+	mvhd := mvhdBoxes[0].(*atom.MvhdBox)
 
 	fmt.Println(mvhd.Name())
 	fmt.Println(mvhd.Version)
 	fmt.Println(mvhd.Volume)
 
-	// TODO(dustin): !! Finish this. A sequence of box types may include the same box-type multiple times. We need to update the index to have slices instead of single values. Then, we can update this to access that slice.
-	// fmt.Println("trak size: ", moov.Traks[0].Size())
-	// fmt.Println("trak size: ", moov.Traks[1].Size())
+	trakBoxes := atom.ChildBoxes(moov, "trak")
+	trak0 := trakBoxes[0].(*atom.TrakBox)
+	trak1 := trakBoxes[1].(*atom.TrakBox)
 
-	mdat := atom.MustGetChildBox(s, "mdat").(*atom.MdatBox)
+	fmt.Println("trak size: ", trak0.Size())
+	fmt.Println("trak size: ", trak1.Size())
+
+	mdatBoxes := atom.ChildBoxes(s, "mdat")
+	mdat := mdatBoxes[0].(*atom.MdatBox)
 
 	fmt.Println("mdat size: ", mdat.Size())
 

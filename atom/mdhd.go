@@ -8,11 +8,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// MdhdBox - Media Header Box
-// Box Type: mdhd
-// Container: Media Box (mdia)
-// Mandatory: Yes
-// Quantity: Any number.
+// MdhdBox is a "Media Header" box.
 //
 // The media header declares overall information that is media-independent,
 // and relevant to characteristics of the media in a track.

@@ -22,23 +22,7 @@ type File struct {
 	LoadedBoxIndex
 }
 
-// // TODO(dustin): This are bridging accessors to keep the tests working while we transition to using indexing.
-// //>>>>
-
-// func (f *File) Ftyp() *FtypBox {
-// 	return f.ftyp
-// }
-
-// func (f *File) Moov() *MoovBox {
-// 	return f.moov
-// }
-
-// func (f *File) Mdat() *MdatBox {
-// 	return f.mdat
-// }
-
-// // <<<<
-
+// NewFile returns a new File struct.
 func NewFile(rs io.ReadSeeker, size int64) *File {
 	return &File{
 		rs:   rs,
@@ -56,31 +40,6 @@ func (f *File) Parse() (err error) {
 
 	boxes, err := readBoxes(f, int64(0), f.size)
 	log.PanicIf(err)
-
-	// for _, box := range boxes {
-	// 	switch box.Name() {
-	// 	case "ftyp":
-	// 		f.ftyp = &FtypBox{Box: box}
-
-	// 		err := f.ftyp.parse()
-	// 		log.PanicIf(err)
-
-	// 	case "wide":
-	// 		// fmt.Println("found wide")
-
-	// 	case "mdat":
-	// 		f.mdat = &MdatBox{Box: box}
-	// 		// No mdat boxes to parse
-
-	// 	case "moov":
-	// 		f.moov = &MoovBox{Box: box}
-
-	// 		err := f.moov.parse()
-	// 		log.PanicIf(err)
-
-	// 		f.isFragmented = f.moov.IsFragmented
-	// 	}
-	// }
 
 	f.LoadedBoxIndex = boxes.Index()
 

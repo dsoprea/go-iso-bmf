@@ -30,6 +30,7 @@ func GetDurationString(duration uint32, timescale uint32) string {
 // Fixed16 is an 8.8 Fixed Point Decimal notation
 type Fixed16 uint16
 
+// String returns a descriptive string.
 func (f Fixed16) String() string {
 	return fmt.Sprintf("%v", uint16(f)>>8)
 }

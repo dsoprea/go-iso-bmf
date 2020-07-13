@@ -11,11 +11,7 @@ const (
 	TrackFlagInPreview = 0x0004
 )
 
-// MoovBox - Movie Box
-// Box Type: moov
-// Container: File
-// Mandatory: Yes
-// Quantity: Exactly one.
+// MoovBox is a "Movie" box.
 //
 // The metadata for a presentation is stored in the single Movie Box which occurs
 // at the top-level of a file. Normally this box is close to the beginning or end
@@ -26,7 +22,8 @@ type MoovBox struct {
 	Mvhd  *MvhdBox
 	Traks []*TrakBox
 
-	IsFragmented bool // check for mvex box exists
+	// check if mvex box exists
+	IsFragmented bool
 
 	LoadedBoxIndex
 }
@@ -40,37 +37,6 @@ func (b *MoovBox) parse() (err error) {
 
 	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
-
-	// for _, box := range boxes {
-	// 	switch box.Name() {
-	// 	case "mvhd":
-	// 		b.Mvhd = &MvhdBox{Box: box}
-
-	// 		err := b.Mvhd.parse()
-	// 		log.PanicIf(err)
-
-	// 	case "iods":
-	// 		// fmt.Println("found iods")
-
-	// 	case "trak":
-	// 		trak := &TrakBox{Box: box}
-
-	// 		err := trak.parse()
-	// 		log.PanicIf(err)
-
-	// 		b.Traks = append(b.Traks, trak)
-
-	// 	case "udta":
-	// 		// fmt.Println("found udta")
-
-	// 	case "mvex":
-	// 		// fmt.Println("found mvex")
-
-	// 		// TODO(dustin): What is this?
-
-	// 		b.IsFragmented = true
-	// 	}
-	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

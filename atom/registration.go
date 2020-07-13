@@ -25,17 +25,18 @@ type CommonBox interface {
 	Name() string
 }
 
+// BoxChildIndexer is a box that has children.
 type BoxChildIndexer interface {
-	GetChildBox(name string) (cb CommonBox, err error)
+	GetChildBoxes(name string) (boxes []CommonBox, err error)
 }
 
-// MustGetChildBox is a simple wrapper that panics if the child box could not be
-// gotten.
-func MustGetChildBox(cb BoxChildIndexer, name string) (ccb CommonBox) {
-	ccb, err := cb.GetChildBox(name)
+// ChildBoxes is a simple wrapper that gets all children of the given type or
+// panics if none.
+func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
+	boxes, err := bci.GetChildBoxes(name)
 	log.PanicIf(err)
 
-	return ccb
+	return boxes
 }
 
 type boxFactory interface {

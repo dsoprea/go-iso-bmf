@@ -6,11 +6,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// HmhdBox - Hint Media Header Box
-// Box Type: hmhd
-// Container: Media Information Box (minf).
-// Mandatory: Yes
-// Quantity: Exactly one specific media header shall be present.
+// HmhdBox is a "Hint Media Header" box.
 //
 // Contains general information, independent of the protocol, for hint tracks.
 type HmhdBox struct {

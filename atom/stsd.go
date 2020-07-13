@@ -6,11 +6,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// StsdBox - Sample Description Box
-// Box Type: stsd
-// Container: Sample Table Box (stbl)
-// Mandatory: Yes
-// Quantity: Exactly one.
+// StsdBox is a "Sample Description" box.
 type StsdBox struct {
 	*Box
 
@@ -37,16 +33,6 @@ func (b *StsdBox) parse() (err error) {
 	// Skip extra 8 bytes.
 	boxes, err := b.Box.readBoxes(8)
 	log.PanicIf(err)
-
-	// for _, box := range boxes {
-	// 	switch box.Name() {
-	// 	case "avc1":
-	// 		b.Avc1 = &Avc1Box{Box: box}
-
-	// 		err := b.Avc1.parse()
-	// 		log.PanicIf(err)
-	// 	}
-	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

@@ -18,9 +18,6 @@ func (b *Avc1Box) parse() (err error) {
 		}
 	}()
 
-	// TODO(dustin): !! The parse methods are sometimes/never checked for error returns.
-	// TODO(dustin): Dump the parse() methods when we can.
-
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 

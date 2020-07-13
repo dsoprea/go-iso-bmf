@@ -7,17 +7,18 @@ import (
 )
 
 // FtypBox is a file-type box.
-//
-// Box Type: ftyp
-// Container: File
-// Mandatory: Yes
-// Quantity: Exactly one
 type FtypBox struct {
 	*Box
 
-	MajorBrand       string   // Brand identifer.
-	MinorVersion     uint32   // Informative integer for the minor version of the major brand.
-	CompatibleBrands []string // A list, to the end of the box, of brands.
+	// MajorBrand is a brand identifer.
+	MajorBrand string
+
+	// MinorVersion is an informative integer for the minor version of the
+	// major brand.
+	MinorVersion uint32
+
+	// CompatibleBrands is a list of brands.
+	CompatibleBrands []string
 }
 
 func (b *FtypBox) parse() (err error) {

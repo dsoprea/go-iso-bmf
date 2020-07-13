@@ -6,11 +6,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// SttsBox - Decoding Time to Sample Box
-// Box Type: stts
-// Container: Sample Table Box (stbl)
-// Mandatory: Yes
-// Quantity: Exactly one.
+// SttsBox is a "Decoding Time to Sample" box.
 type SttsBox struct {
 	*Box
 

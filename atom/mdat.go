@@ -4,13 +4,10 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// MdatBox - Media Data Box
-// Box Type: mdat
-// Container: File
-// Mandatory: No
-// Quantity: Any number.
+// MdatBox is a "Media Data" box.
 //
-// A container box which can hold the actual media data for a presentation (mdat).
+// A container box which can hold the actual media data for a presentation
+// (mdat).
 type MdatBox struct {
 	*Box
 }

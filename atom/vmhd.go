@@ -6,11 +6,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// VmhdBox - Video Media Header Box
-// Box Type: vmhd
-// Container: Media Information Box (minf)
-// Mandatory: Yes
-// Quantity: Exactly one specific media header shall be present.
+// VmhdBox is the "Video Media Header" box.
 type VmhdBox struct {
 	*Box
 

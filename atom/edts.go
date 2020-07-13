@@ -4,11 +4,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// EdtsBox - Edit Box
-// Box Type: edts
-// Container: Track Box (trak)
-// Mandatory: No
-// Quantity: Zero or one
+// EdtsBox is an "Edit" box.
 type EdtsBox struct {
 	*Box
 
@@ -26,18 +22,6 @@ func (b *EdtsBox) parse() (err error) {
 
 	boxes, err := b.Box.readBoxes(0)
 	log.PanicIf(err)
-
-	// for _, box := range boxes {
-	// 	switch box.Name() {
-	// 	case "elst":
-	// 		b.Elst = &ElstBox{
-	// 			CommonBox: box,
-	// 		}
-
-	// 		err := b.Elst.parse()
-	// 		log.PanicIf(err)
-	// 	}
-	// }
 
 	b.LoadedBoxIndex = boxes.Index()
 

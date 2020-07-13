@@ -71,6 +71,27 @@ func (b *Box) readBoxData() (data []byte, err error) {
 	return data, nil
 }
 
+// LoadedBoxIndex provides a GetChildBoxes() method that returns a child box if
+// present or panics with a descriptive error.
+type LoadedBoxIndex map[string][]CommonBox
+
+// GetChildBox returns the given child box or panics. If box does not support
+// children this should return ErrNoChildren.
+func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	boxes, found := lbi[name]
+	if found == false {
+		log.Panicf("child box not found: [%s]", name)
+	}
+
+	return boxes, nil
+}
+
 // Boxes is a slice of boxes that have been parsed and are ready to be acted on.
 type Boxes []CommonBox
 
@@ -82,38 +103,23 @@ func (boxes Boxes) Index() (index LoadedBoxIndex) {
 	index = make(LoadedBoxIndex)
 
 	for _, box := range boxes {
-		index[box.Name()] = box
+		name := box.Name()
+		if existing, found := index[name]; found == true {
+			index[name] = append(existing, box)
+		} else {
+			index[name] = []CommonBox{box}
+		}
 	}
 
 	return index
 }
 
-// LoadedBoxIndex provides a GetChildBox() method that returns a child box if
-// present or panics with a descriptive error.
-type LoadedBoxIndex map[string]CommonBox
-
-// GetChildBox returns the given child box or panics. If box does not support
-// children this should return ErrNoChildren.
-func (lbi LoadedBoxIndex) GetChildBox(name string) (cb CommonBox, err error) {
-	defer func() {
-		if errRaw := recover(); errRaw != nil {
-			err = log.Wrap(errRaw.(error))
-		}
-	}()
-
-	cb, found := lbi[name]
-	if found == false {
-		log.Panicf("child box not found: [%s]", name)
-	}
-
-	return cb, nil
-}
-
-// UnsupportedBoxIndex provides a GetChildBox() method that always panics.
+// UnsupportedBoxIndex provides a GetChildBoxes() method that always panics due
+// to lack of support.
 type UnsupportedBoxIndex struct{}
 
 // GetChildBox returns the given child box or panics uncontrollably.
-func (UnsupportedBoxIndex) GetChildBox(name string) (cb CommonBox, err error) {
+func (UnsupportedBoxIndex) GetChildBoxes(name string) (CommonBox, error) {
 	return nil, ErrNoChildren
 }
 

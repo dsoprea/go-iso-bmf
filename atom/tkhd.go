@@ -6,11 +6,7 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// TkhdBox - Track Header Box
-// Box Type: tkhd
-// Container: Track Box (trak)
-// Mandatory: Yes
-// Quantity: Exactly one.
+// TkhdBox is a "Track Header" box.
 type TkhdBox struct {
 	*Box
 
