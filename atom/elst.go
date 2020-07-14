@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -67,15 +65,15 @@ func (b *ElstBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
-	b.version = binary.BigEndian.Uint32(data[0:4])
-	b.entryCount = binary.BigEndian.Uint32(data[4:8])
+	b.version = defaultEndianness.Uint32(data[0:4])
+	b.entryCount = defaultEndianness.Uint32(data[4:8])
 	b.entries = make([]elstEntry, b.entryCount)
 
 	for i := 0; i < len(b.entries); i++ {
-		b.entries[i].segmentDuration = binary.BigEndian.Uint32(data[(8 + 12*i):(12 + 12*i)])
-		b.entries[i].mediaTime = binary.BigEndian.Uint32(data[(12 + 12*i):(16 + 12*i)])
-		b.entries[i].mediaRate = binary.BigEndian.Uint16(data[(16 + 12*i):(18 + 12*i)])
-		b.entries[i].mediaRateFraction = binary.BigEndian.Uint16(data[(18 + 12*i):(20 + 12*i)])
+		b.entries[i].segmentDuration = defaultEndianness.Uint32(data[(8 + 12*i):(12 + 12*i)])
+		b.entries[i].mediaTime = defaultEndianness.Uint32(data[(12 + 12*i):(16 + 12*i)])
+		b.entries[i].mediaRate = defaultEndianness.Uint16(data[(16 + 12*i):(18 + 12*i)])
+		b.entries[i].mediaRateFraction = defaultEndianness.Uint16(data[(18 + 12*i):(20 + 12*i)])
 	}
 
 	return nil

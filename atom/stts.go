@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -48,15 +46,15 @@ func (b *SttsBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.flags = binary.BigEndian.Uint32(data[0:4])
+	b.flags = defaultEndianness.Uint32(data[0:4])
 
-	count := binary.BigEndian.Uint32(data[4:8])
+	count := defaultEndianness.Uint32(data[4:8])
 	b.sampleCounts = make([]uint32, count)
 	b.sampleDeltas = make([]uint32, count)
 
 	for i := 0; i < int(count); i++ {
-		b.sampleCounts[i] = binary.BigEndian.Uint32(data[(8 + 8*i):(12 + 8*i)])
-		b.sampleDeltas[i] = binary.BigEndian.Uint32(data[(12 + 8*i):(16 + 8*i)])
+		b.sampleCounts[i] = defaultEndianness.Uint32(data[(8 + 8*i):(12 + 8*i)])
+		b.sampleDeltas[i] = defaultEndianness.Uint32(data[(12 + 8*i):(16 + 8*i)])
 	}
 
 	return nil

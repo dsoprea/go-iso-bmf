@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -85,13 +83,13 @@ func (b *TkhdBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.flags = binary.BigEndian.Uint32(data[0:4])
-	b.creationTime = binary.BigEndian.Uint32(data[4:8])
-	b.modificationTime = binary.BigEndian.Uint32(data[8:12])
-	b.trackID = binary.BigEndian.Uint32(data[12:16])
-	b.duration = binary.BigEndian.Uint32(data[20:24])
-	b.layer = binary.BigEndian.Uint16(data[32:34])
-	b.alternateGroup = binary.BigEndian.Uint16(data[34:36])
+	b.flags = defaultEndianness.Uint32(data[0:4])
+	b.creationTime = defaultEndianness.Uint32(data[4:8])
+	b.modificationTime = defaultEndianness.Uint32(data[8:12])
+	b.trackID = defaultEndianness.Uint32(data[12:16])
+	b.duration = defaultEndianness.Uint32(data[20:24])
+	b.layer = defaultEndianness.Uint16(data[32:34])
+	b.alternateGroup = defaultEndianness.Uint16(data[34:36])
 	b.volume = fixed16(data[36:38])
 	b.matrix = data[40:76]
 	b.width = fixed32(data[76:80])

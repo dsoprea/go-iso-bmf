@@ -3,8 +3,6 @@ package atom
 import (
 	"io"
 
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -57,7 +55,7 @@ func (f *File) readBoxAt(offset int64) (boxSize uint32, boxType string, err erro
 	buf, err := f.readBytesAt(boxHeaderSize, offset)
 	log.PanicIf(err)
 
-	boxSize = binary.BigEndian.Uint32(buf[0:4])
+	boxSize = defaultEndianness.Uint32(buf[0:4])
 	boxType = string(buf[4:8])
 
 	return boxSize, boxType, nil

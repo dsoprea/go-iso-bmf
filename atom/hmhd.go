@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -50,10 +48,10 @@ func (b *HmhdBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.maxPDUSize = binary.BigEndian.Uint16(data[0:2])
-	b.avgPDUSize = binary.BigEndian.Uint16(data[2:4])
-	b.maxBitrate = binary.BigEndian.Uint32(data[4:8])
-	b.avgBitrate = binary.BigEndian.Uint32(data[8:12])
+	b.maxPDUSize = defaultEndianness.Uint16(data[0:2])
+	b.avgPDUSize = defaultEndianness.Uint16(data[2:4])
+	b.maxBitrate = defaultEndianness.Uint32(data[4:8])
+	b.avgBitrate = defaultEndianness.Uint32(data[8:12])
 
 	return nil
 }

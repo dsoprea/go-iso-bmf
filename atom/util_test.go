@@ -3,8 +3,6 @@ package atom
 import (
 	"fmt"
 	"testing"
-
-	"encoding/binary"
 )
 
 func TestGetDurationString(t *testing.T) {
@@ -31,7 +29,7 @@ func TestFixed16(t *testing.T) {
 		t.Fatalf("bl not correct.")
 	}
 
-	if uint16(b1) != uint16(binary.BigEndian.Uint16(b)) {
+	if uint16(b1) != uint16(defaultEndianness.Uint16(b)) {
 		t.Fatalf("bl not correct.")
 	}
 
@@ -46,7 +44,7 @@ func TestFixed32(t *testing.T) {
 		t.Fatalf("fixed32 not correct.")
 	}
 
-	if uint32(a1) != uint32(binary.BigEndian.Uint32(a)) {
+	if uint32(a1) != uint32(defaultEndianness.Uint32(a)) {
 		t.Fatalf("uint32 not correct.")
 	}
 }

@@ -3,6 +3,8 @@ package atom
 import (
 	"fmt"
 
+	"encoding/binary"
+
 	"github.com/dsoprea/go-logging"
 )
 
@@ -13,6 +15,10 @@ var (
 const (
 	// boxHeaderSize is the size of box header.
 	boxHeaderSize = int64(8)
+)
+
+var (
+	defaultEndianness binary.ByteOrder = binary.BigEndian
 )
 
 // Box defines an Atom Box structure.

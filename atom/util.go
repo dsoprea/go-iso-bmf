@@ -3,8 +3,6 @@ package atom
 import (
 	"fmt"
 	"math"
-
-	"encoding/binary"
 )
 
 // GetDurationString Helper function to print a duration value in the form H:MM:SS.MS
@@ -36,12 +34,12 @@ func (f Fixed16) String() string {
 }
 
 func fixed16(bytes []byte) Fixed16 {
-	return Fixed16(binary.BigEndian.Uint16(bytes))
+	return Fixed16(defaultEndianness.Uint16(bytes))
 }
 
 // Fixed32 is a 16.16 Fixed Point Decimal notation
 type Fixed32 uint32
 
 func fixed32(bytes []byte) Fixed32 {
-	return Fixed32(binary.BigEndian.Uint32(bytes))
+	return Fixed32(defaultEndianness.Uint32(bytes))
 }

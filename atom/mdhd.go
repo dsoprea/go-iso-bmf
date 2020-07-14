@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -66,12 +64,12 @@ func (b *MdhdBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.flags = binary.BigEndian.Uint32(data[0:4])
-	b.creationTime = binary.BigEndian.Uint32(data[4:8])
-	b.modificationTime = binary.BigEndian.Uint32(data[8:12])
-	b.timescale = binary.BigEndian.Uint32(data[12:16])
-	b.duration = binary.BigEndian.Uint32(data[16:20])
-	b.language = binary.BigEndian.Uint16(data[20:22])
+	b.flags = defaultEndianness.Uint32(data[0:4])
+	b.creationTime = defaultEndianness.Uint32(data[4:8])
+	b.modificationTime = defaultEndianness.Uint32(data[8:12])
+	b.timescale = defaultEndianness.Uint32(data[12:16])
+	b.duration = defaultEndianness.Uint32(data[16:20])
+	b.language = defaultEndianness.Uint16(data[20:22])
 	b.languageString = b.getLanguageString()
 
 	return nil

@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -35,7 +33,7 @@ func (b *StsdBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.flags = binary.BigEndian.Uint32(data[0:4])
+	b.flags = defaultEndianness.Uint32(data[0:4])
 
 	// Skip extra 8 bytes.
 	boxes, err := b.Box.readBoxes(8)

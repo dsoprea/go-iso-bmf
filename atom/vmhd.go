@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -43,9 +41,9 @@ func (b *VmhdBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.flags = binary.BigEndian.Uint32(data[0:4])
-	b.graphicsMode = binary.BigEndian.Uint16(data[4:6])
-	b.opColor = binary.BigEndian.Uint16(data[6:8])
+	b.flags = defaultEndianness.Uint32(data[0:4])
+	b.graphicsMode = defaultEndianness.Uint16(data[4:6])
+	b.opColor = defaultEndianness.Uint16(data[6:8])
 
 	return nil
 }

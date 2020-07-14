@@ -1,8 +1,6 @@
 package atom
 
 import (
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -44,7 +42,7 @@ func (b *HdlrBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.flags = binary.BigEndian.Uint32(data[0:4])
+	b.flags = defaultEndianness.Uint32(data[0:4])
 	b.handler = string(data[8:12])
 	b.hdlrName = string(data[24 : b.Size()-boxHeaderSize])
 

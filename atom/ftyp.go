@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"encoding/binary"
-
 	"github.com/dsoprea/go-logging"
 )
 
@@ -61,7 +59,7 @@ func (fb *FtypBox) parse() (err error) {
 	log.PanicIf(err)
 
 	fb.majorBrand = string(data[0:4])
-	fb.minorVersion = binary.BigEndian.Uint32(data[4:8])
+	fb.minorVersion = defaultEndianness.Uint32(data[4:8])
 
 	if len(data) > 8 {
 		for i := 8; i < len(data); i += 4 {
