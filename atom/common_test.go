@@ -2,8 +2,10 @@ package atom
 
 import (
 	"bytes"
+	"reflect"
 	"testing"
-	// "github.com/dsoprea/go-logging"
+
+	"github.com/dsoprea/go-logging"
 	// "github.com/dsoprea/go-utility/filesystem"
 )
 
@@ -85,5 +87,111 @@ func TestPushBox_Multiple(t *testing.T) {
 
 	if bytes.Equal(b, expected) != true {
 		t.Fatalf("Bytes not correct: %x\n", b)
+	}
+}
+
+func pushBytes(buffer *[]byte, x interface{}) {
+	var encoded []byte
+
+	if u32, ok := x.(uint32); ok == true {
+		encoded = make([]byte, 4)
+
+		defaultEndianness.PutUint32(
+			encoded,
+			u32)
+	} else if u64, ok := x.(uint64); ok == true {
+		encoded = make([]byte, 8)
+
+		defaultEndianness.PutUint64(
+			encoded,
+			u64)
+	} else {
+		log.Panicf("can not encode [%v] [%v]", reflect.TypeOf(x), x)
+	}
+
+	*buffer = append(*buffer, encoded...)
+}
+
+func TestPushBytes_32_ToEmpty(t *testing.T) {
+	value := uint32(1234)
+
+	var b []byte
+	pushBytes(&b, value)
+
+	if len(b) != 4 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	expected := make([]byte, 4)
+
+	defaultEndianness.PutUint32(
+		expected,
+		value)
+
+	if bytes.Equal(b, expected) != true {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
+func TestPushBytes_32_ToNonEmpty(t *testing.T) {
+	value := uint32(1234)
+
+	b := make([]byte, 4)
+	pushBytes(&b, value)
+
+	if len(b) != 8 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	expected := make([]byte, 4)
+
+	defaultEndianness.PutUint32(
+		expected,
+		value)
+
+	if bytes.Equal(b[4:], expected) != true {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
+func TestPushBytes_64_ToEmpty(t *testing.T) {
+	value := uint64(12345678)
+
+	var b []byte
+	pushBytes(&b, value)
+
+	if len(b) != 8 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	expected := make([]byte, 8)
+
+	defaultEndianness.PutUint64(
+		expected,
+		value)
+
+	if bytes.Equal(b, expected) != true {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
+func TestPushBytes_64_ToNonEmpty(t *testing.T) {
+	value := uint64(12345678)
+
+	b := make([]byte, 4)
+	pushBytes(&b, value)
+
+	if len(b) != 12 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	expected := make([]byte, 12)
+
+	defaultEndianness.PutUint64(
+		expected[4:],
+		value)
+
+	if bytes.Equal(b, expected) != true {
+		t.Fatalf("Bytes not correct: %x", b)
 	}
 }
