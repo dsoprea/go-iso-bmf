@@ -81,38 +81,78 @@ func (f *File) readBoxAt(offset int64) (boxSize uint32, boxType string, err erro
 	return boxSize, boxType, nil
 }
 
-func readBoxes(f *File, start int64, n int64) (boxes Boxes, err error) {
+func (f *File) readBaseBox(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
 
-	// TODO(dustin): Can make this a common method?
+	// TODO(dustin): Add test
+
+	size, name, err := f.readBoxAt(offset)
+	log.PanicIf(err)
+
+	box = newBox(name, offset, int64(size), f)
+
+	return box, nil
+}
+
+func readBox(f *File, offset int64) (cb CommonBox, known bool, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	// TODO(dustin): Add test
+
+	fileLogger.Debugf(nil, "Reading box at offset (0x%016x).", offset)
+
+	box, err := f.readBaseBox(offset)
+	log.PanicIf(err)
+
+	name := box.Name()
+
+	bf := GetFactory(name)
+
+	if bf == nil {
+		boxLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
+		return box, false, nil
+	}
+
+	// Construct the type-specific box.
+
+	cb, err = bf.New(box)
+	log.PanicIf(err)
+
+	return cb, true, nil
+}
+
+func readBoxes(f *File, start int64, totalSize int64) (boxes Boxes, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
 
 	i := 0
-	for offset := start; offset < start+n; {
+	for offset := start; offset < start+totalSize; {
 		fileLogger.Debugf(nil, "Reading box (%d) at offset (0x%016x).", i, offset)
 
-		size, name, err := f.readBoxAt(offset)
+		cb, known, err := readBox(f, offset)
 		log.PanicIf(err)
 
-		bf := GetFactory(name)
-
-		if bf != nil {
-			// Construct the type-specific box.
-
-			box := newBox(name, offset, int64(size), f)
-
-			c, err := bf.New(box)
-			log.PanicIf(err)
-
-			boxes = append(boxes, c)
+		if known == true {
+			boxes = append(boxes, cb)
 		} else {
+			name := cb.Name()
 			boxLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
 		}
 
-		offset += int64(size)
+		boxSize := cb.Size()
+
+		offset += int64(boxSize)
 		i++
 	}
 

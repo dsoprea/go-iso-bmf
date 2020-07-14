@@ -1,6 +1,8 @@
 package atom
 
 import (
+	"fmt"
+
 	"github.com/dsoprea/go-logging"
 )
 
@@ -31,6 +33,18 @@ func (hb *HdlrBox) HdlrName() string {
 	return hb.hdlrName
 }
 
+// String returns a descriptive string.
+func (hb *HdlrBox) String() string {
+	return fmt.Sprintf("hdlr<%s>", hb.InlineString())
+}
+
+// InlineString returns an undecorated string of field names and values.
+func (hb *HdlrBox) InlineString() string {
+	return fmt.Sprintf(
+		"%s VER=(0x%02x) FLAGS=(0x%08x) HANDLER=[%s] HDLR-NAME=[%s]",
+		hb.Box.InlineString(), hb.version, hb.flags, hb.handler, hb.hdlrName)
+}
+
 func (b *HdlrBox) parse() (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -42,9 +56,22 @@ func (b *HdlrBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-	b.flags = defaultEndianness.Uint32(data[0:4])
+
+	// Copy the three bytes of flags into a four-byte space so it can be
+	// properly ordered.
+	flagsRaw := make([]byte, 4)
+	copy(flagsRaw, data[1:4])
+
+	b.flags = defaultEndianness.Uint32(flagsRaw)
+
+	// TODO(dustin): Skipping over data, here?
+
 	b.handler = string(data[8:12])
-	b.hdlrName = string(data[24 : b.Size()-boxHeaderSize])
+
+	// TODO(dustin): Skipping over data, here?
+
+	boxDataSize := b.Size() - boxHeaderSize
+	b.hdlrName = string(data[24:boxDataSize])
 
 	return nil
 }

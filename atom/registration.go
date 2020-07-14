@@ -24,6 +24,10 @@ type CommonBox interface {
 	// Name returns the name of the box-type.
 	Name() string
 
+	// Size is the total size of the box on disk including standard eight-byte
+	// header.
+	Size() int64
+
 	// InlineString returns an undecorated string of field names and values.
 	InlineString() string
 }

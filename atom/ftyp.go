@@ -45,7 +45,9 @@ func (fb *FtypBox) String() string {
 
 // InlineString returns an undecorated string of field names and values.
 func (fb *FtypBox) InlineString() string {
-	return fmt.Sprintf("%s MAJOR-BRAND=[%s] MINOR-VER=(%d) COMPAT-BRANDS=[%s]", fb.Box.InlineString(), fb.majorBrand, fb.minorVersion, strings.Join(fb.compatibleBrands, ","))
+	return fmt.Sprintf(
+		"%s MAJOR-BRAND=[%s] MINOR-VER=(0x%08x) COMPAT-BRANDS=[%s]",
+		fb.Box.InlineString(), fb.majorBrand, fb.minorVersion, strings.Join(fb.compatibleBrands, ","))
 }
 
 func (fb *FtypBox) parse() (err error) {
