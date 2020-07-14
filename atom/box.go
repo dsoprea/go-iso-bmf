@@ -24,9 +24,18 @@ var (
 // Box defines an Atom Box structure.
 type Box struct {
 	name  string
-	size  int64
 	start int64
+	size  int64
 	file  *File
+}
+
+func newBox(name string, start, size int64, file *File) Box {
+	return Box{
+		name:  name,
+		start: start,
+		size:  size,
+		file:  file,
+	}
 }
 
 // InlineString returns an undecorated string of field names and values.
@@ -79,8 +88,8 @@ func (box Box) readBoxData() (data []byte, err error) {
 	}
 
 	data, err = box.file.readBytesAt(
-		box.size-boxHeaderSize,
-		box.start+boxHeaderSize)
+		box.start+boxHeaderSize,
+		box.size-boxHeaderSize)
 
 	log.PanicIf(err)
 
@@ -141,43 +150,4 @@ func (boxes Boxes) Index() (index LoadedBoxIndex) {
 	}
 
 	return index
-}
-
-func readBoxes(f *File, start int64, n int64) (boxes Boxes, err error) {
-	defer func() {
-		if errRaw := recover(); errRaw != nil {
-			err = log.Wrap(errRaw.(error))
-		}
-	}()
-
-	// TODO(dustin): Can make this a common method?
-
-	for offset := start; offset < start+n; {
-		size, name, err := f.readBoxAt(offset)
-		log.PanicIf(err)
-
-		bf := GetFactory(name)
-
-		if bf != nil {
-			// Construct the type-specific box.
-
-			box := Box{
-				name:  name,
-				size:  int64(size),
-				file:  f,
-				start: offset,
-			}
-
-			c, err := bf.New(box)
-			log.PanicIf(err)
-
-			boxes = append(boxes, c)
-		} else {
-			boxLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
-		}
-
-		offset += int64(size)
-	}
-
-	return boxes, nil
 }
