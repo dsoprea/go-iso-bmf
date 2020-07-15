@@ -61,7 +61,7 @@ type boxFactory interface {
 	Name() string
 }
 
-func registerAtom(bf boxFactory) {
+func RegisterBoxType(bf boxFactory) {
 	name := bf.Name()
 
 	if _, found := boxMapping[name]; found == true {

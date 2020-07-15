@@ -80,5 +80,5 @@ var (
 )
 
 func init() {
-	registerAtom(vmhdBoxFactory{})
+	RegisterBoxType(vmhdBoxFactory{})
 }

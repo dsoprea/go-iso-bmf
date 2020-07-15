@@ -113,5 +113,5 @@ var (
 )
 
 func init() {
-	registerAtom(elstBoxFactory{})
+	RegisterBoxType(elstBoxFactory{})
 }

@@ -58,5 +58,5 @@ var (
 )
 
 func init() {
-	registerAtom(stblBoxFactory{})
+	RegisterBoxType(stblBoxFactory{})
 }

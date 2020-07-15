@@ -58,5 +58,5 @@ var (
 )
 
 func init() {
-	registerAtom(edtsBoxFactory{})
+	RegisterBoxType(edtsBoxFactory{})
 }

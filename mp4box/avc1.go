@@ -65,5 +65,5 @@ var (
 )
 
 func init() {
-	registerAtom(avc1BoxFactory{})
+	RegisterBoxType(avc1BoxFactory{})
 }

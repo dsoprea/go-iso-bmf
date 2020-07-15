@@ -76,5 +76,5 @@ var (
 )
 
 func init() {
-	registerAtom(stsdBoxFactory{})
+	RegisterBoxType(stsdBoxFactory{})
 }

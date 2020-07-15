@@ -88,5 +88,5 @@ var (
 )
 
 func init() {
-	registerAtom(hmhdBoxFactory{})
+	RegisterBoxType(hmhdBoxFactory{})
 }

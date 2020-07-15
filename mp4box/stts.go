@@ -92,5 +92,5 @@ var (
 )
 
 func init() {
-	registerAtom(sttsBoxFactory{})
+	RegisterBoxType(sttsBoxFactory{})
 }

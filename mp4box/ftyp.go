@@ -104,5 +104,5 @@ var (
 )
 
 func init() {
-	registerAtom(ftypBoxFactory{})
+	RegisterBoxType(ftypBoxFactory{})
 }

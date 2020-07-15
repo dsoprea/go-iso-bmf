@@ -96,5 +96,5 @@ var (
 )
 
 func init() {
-	registerAtom(mvhdBoxFactory{})
+	RegisterBoxType(mvhdBoxFactory{})
 }

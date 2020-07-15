@@ -61,5 +61,5 @@ var (
 )
 
 func init() {
-	registerAtom(minfBoxFactory{})
+	RegisterBoxType(minfBoxFactory{})
 }

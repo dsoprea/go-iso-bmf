@@ -130,5 +130,5 @@ var (
 )
 
 func init() {
-	registerAtom(tkhdBoxFactory{})
+	RegisterBoxType(tkhdBoxFactory{})
 }

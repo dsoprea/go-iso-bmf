@@ -78,5 +78,5 @@ var (
 )
 
 func init() {
-	registerAtom(moovBoxFactory{})
+	RegisterBoxType(moovBoxFactory{})
 }

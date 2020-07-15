@@ -65,5 +65,5 @@ var (
 )
 
 func init() {
-	registerAtom(trakBoxFactory{})
+	RegisterBoxType(trakBoxFactory{})
 }

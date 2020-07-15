@@ -41,5 +41,5 @@ var (
 )
 
 func init() {
-	registerAtom(mdatBoxFactory{})
+	RegisterBoxType(mdatBoxFactory{})
 }

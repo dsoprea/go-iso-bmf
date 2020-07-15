@@ -108,5 +108,5 @@ var (
 )
 
 func init() {
-	registerAtom(hdlrBoxFactory{})
+	RegisterBoxType(hdlrBoxFactory{})
 }
