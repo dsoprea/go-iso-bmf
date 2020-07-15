@@ -48,6 +48,8 @@ func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
 	boxes, err := bci.GetChildBoxes(name)
 	log.PanicIf(err)
 
+	// TODO(dustin): Add test
+
 	return boxes
 }
 
@@ -61,7 +63,11 @@ type boxFactory interface {
 	Name() string
 }
 
+// RegisterBoxType registers the factory for a box-type.
 func RegisterBoxType(bf boxFactory) {
+
+	// TODO(dustin): Add test
+
 	name := bf.Name()
 
 	if _, found := boxMapping[name]; found == true {
@@ -74,5 +80,8 @@ func RegisterBoxType(bf boxFactory) {
 // GetFactory returns the factory for the given box-type. Will return `nil` if
 // not known.
 func GetFactory(name string) boxFactory {
+
+	// TODO(dustin): Add test
+
 	return boxMapping[name]
 }

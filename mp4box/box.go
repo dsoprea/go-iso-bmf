@@ -30,6 +30,9 @@ type Box struct {
 }
 
 func newBox(name string, start, size int64, file *File) Box {
+
+	// TODO(dustin): Add test
+
 	return Box{
 		name:  name,
 		start: start,
@@ -40,21 +43,33 @@ func newBox(name string, start, size int64, file *File) Box {
 
 // InlineString returns an undecorated string of field names and values.
 func (box Box) InlineString() string {
+
+	// TODO(dustin): Add test
+
 	return fmt.Sprintf("NAME=[%s] START=(%d) SIZE=(%d)", box.name, box.start, box.size)
 }
 
 // Name returns the box name.
 func (box Box) Name() string {
+
+	// TODO(dustin): Add test
+
 	return box.name
 }
 
 // Size returns the box size.
 func (box Box) Size() int64 {
+
+	// TODO(dustin): Add test
+
 	return box.size
 }
 
 // Start returns the box start offset.
 func (box Box) Start() int64 {
+
+	// TODO(dustin): Add test
+
 	return box.start
 }
 
@@ -64,6 +79,8 @@ func (box Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
+
+	// TODO(dustin): Add test
 
 	start := box.Start() + boxHeaderSize + int64(startDisplace)
 	stop := box.Size() - boxHeaderSize
@@ -82,6 +99,8 @@ func (box Box) readBoxData() (data []byte, err error) {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
+
+	// TODO(dustin): Add test
 
 	if box.size <= boxHeaderSize {
 		return nil, nil
@@ -109,6 +128,8 @@ func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err err
 		}
 	}()
 
+	// TODO(dustin): Add test
+
 	boxes, found := lbi[name]
 	if found == false {
 		log.Panicf("child box not found: [%s]", name)
@@ -120,6 +141,9 @@ func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err err
 // ChildrenTypes returns a slice with the names of all children with registered
 // types.
 func (lbi LoadedBoxIndex) ChildrenTypes() (names []string) {
+
+	// TODO(dustin): Add test
+
 	names = make([]string, len(lbi))
 	i := 0
 	for name, _ := range lbi {
@@ -136,7 +160,7 @@ type Boxes []CommonBox
 // Index returns a dictionary of boxes, keyed by name.
 func (boxes Boxes) Index() (index LoadedBoxIndex) {
 
-	// TODO(dustin): !! Can there be duplicates (read: sequences of boxes that may have more than one of the same type)?
+	// TODO(dustin): Add test
 
 	index = make(LoadedBoxIndex)
 

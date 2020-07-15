@@ -8,6 +8,9 @@ import (
 )
 
 func dump(box interface{}, level int) {
+
+	// TODO(dustin): Add test
+
 	switch t := box.(type) {
 	case BoxChildIndexer:
 		names := t.ChildrenTypes()
@@ -29,5 +32,8 @@ func dump(box interface{}, level int) {
 }
 
 func Dump(box interface{}) {
+
+	// TODO(dustin): Add test
+
 	dump(box, 0)
 }
