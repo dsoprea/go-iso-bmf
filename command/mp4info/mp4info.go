@@ -7,7 +7,7 @@ import (
 	"github.com/jessevdk/go-flags"
 
 	"github.com/dsoprea/go-mp4"
-	"github.com/dsoprea/go-mp4/atom"
+	"github.com/dsoprea/go-mp4/mp4box"
 )
 
 type parameters struct {
@@ -47,7 +47,7 @@ func main() {
 	f, err := mp4.Open(arguments.Filepath)
 	log.PanicIf(err)
 
-	atom.Dump(f)
+	mp4box.Dump(f)
 }
 
 // func getFramerate(sampleCounts []uint32, duration, timescale uint32) string {
@@ -60,7 +60,7 @@ func main() {
 // 	return fmt.Sprintf("%.2f", math.Floor(float64(duration)/float64(timescale)*1000))
 // }
 
-// func to16(i atom.Fixed32) int {
+// func to16(i mp4box.Fixed32) int {
 // 	return int(i / (1 << 16))
 // }
 
@@ -76,15 +76,15 @@ func main() {
 
 // func getFlags(flags uint32) string {
 // 	var f []string
-// 	if flags&atom.TrackFlagEnabled == atom.TrackFlagEnabled {
+// 	if flags&mp4box.TrackFlagEnabled == mp4box.TrackFlagEnabled {
 // 		f = append(f, "ENABLED")
 // 	}
 
-// 	if flags&atom.TrackFlagInMovie == atom.TrackFlagInMovie {
+// 	if flags&mp4box.TrackFlagInMovie == mp4box.TrackFlagInMovie {
 // 		f = append(f, "IN-MOVIE")
 // 	}
 
-// 	if flags&atom.TrackFlagInPreview == atom.TrackFlagInPreview {
+// 	if flags&mp4box.TrackFlagInPreview == mp4box.TrackFlagInPreview {
 // 		f = append(f, "IN-PREVIEW")
 // 	}
 // 	str := strings.Join(f, " ")

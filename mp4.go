@@ -5,11 +5,11 @@ import (
 
 	"github.com/dsoprea/go-logging"
 
-	"github.com/dsoprea/go-mp4/atom"
+	"github.com/dsoprea/go-mp4/mp4box"
 )
 
 // Open opens a file and returns a &File{}.
-func Open(path string) (file *atom.File, err error) {
+func Open(path string) (file *mp4box.File, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -24,7 +24,7 @@ func Open(path string) (file *atom.File, err error) {
 
 	size := s.Size()
 
-	file = atom.NewFile(f, size)
+	file = mp4box.NewFile(f, size)
 
 	err = file.Parse()
 	log.PanicIf(err)
