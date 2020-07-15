@@ -8,9 +8,8 @@ import (
 type ElstBox struct {
 	Box
 
-	version    uint32
-	entryCount uint32
-	entries    []elstEntry
+	version uint32
+	entries []elstEntry
 }
 
 // Version is the version of this box.
@@ -18,20 +17,22 @@ func (eb *ElstBox) Version() uint32 {
 	return eb.version
 }
 
-// EntryCount is the number of entries.
-func (eb *ElstBox) EntryCount() uint32 {
-	return eb.entryCount
-}
-
-// Entries is the number of entries.
+// Entries returns the entries.
 func (eb *ElstBox) Entries() []elstEntry {
 	return eb.entries
 }
 
 type elstEntry struct {
-	segmentDuration   uint32 // Duration of this edit segment.
-	mediaTime         uint32 // Starting time within the media of this edit segment.
-	mediaRate         uint16 // Relative rate at which to play the media corresponding to this segment.
+	// segmentDuration is the duration of this edit segment.
+	segmentDuration uint32
+
+	// mediaTime is the starting time within the media of this edit segment.
+	mediaTime uint32
+
+	// mediaRate is the relative rate at which to play the media corresponding
+	// to this segment.
+	mediaRate uint16
+
 	mediaRateFraction uint16
 }
 
@@ -66,10 +67,11 @@ func (b *ElstBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = defaultEndianness.Uint32(data[0:4])
-	b.entryCount = defaultEndianness.Uint32(data[4:8])
-	b.entries = make([]elstEntry, b.entryCount)
 
-	for i := 0; i < len(b.entries); i++ {
+	entryCount := int(defaultEndianness.Uint32(data[4:8]))
+	b.entries = make([]elstEntry, entryCount)
+
+	for i := 0; i < entryCount; i++ {
 		b.entries[i].segmentDuration = defaultEndianness.Uint32(data[(8 + 12*i):(12 + 12*i)])
 		b.entries[i].mediaTime = defaultEndianness.Uint32(data[(12 + 12*i):(16 + 12*i)])
 		b.entries[i].mediaRate = defaultEndianness.Uint16(data[(16 + 12*i):(18 + 12*i)])
