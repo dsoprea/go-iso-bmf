@@ -93,7 +93,13 @@ func TestPushBox_Multiple(t *testing.T) {
 func pushBytes(buffer *[]byte, x interface{}) {
 	var encoded []byte
 
-	if u32, ok := x.(uint32); ok == true {
+	if u16, ok := x.(uint16); ok == true {
+		encoded = make([]byte, 2)
+
+		defaultEndianness.PutUint16(
+			encoded,
+			u16)
+	} else if u32, ok := x.(uint32); ok == true {
 		encoded = make([]byte, 4)
 
 		defaultEndianness.PutUint32(
@@ -110,6 +116,48 @@ func pushBytes(buffer *[]byte, x interface{}) {
 	}
 
 	*buffer = append(*buffer, encoded...)
+}
+
+func TestPushBytes_16_ToEmpty(t *testing.T) {
+	value := uint16(1234)
+
+	var b []byte
+	pushBytes(&b, value)
+
+	if len(b) != 2 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	expected := make([]byte, 2)
+
+	defaultEndianness.PutUint16(
+		expected,
+		value)
+
+	if bytes.Equal(b, expected) != true {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
+func TestPushBytes_16_ToNonEmpty(t *testing.T) {
+	value := uint16(1234)
+
+	b := make([]byte, 4)
+	pushBytes(&b, value)
+
+	if len(b) != 6 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	expected := make([]byte, 2)
+
+	defaultEndianness.PutUint16(
+		expected,
+		value)
+
+	if bytes.Equal(b[4:], expected) != true {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
 }
 
 func TestPushBytes_32_ToEmpty(t *testing.T) {
