@@ -136,7 +136,7 @@ func TestReadBoxes(t *testing.T) {
 
 	hdlrBoxData := []byte{
 		// 0: version (1)
-		0x11,
+		0x0b,
 
 		// 1: flags (3)
 		flagsBytes[0], flagsBytes[1], flagsBytes[2],
@@ -212,7 +212,7 @@ func TestReadBoxes(t *testing.T) {
 
 	expectedPhrases := []string{
 		"ftyp<NAME=[ftyp] START=(0) SIZE=(24) MAJOR-BRAND=[abcd] MINOR-VER=(0x01020304) COMPAT-BRANDS=[efgh,ijkl]>",
-		"hdlr<NAME=[hdlr] START=(24) SIZE=(40) VER=(0x11) FLAGS=(0x01020300) HANDLER=[abcd] HDLR-NAME=[testname]>",
+		"hdlr<NAME=[hdlr] START=(24) SIZE=(40) VER=(0x0b) FLAGS=(0x01020300) HANDLER=[abcd] HDLR-NAME=[testname]>",
 	}
 
 	if reflect.DeepEqual(actualPhrases, expectedPhrases) != true {
