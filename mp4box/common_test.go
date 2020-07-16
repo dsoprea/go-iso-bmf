@@ -6,20 +6,16 @@ import (
 	"testing"
 
 	"github.com/dsoprea/go-logging"
-	// "github.com/dsoprea/go-utility/filesystem"
 )
 
-// func newBoxEmptyHeader(name string, data []byte) Box {
-// 	b := make([]byte, boxHeaderSize)
-// 	b = append(b, data...)
-
-// 	sb := rifs.NewSeekableBufferWithBytes(b)
-
-// 	file := NewFile(sb, int64(len(b)))
-// 	return newBox(name, 0, int64(len(data)), file)
-// }
-
 func pushBox(buffer *[]byte, name string, data []byte) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+			log.Panic(err)
+		}
+	}()
+
 	start := len(*buffer)
 
 	if data == nil {
