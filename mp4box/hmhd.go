@@ -47,11 +47,13 @@ func (b *HmhdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
+	// TODO(dustin): !! This still needs to be validated. The original implementation was buggy (overlapping bytes). According to the spec, this looks fine, now.
+
 	b.version = data[0]
-	b.maxPDUSize = defaultEndianness.Uint16(data[0:2])
-	b.avgPDUSize = defaultEndianness.Uint16(data[2:4])
-	b.maxBitrate = defaultEndianness.Uint32(data[4:8])
-	b.avgBitrate = defaultEndianness.Uint32(data[8:12])
+	b.maxPDUSize = defaultEndianness.Uint16(data[1:3])
+	b.avgPDUSize = defaultEndianness.Uint16(data[3:5])
+	b.maxBitrate = defaultEndianness.Uint32(data[5:9])
+	b.avgBitrate = defaultEndianness.Uint32(data[9:13])
 
 	return nil
 }

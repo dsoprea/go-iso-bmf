@@ -1,6 +1,9 @@
 package mp4box
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/dsoprea/go-logging"
 )
 
@@ -11,46 +14,106 @@ import (
 type MdhdBox struct {
 	Box
 
-	version          byte
-	flags            uint32
-	creationTime     uint32
-	modificationTime uint32
-	timescale        uint32
-	duration         uint32
-	language         uint16
-	languageString   string
+	version           byte
+	flags             uint32
+	creationEpoch     uint32
+	modificationEpoch uint32
+	timeScale         uint32
+	scaledDuration    uint32
+	language          uint16
 }
 
+// Version returns the version.
 func (mb *MdhdBox) Version() byte {
 	return mb.version
 }
 
+// Flags returns the flags.
 func (mb *MdhdBox) Flags() uint32 {
 	return mb.flags
 }
 
-func (mb *MdhdBox) CreationTime() uint32 {
-	return mb.creationTime
+// CreationTime returns the creation time.
+func (mb *MdhdBox) CreationTime() time.Time {
+	t := EpochToTime(mb.creationEpoch)
+	return t
 }
 
-func (mb *MdhdBox) ModificationTime() uint32 {
-	return mb.modificationTime
+// HasCreationTime returns true if the creation-time looks present.
+func (mb *MdhdBox) HasCreationTime() bool {
+	return mb.creationEpoch > 0
 }
 
-func (mb *MdhdBox) Timescale() uint32 {
-	return mb.timescale
+// ModificationTime returns the modification time.
+func (mb *MdhdBox) ModificationTime() time.Time {
+	t := EpochToTime(mb.modificationEpoch)
+	return t
 }
 
-func (mb *MdhdBox) Duration() uint32 {
-	return mb.duration
+// HasModificationTime returns true if the modification-time looks present.
+func (mb *MdhdBox) HasModificationTime() bool {
+	return mb.modificationEpoch > 0
 }
 
-func (mb *MdhdBox) Language() uint16 {
-	return mb.language
+// TimeScale returns the time-scale.
+func (mb *MdhdBox) TimeScale() uint32 {
+	return mb.timeScale
 }
 
-func (mb *MdhdBox) LanguageString() string {
-	return mb.languageString
+// HasDuration returns true if the duration has a meaningful value.
+func (mb *MdhdBox) HasDuration() bool {
+	allOnes := ^uint32(0)
+	return mb.scaledDuration < allOnes
+}
+
+// ScaledDuration returns the duration in timescale units (divide this number by
+// the time-scale to get the number of seconds).
+func (mb *MdhdBox) ScaledDuration() uint32 {
+	if mb.HasDuration() == false {
+		log.Panicf("duration not set (scaled-duration)")
+	}
+
+	return mb.scaledDuration
+}
+
+// Duration returns the duration as a `time.Duration`.
+func (mb *MdhdBox) Duration() time.Duration {
+	if mb.HasDuration() == false {
+		log.Panicf("duration not set (duration)")
+	}
+
+	durationSeconds := float64(mb.scaledDuration) / float64(mb.timeScale)
+
+	return time.Duration(durationSeconds * float64(time.Second))
+}
+
+// Language returns the stringified language.
+func (mb *MdhdBox) Language() string {
+	languageString := mb.getLanguageString(mb.language)
+
+	return languageString
+}
+
+// String returns a descriptive string.
+func (mb *MdhdBox) String() string {
+	return fmt.Sprintf("mdhd<%s>", mb.InlineString())
+}
+
+// InlineString returns an undecorated string of field names and values.
+func (mb *MdhdBox) InlineString() string {
+	optional := ""
+
+	if mb.HasCreationTime() == true {
+		optional = fmt.Sprintf("%s CTIME=[%s]", optional, mb.CreationTime())
+	}
+
+	if mb.HasModificationTime() == true {
+		optional = fmt.Sprintf("%s MTIME=[%s]", optional, mb.ModificationTime())
+	}
+
+	return fmt.Sprintf(
+		"%s VER=(0x%02x) FLAGS=(0x%08x) DUR-S=[%.02f] LANG=[%s]%s",
+		mb.Box.InlineString(), mb.version, mb.flags, float64(mb.Duration())/float64(time.Second), mb.Language(), optional)
 }
 
 func (b *MdhdBox) parse() (err error) {
@@ -63,24 +126,25 @@ func (b *MdhdBox) parse() (err error) {
 	data, err := b.readBoxData()
 	log.PanicIf(err)
 
+	// TODO(dustin): In the past, we've made some changes regarding the overlap between the "version" byte and whatever comes behind it. However, this box decodes pairly in several respects if we "fix" it.
+
 	b.version = data[0]
 	b.flags = defaultEndianness.Uint32(data[0:4])
-	b.creationTime = defaultEndianness.Uint32(data[4:8])
-	b.modificationTime = defaultEndianness.Uint32(data[8:12])
-	b.timescale = defaultEndianness.Uint32(data[12:16])
-	b.duration = defaultEndianness.Uint32(data[16:20])
+	b.creationEpoch = defaultEndianness.Uint32(data[4:8])
+	b.modificationEpoch = defaultEndianness.Uint32(data[8:12])
+	b.timeScale = defaultEndianness.Uint32(data[12:16])
+	b.scaledDuration = defaultEndianness.Uint32(data[16:20])
 	b.language = defaultEndianness.Uint16(data[20:22])
-	b.languageString = b.getLanguageString()
 
 	return nil
 }
 
-func (b *MdhdBox) getLanguageString() string {
+func (b *MdhdBox) getLanguageString(language uint16) string {
 	var l [3]uint8
 
-	l[0] = uint8((b.language >> 10) & 0x1F)
-	l[1] = uint8((b.language >> 5) & 0x1F)
-	l[2] = uint8((b.language) & 0x1F)
+	l[0] = uint8((language >> 10) & 0b11111)
+	l[1] = uint8((language >> 5) & 0b11111)
+	l[2] = uint8((language) & 0b11111)
 
 	return string([]byte{l[0] + 0x60, l[1] + 0x60, l[2] + 0x60})
 }

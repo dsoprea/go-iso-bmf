@@ -3,6 +3,11 @@ package mp4box
 import (
 	"fmt"
 	"math"
+	"time"
+)
+
+var (
+	epochTime = time.Date(1904, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
 // GetDurationString Helper function to print a duration value in the form H:MM:SS.MS
@@ -52,4 +57,33 @@ func DumpBytes(data []byte) {
 	}
 
 	fmt.Printf("\n")
+}
+
+// EpochDelta returns the number of seconds since the MP4 epoch.
+func EpochDelta(t time.Time) uint32 {
+
+	// TODO(dustin): Add test
+
+	d := t.Sub(epochTime)
+
+	return uint32(math.Floor(float64(d.Seconds())))
+}
+
+// EpochToTime returns a the given MP4 epoch as a `time.Time`.
+func EpochToTime(epoch uint32) time.Time {
+
+	// TODO(dustin): Add test
+
+	duration := time.Second * time.Duration(epoch)
+	t := epochTime.Add(duration)
+
+	return t
+}
+
+// NowTime returns a UTC time.Time that has been rounded to seconds.
+func NowTime() time.Time {
+
+	// TODO(dustin): Add test
+
+	return time.Now().UTC().Round(time.Second)
 }
