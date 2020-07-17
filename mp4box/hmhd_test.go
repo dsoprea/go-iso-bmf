@@ -66,9 +66,7 @@ func TestHmhdBoxFactory_Name(t *testing.T) {
 }
 
 func TestHmhdBoxFactory_New(t *testing.T) {
-	data := []byte{
-		0x11,
-	}
+	var data []byte
 
 	pushBytes(&data, uint16(0x22))
 	pushBytes(&data, uint16(0x33))
@@ -92,7 +90,7 @@ func TestHmhdBoxFactory_New(t *testing.T) {
 
 	hb := cb.(*HmhdBox)
 
-	if hb.Version() != 0x11 {
+	if hb.Version() != 0 {
 		t.Fatalf("Version() not correct.")
 	} else if hb.MaxPDUSize() != 0x22 {
 		t.Fatalf("MaxPDUSize() not correct: (0x%04x)", hb.MaxPDUSize())

@@ -74,6 +74,13 @@ func main() {
 // 	return t
 // }
 
+// // Flag constants.
+// const (
+// 	TrackFlagEnabled   = 0x0001
+// 	TrackFlagInMovie   = 0x0002
+// 	TrackFlagInPreview = 0x0004
+// )
+
 // func getFlags(flags uint32) string {
 // 	var f []string
 // 	if flags&mp4box.TrackFlagEnabled == mp4box.TrackFlagEnabled {

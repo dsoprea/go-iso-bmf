@@ -16,21 +16,6 @@ func (b Avc1Box) Version() byte {
 	return b.version
 }
 
-func (b *Avc1Box) parse() (err error) {
-	defer func() {
-		if errRaw := recover(); errRaw != nil {
-			err = log.Wrap(errRaw.(error))
-		}
-	}()
-
-	data, err := b.readBoxData()
-	log.PanicIf(err)
-
-	b.version = data[0]
-
-	return nil
-}
-
 type avc1BoxFactory struct {
 }
 

@@ -31,7 +31,7 @@ func TestMdhdBox_Flags(t *testing.T) {
 func TestMdhdBox_HasCreationTime_False(t *testing.T) {
 	mb := MdhdBox{}
 
-	if mb.HasCreationTime() != false {
+	if mb.standard32TimeSupport.HasCreationTime() != false {
 		t.Fatalf("HasCreationTime() should be false.")
 	}
 }
@@ -41,10 +41,12 @@ func TestMdhdBox_HasCreationTime_True(t *testing.T) {
 	creationEpoch := EpochDelta(now)
 
 	mb := MdhdBox{
-		creationEpoch: creationEpoch,
+		standard32TimeSupport: standard32TimeSupport{
+			creationEpoch: creationEpoch,
+		},
 	}
 
-	if mb.HasCreationTime() != true {
+	if mb.standard32TimeSupport.HasCreationTime() != true {
 		t.Fatalf("HasCreationTime() should be true.")
 	}
 }
@@ -54,18 +56,20 @@ func TestMdhdBox_CreationTime(t *testing.T) {
 	creationEpoch := EpochDelta(now)
 
 	mb := MdhdBox{
-		creationEpoch: creationEpoch,
+		standard32TimeSupport: standard32TimeSupport{
+			creationEpoch: creationEpoch,
+		},
 	}
 
-	if mb.CreationTime() != now {
-		t.Fatalf("CreationTime() not correct: [%s] != [%s]", mb.CreationTime(), now)
+	if mb.standard32TimeSupport.CreationTime() != now {
+		t.Fatalf("CreationTime() not correct: [%s] != [%s]", mb.standard32TimeSupport.CreationTime(), now)
 	}
 }
 
 func TestMdhdBox_HasModificationTime_False(t *testing.T) {
 	mb := MdhdBox{}
 
-	if mb.HasModificationTime() != false {
+	if mb.standard32TimeSupport.HasModificationTime() != false {
 		t.Fatalf("HasModificationTime() should be false.")
 	}
 }
@@ -75,10 +79,12 @@ func TestMdhdBox_HasModificationTime_True(t *testing.T) {
 	modificationEpoch := EpochDelta(now)
 
 	mb := MdhdBox{
-		modificationEpoch: modificationEpoch,
+		standard32TimeSupport: standard32TimeSupport{
+			modificationEpoch: modificationEpoch,
+		},
 	}
 
-	if mb.HasModificationTime() != true {
+	if mb.standard32TimeSupport.HasModificationTime() != true {
 		t.Fatalf("HasModificationTime() should be true.")
 	}
 }
@@ -88,58 +94,78 @@ func TestMdhdBox_ModificationTime(t *testing.T) {
 	modificationEpoch := EpochDelta(now)
 
 	mb := MdhdBox{
-		modificationEpoch: modificationEpoch,
+		standard32TimeSupport: standard32TimeSupport{
+			modificationEpoch: modificationEpoch,
+		},
 	}
 
-	if mb.ModificationTime() != now {
+	if mb.standard32TimeSupport.ModificationTime() != now {
 		t.Fatalf("ModificationTime() not correct.")
 	}
 }
 
 func TestMdhdBox_TimeScale(t *testing.T) {
 	mb := MdhdBox{
-		timeScale: 55,
+		standard32TimeSupport: standard32TimeSupport{
+			timeScale: 55,
+		},
 	}
 
-	if mb.TimeScale() != 55 {
+	if mb.standard32TimeSupport.TimeScale() != 55 {
 		t.Fatalf("TimeScale() not correct.")
 	}
 }
 
 func TestMdhdBox_ScaledDuration(t *testing.T) {
 	mb := MdhdBox{
-		scaledDuration: 10,
+		standard32TimeSupport: standard32TimeSupport{
+			scaledDuration: 10,
+		},
 	}
 
-	if mb.ScaledDuration() != 10 {
+	if mb.standard32TimeSupport.ScaledDuration() != 10 {
 		t.Fatalf("ScaledDuration() not correct.")
 	}
 }
 
-func TestMdhdBox_Duration(t *testing.T) {
-	d := time.Second * 10
+func TestMdhdBox_HasDuration_False(t *testing.T) {
+	mb := MdhdBox{}
 
-	timeScale := uint32(60)
-
-	mb := MdhdBox{
-		timeScale:      timeScale,
-		scaledDuration: timeScale * 10,
-	}
-
-	if mb.Duration() != d {
-		t.Fatalf("Duration() not correct: [%s] != [%s]", mb.Duration(), d)
+	if mb.standard32TimeSupport.HasDuration() != false {
+		t.Fatalf("HasDuration() not correct.")
 	}
 }
 
-// func TestMdhdBox_HasDuration(t testing.T) {
+func TestMdhdBox_HasDuration_True(t *testing.T) {
+	timeScale := uint32(60)
 
-// 	// TODO(dustin): Finish
+	mb := MdhdBox{
+		standard32TimeSupport: standard32TimeSupport{
+			timeScale:      timeScale,
+			scaledDuration: timeScale * 10,
+		},
+	}
 
-// }
+	if mb.standard32TimeSupport.HasDuration() != true {
+		t.Fatalf("HasDuration() not correct.")
+	}
+}
 
-// TODO(dustin): Add tests
-// func (mb *MdhdBox) HasCreationTime() bool {
-// func (mb *MdhdBox) HasModificationTime() bool {
+func TestMdhdBox_Duration(t *testing.T) {
+	timeScale := uint32(60)
+
+	mb := MdhdBox{
+		standard32TimeSupport: standard32TimeSupport{
+			timeScale:      timeScale,
+			scaledDuration: timeScale * 10,
+		},
+	}
+
+	d := time.Second * 10
+	if mb.standard32TimeSupport.Duration() != d {
+		t.Fatalf("Duration() not correct: [%s] != [%s]", mb.standard32TimeSupport.Duration(), d)
+	}
+}
 
 func TestMdhdBox_LanguageString(t *testing.T) {
 
@@ -176,19 +202,21 @@ func TestMdhdBox_String(t *testing.T) {
 	timeScale := uint32(60)
 
 	mb := MdhdBox{
-		Box:               box,
-		version:           11,
-		flags:             22,
-		creationEpoch:     uint32(epoch),
-		modificationEpoch: uint32(epoch + 1),
-		timeScale:         timeScale,
-		scaledDuration:    timeScale * 10,
+		Box:     box,
+		version: 11,
+		flags:   22,
+		standard32TimeSupport: standard32TimeSupport{
+			creationEpoch:     uint32(epoch),
+			modificationEpoch: uint32(epoch + 1),
+			timeScale:         timeScale,
+			scaledDuration:    timeScale * 10,
+		},
 
 		// 00100 00101 00110
 		language: 0b001000010100110,
 	}
 
-	if mb.String() != "mdhd<NAME=[mdhd] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) DUR-S=[10.00] LANG=[def] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]>" {
+	if mb.String() != "mdhd<NAME=[mdhd] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) LANG=[def] DUR-S=[10.00] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]>" {
 		t.Fatalf("String() not correct: [%s]", mb.String())
 	}
 }
@@ -205,19 +233,21 @@ func TestMdhdBox_InlineString(t *testing.T) {
 	timeScale := uint32(60)
 
 	mb := MdhdBox{
-		Box:               box,
-		version:           11,
-		flags:             22,
-		creationEpoch:     uint32(epoch),
-		modificationEpoch: uint32(epoch + 1),
-		timeScale:         timeScale,
-		scaledDuration:    timeScale * 10,
+		Box:     box,
+		version: 11,
+		flags:   22,
+		standard32TimeSupport: standard32TimeSupport{
+			creationEpoch:     uint32(epoch),
+			modificationEpoch: uint32(epoch + 1),
+			timeScale:         timeScale,
+			scaledDuration:    timeScale * 10,
+		},
 
 		// 00100 00101 00110
 		language: 0b001000010100110,
 	}
 
-	if mb.InlineString() != "NAME=[mdhd] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) DUR-S=[10.00] LANG=[def] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]" {
+	if mb.InlineString() != "NAME=[mdhd] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) LANG=[def] DUR-S=[10.00] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]" {
 		t.Fatalf("InlineString() not correct: [%s]", mb.String())
 	}
 }

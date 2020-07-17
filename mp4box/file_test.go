@@ -134,28 +134,26 @@ func TestReadBoxes(t *testing.T) {
 	flagsBytes := make([]byte, 4)
 	defaultEndianness.PutUint32(flagsBytes, 0x01020304)
 
-	hdlrBoxData := []byte{
-		// 0: version (1)
-		0x0b,
+	var hdlrBoxData []byte
 
-		// 1: flags (3)
-		flagsBytes[0], flagsBytes[1], flagsBytes[2],
+	// Version and flags.
+	pushBytes(&hdlrBoxData, uint32(0x11223344))
 
-		// 4: (reserved spacing) (4)
-		0, 0, 0, 0,
+	// Reserved spacing.
+	pushBytes(&hdlrBoxData, uint32(0))
 
-		// 8: handler (4)
-		'a', 'b', 'c', 'd',
+	// Handler name
+	pushBytes(&hdlrBoxData, []byte{'a', 'b', 'c', 'd'})
 
-		// 12: (reserved spacing) (12)
-		// TODO(dustin): This is probably data that we need to add support for.
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-		0, 0, 0, 0,
+	// Reserved spacing.
+	// TODO(dustin): This is probably data that we need to add support for.
+	pushBytes(&hdlrBoxData, uint32(0))
+	pushBytes(&hdlrBoxData, uint32(0))
+	pushBytes(&hdlrBoxData, uint32(0))
 
-		// 24: hdlrName (all remaining)
-		't', 'e', 's', 't', 'n', 'a', 'm', 'e',
-	}
+	// handler name (all remaining)
+	// TODO(dustin): Update this comment to not be a duplicate.
+	pushBytes(&hdlrBoxData, []byte{'t', 'e', 's', 't', 'n', 'a', 'm', 'e'})
 
 	data := []byte{}
 	pushBox(&data, "ftyp", ftypBoxData)
@@ -212,7 +210,7 @@ func TestReadBoxes(t *testing.T) {
 
 	expectedPhrases := []string{
 		"ftyp<NAME=[ftyp] START=(0) SIZE=(24) MAJOR-BRAND=[abcd] MINOR-VER=(0x01020304) COMPAT-BRANDS=[efgh,ijkl]>",
-		"hdlr<NAME=[hdlr] START=(24) SIZE=(40) VER=(0x0b) FLAGS=(0x01020300) HANDLER=[abcd] HDLR-NAME=[testname]>",
+		"hdlr<NAME=[hdlr] START=(24) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=[testname]>",
 	}
 
 	if reflect.DeepEqual(actualPhrases, expectedPhrases) != true {

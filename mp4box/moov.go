@@ -4,13 +4,6 @@ import (
 	"github.com/dsoprea/go-logging"
 )
 
-// Flag constants.
-const (
-	TrackFlagEnabled   = 0x0001
-	TrackFlagInMovie   = 0x0002
-	TrackFlagInPreview = 0x0004
-)
-
 // MoovBox is a "Movie" box.
 //
 // The metadata for a presentation is stored in the single Movie Box which occurs
@@ -19,6 +12,7 @@ const (
 type MoovBox struct {
 	Box
 
+	// TODO(dustin): Add test for this.
 	isFragmented bool
 
 	LoadedBoxIndex

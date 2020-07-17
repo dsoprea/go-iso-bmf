@@ -56,13 +56,7 @@ func (b *HdlrBox) parse() (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
-
-	// Copy the three bytes of flags into a four-byte space so it can be
-	// properly ordered.
-	flagsRaw := make([]byte, 4)
-	copy(flagsRaw, data[1:4])
-
-	b.flags = defaultEndianness.Uint32(flagsRaw)
+	b.flags = defaultEndianness.Uint32(data[0:4])
 
 	// TODO(dustin): Skipping over data, here?
 

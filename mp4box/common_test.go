@@ -107,6 +107,8 @@ func pushBytes(buffer *[]byte, x interface{}) {
 		defaultEndianness.PutUint64(
 			encoded,
 			u64)
+	} else if bs, ok := x.([]byte); ok == true {
+		*buffer = append(*buffer, bs...)
 	} else {
 		log.Panicf("can not encode [%v] [%v]", reflect.TypeOf(x), x)
 	}

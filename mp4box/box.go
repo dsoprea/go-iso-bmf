@@ -83,9 +83,9 @@ func (box Box) readBoxes(startDisplace int) (boxes Boxes, err error) {
 	// TODO(dustin): Add test
 
 	start := box.Start() + boxHeaderSize + int64(startDisplace)
-	stop := box.Size() - boxHeaderSize
+	size := box.Size() - boxHeaderSize - int64(startDisplace)
 
-	boxes, err = readBoxes(box.file, start, stop)
+	boxes, err = readBoxes(box.file, start, size)
 
 	log.PanicIf(err)
 

@@ -98,31 +98,26 @@ func TestHdlrBoxFactory_Name(t *testing.T) {
 func TestHdlrBoxFactory_New(t *testing.T) {
 	// Load
 
-	var flagsBytes []byte
-	pushBytes(&flagsBytes, uint32(0x11223344))
+	var hdlrBoxData []byte
 
-	hdlrBoxData := []byte{
-		// 0: version (1)
-		0x0b,
+	// Version and flags.
+	pushBytes(&hdlrBoxData, uint32(0x11223344))
 
-		// 1: flags (3)
-		flagsBytes[0], flagsBytes[1], flagsBytes[2],
+	// Reserved spacing.
+	pushBytes(&hdlrBoxData, uint32(0))
 
-		// 4: (reserved spacing) (4)
-		0, 0, 0, 0,
+	// Handler name
+	pushBytes(&hdlrBoxData, []byte{'a', 'b', 'c', 'd'})
 
-		// 8: handler (4)
-		'a', 'b', 'c', 'd',
+	// Reserved spacing.
+	// TODO(dustin): This is probably data that we need to add support for.
+	pushBytes(&hdlrBoxData, uint32(0))
+	pushBytes(&hdlrBoxData, uint32(0))
+	pushBytes(&hdlrBoxData, uint32(0))
 
-		// 12: (reserved spacing) (12)
-		// TODO(dustin): This is probably data that we need to add support for.
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-
-		// 24: hdlrName (all remaining)
-		't', 'e', 's', 't', 'n', 'a', 'm', 'e',
-	}
+	// handler name (all remaining)
+	// TODO(dustin): Update this comment to not be a duplicate.
+	pushBytes(&hdlrBoxData, []byte{'t', 'e', 's', 't', 'n', 'a', 'm', 'e'})
 
 	b := []byte{}
 	pushBox(&b, "hdlr", hdlrBoxData)
@@ -141,11 +136,11 @@ func TestHdlrBoxFactory_New(t *testing.T) {
 
 	hb := cb.(*HdlrBox)
 
-	if hb.Version() != 0x0b {
+	if hb.Version() != 0x11 {
 		t.Fatalf("Version() not correct.")
 	}
 
-	if hb.Flags() != 0x11223300 {
+	if hb.Flags() != 0x11223344 {
 		t.Fatalf("Flags() not correct: (0x%x)", hb.Flags())
 	}
 
@@ -157,11 +152,11 @@ func TestHdlrBoxFactory_New(t *testing.T) {
 		t.Fatalf("HdlrName() not correct.")
 	}
 
-	if hb.String() != "hdlr<NAME=[hdlr] START=(0) SIZE=(40) VER=(0x0b) FLAGS=(0x11223300) HANDLER=[abcd] HDLR-NAME=[testname]>" {
+	if hb.String() != "hdlr<NAME=[hdlr] START=(0) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=[testname]>" {
 		t.Fatalf("String() not correct: [%s]", hb.String())
 	}
 
-	if hb.InlineString() != "NAME=[hdlr] START=(0) SIZE=(40) VER=(0x0b) FLAGS=(0x11223300) HANDLER=[abcd] HDLR-NAME=[testname]" {
+	if hb.InlineString() != "NAME=[hdlr] START=(0) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=[testname]" {
 		t.Fatalf("InlineString() not correct: [%s]", hb.InlineString())
 	}
 }
