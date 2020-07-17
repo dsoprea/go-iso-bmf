@@ -9,6 +9,6 @@ env:
 install:
   - go get -t ./...
 script:
-  - go test -v ./... -coverprofile=coverage.txt -covermode=mp4boxic
+  - go test -v ./... -coverprofile=coverage.txt -covermode=atomic
 after_success:
   - curl -s https://codecov.io/bash | bash
