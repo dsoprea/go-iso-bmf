@@ -1,5 +1,6 @@
-module github.com/dsoprea/go-mp4
+module github.com/dsoprea/go-iso-bmf
 
+// Uses binary literals.
 go 1.13
 
 require (
