@@ -10,7 +10,6 @@ type SttsBox struct {
 
 	version      byte
 	flags        uint32
-	entryCount   uint32
 	sampleCounts []uint32
 	sampleDeltas []uint32
 }
@@ -21,10 +20,6 @@ func (sb *SttsBox) Version() byte {
 
 func (sb *SttsBox) Flags() uint32 {
 	return sb.flags
-}
-
-func (sb *SttsBox) EntryCount() uint32 {
-	return sb.entryCount
 }
 
 func (sb *SttsBox) SampleCounts() []uint32 {
@@ -52,9 +47,12 @@ func (b *SttsBox) parse() (err error) {
 	b.sampleCounts = make([]uint32, count)
 	b.sampleDeltas = make([]uint32, count)
 
+	offset := 8
 	for i := 0; i < int(count); i++ {
-		b.sampleCounts[i] = defaultEndianness.Uint32(data[(8 + 8*i):(12 + 8*i)])
-		b.sampleDeltas[i] = defaultEndianness.Uint32(data[(12 + 8*i):(16 + 8*i)])
+		b.sampleCounts[i] = defaultEndianness.Uint32(data[offset : offset+4])
+		b.sampleDeltas[i] = defaultEndianness.Uint32(data[offset+4 : offset+8])
+
+		offset += 8
 	}
 
 	return nil

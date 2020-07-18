@@ -39,7 +39,7 @@ func (mb *MvhdBox) Volume() Fixed16 {
 // InlineString returns an undecorated string of field names and values.
 func (mb *MvhdBox) InlineString() string {
 	return fmt.Sprintf(
-		"%s VER=(0x%02x) FLAGS=(0x%08x) RATE=(%d]) VOLUME=(%d)%s",
+		"%s VER=(0x%02x) FLAGS=(0x%08x) RATE=(%d]) VOLUME=(%d) %s",
 		mb.Box.InlineString(), mb.version, mb.flags, mb.rate, mb.volume,
 		mb.standard32TimeSupport.InlineString())
 }
@@ -60,6 +60,8 @@ func (b *MvhdBox) parse() (err error) {
 	if b.version != 0 {
 		log.Panicf("mvhd: only version (0) is supported")
 	}
+
+	// TODO(dustin): !! Note that there is a discrepancy of three bytes here. The first four bytes are probably, technically, the flags as in the other boxes (with the version being the first byte, also as in the other boxes).
 
 	creationEpoch := defaultEndianness.Uint32(data[4:8])
 	modificationEpoch := defaultEndianness.Uint32(data[8:12])

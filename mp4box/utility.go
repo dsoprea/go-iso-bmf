@@ -30,6 +30,8 @@ func GetDurationString(duration uint32, timescale uint32) string {
 	return str
 }
 
+// TODO(dustin): !! The Fixed16 and Fixed32 types don't seem to add value. Dump?
+
 // Fixed16 is an 8.8 Fixed Point Decimal notation
 type Fixed16 uint16
 
