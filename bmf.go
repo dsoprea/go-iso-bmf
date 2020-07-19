@@ -1,15 +1,16 @@
-package mp4
+package bmf
 
 import (
 	"os"
 
 	"github.com/dsoprea/go-logging"
 
-	"github.com/dsoprea/go-iso-bmf/boxtype"
+	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// Open opens a file and returns a &File{}.
-func Open(path string) (file *boxtype.File, err error) {
+// Open opens a physical and returns a File struct. To just use a
+// `io.ReadSeeker`, call `bmfcommon.NewFile()` directly.
+func Open(path string) (file *bmfcommon.File, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -24,7 +25,7 @@ func Open(path string) (file *boxtype.File, err error) {
 
 	size := s.Size()
 
-	file = boxtype.NewFile(f, size)
+	file = bmfcommon.NewFile(f, size)
 
 	err = file.Parse()
 	log.PanicIf(err)

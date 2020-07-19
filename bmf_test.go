@@ -1,4 +1,4 @@
-package mp4
+package bmf
 
 import (
 	"fmt"
@@ -6,7 +6,8 @@ import (
 
 	"github.com/dsoprea/go-logging"
 
-	"github.com/dsoprea/go-iso-bmf/boxtype"
+	"github.com/dsoprea/go-iso-bmf/common"
+	"github.com/dsoprea/go-iso-bmf/type"
 )
 
 const (
@@ -18,8 +19,8 @@ func TestOpen_Mp4(t *testing.T) {
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	ftypBoxes := boxtype.ChildBoxes(s, "ftyp")
-	ftyp := ftypBoxes[0].(*boxtype.FtypBox)
+	ftypBoxes := bmfcommon.ChildBoxes(s, "ftyp")
+	ftyp := ftypBoxes[0].(*bmftype.FtypBox)
 
 	if ftyp.Name() != "ftyp" {
 		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
@@ -34,8 +35,8 @@ func TestOpen_Heic(t *testing.T) {
 	s, err := Open(testHeicFilepath)
 	log.PanicIf(err)
 
-	ftypBoxes := boxtype.ChildBoxes(s, "ftyp")
-	ftyp := ftypBoxes[0].(*boxtype.FtypBox)
+	ftypBoxes := bmfcommon.ChildBoxes(s, "ftyp")
+	ftyp := ftypBoxes[0].(*bmftype.FtypBox)
 
 	if ftyp.Name() != "ftyp" {
 		t.Fatalf("ftyp name not correct: [%s]", ftyp.Name())
@@ -50,48 +51,50 @@ func ExampleOpen() {
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
-	ftypBoxes := boxtype.ChildBoxes(s, "ftyp")
-	ftyp := ftypBoxes[0].(*boxtype.FtypBox)
+	ftypBoxes := bmfcommon.ChildBoxes(s, "ftyp")
+	ftyp := ftypBoxes[0].(*bmftype.FtypBox)
 
-	fmt.Println(ftyp.Name())
-	fmt.Println(ftyp.MajorBrand())
-	fmt.Println(ftyp.MinorVersion())
-	fmt.Println(ftyp.CompatibleBrands())
+	fmt.Printf("ftyp Name: [%s]\n", ftyp.Name())
+	fmt.Printf("ftyp MajorBrand: [%s]\n", ftyp.MajorBrand())
+	fmt.Printf("ftyp MinorVersion: (%d)\n", ftyp.MinorVersion())
+	fmt.Printf("ftyp CompatibleBrands: %v\n", ftyp.CompatibleBrands())
 
-	moovBoxes := boxtype.ChildBoxes(s, "moov")
-	moov := moovBoxes[0].(*boxtype.MoovBox)
+	moovBoxes := bmfcommon.ChildBoxes(s, "moov")
+	moov := moovBoxes[0].(*bmftype.MoovBox)
 
-	fmt.Println(moov.Name(), moov.Size())
+	fmt.Printf("moov Name: [%s]\n", moov.Name())
+	fmt.Printf("moov Size: (%d)\n", moov.Size())
 
-	mvhdBoxes := boxtype.ChildBoxes(moov, "mvhd")
-	mvhd := mvhdBoxes[0].(*boxtype.MvhdBox)
+	mvhdBoxes := bmfcommon.ChildBoxes(moov, "mvhd")
+	mvhd := mvhdBoxes[0].(*bmftype.MvhdBox)
 
-	fmt.Println(mvhd.Name())
-	fmt.Println(mvhd.Version())
-	fmt.Println(mvhd.Volume())
+	fmt.Printf("mvhd Name: [%s]\n", mvhd.Name())
+	fmt.Printf("mvhd Version: (%d)\n", mvhd.Version())
+	fmt.Printf("mvhd Volume: (%d)\n", mvhd.Volume())
 
-	trakBoxes := boxtype.ChildBoxes(moov, "trak")
-	trak0 := trakBoxes[0].(*boxtype.TrakBox)
-	trak1 := trakBoxes[1].(*boxtype.TrakBox)
+	trakBoxes := bmfcommon.ChildBoxes(moov, "trak")
+	trak0 := trakBoxes[0].(*bmftype.TrakBox)
+	trak1 := trakBoxes[1].(*bmftype.TrakBox)
 
-	fmt.Println("trak size: ", trak0.Size())
-	fmt.Println("trak size: ", trak1.Size())
+	fmt.Printf("trak (0) Size: (%d)\n", trak0.Size())
+	fmt.Printf("trak (1) Size: (%d)\n", trak1.Size())
 
-	mdatBoxes := boxtype.ChildBoxes(s, "mdat")
-	mdat := mdatBoxes[0].(*boxtype.MdatBox)
+	mdatBoxes := bmfcommon.ChildBoxes(s, "mdat")
+	mdat := mdatBoxes[0].(*bmftype.MdatBox)
 
-	fmt.Println("mdat size: ", mdat.Size())
+	fmt.Printf("mdat Size: (%d)\n", mdat.Size())
 
 	// Output:
-	// ftyp
-	// isom
-	// 512
-	// [isom iso2 avc1 mp41]
-	// moov 3170
-	// mvhd
-	// 0
-	// 1
-	// trak size:  1517
-	// trak size:  1439
-	// mdat size:  2872360
+	// ftyp Name: [ftyp]
+	// ftyp MajorBrand: [isom]
+	// ftyp MinorVersion: (512)
+	// ftyp CompatibleBrands: [isom iso2 avc1 mp41]
+	// moov Name: [moov]
+	// moov Size: (3170)
+	// mvhd Name: [mvhd]
+	// mvhd Version: (0)
+	// mvhd Volume: (1)
+	// trak (0) Size: (1517)
+	// trak (1) Size: (1439)
+	// mdat Size: (2872360)
 }
