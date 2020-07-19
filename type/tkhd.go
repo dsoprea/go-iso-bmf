@@ -1,6 +1,8 @@
 package bmftype
 
 import (
+	"fmt"
+
 	"github.com/dsoprea/go-logging"
 
 	"github.com/dsoprea/go-iso-bmf/common"
@@ -9,19 +11,17 @@ import (
 // TkhdBox is a "Track Header" box.
 type TkhdBox struct {
 	bmfcommon.Box
+	bmfcommon.Standard32TimeSupport
 
-	version          byte
-	flags            uint32
-	creationTime     uint32
-	modificationTime uint32
-	trackID          uint32
-	duration         uint32
-	layer            uint16
-	alternateGroup   uint16
-	volume           bmfcommon.Volume
-	matrix           []byte
-	width            TkhdWidthOrHeight
-	height           TkhdWidthOrHeight
+	version        byte
+	flags          uint32
+	trackId        uint32
+	layer          uint16
+	alternateGroup uint16
+	volume         bmfcommon.Volume
+	matrix         []byte
+	width          uint32
+	height         uint32
 }
 
 // Version returns the version of the box
@@ -34,30 +34,9 @@ func (tb *TkhdBox) Flags() uint32 {
 	return tb.flags
 }
 
-// CreationTime returns the creation time.
-func (tb *TkhdBox) CreationTime() uint32 {
-
-	// TODO(dustin): Finish converting this to return a time.Time .
-
-	return tb.creationTime
-}
-
-// ModificationTime returns the modification time.
-func (tb *TkhdBox) ModificationTime() uint32 {
-
-	// TODO(dustin): Finish converting this to return a time.Time .
-
-	return tb.modificationTime
-}
-
-// TrackID returns the track-ID.
-func (tb *TkhdBox) TrackID() uint32 {
-	return tb.trackID
-}
-
-// Duration returns the duration.
-func (tb *TkhdBox) Duration() uint32 {
-	return tb.duration
+// TrackId returns the track-ID.
+func (tb *TkhdBox) TrackId() uint32 {
+	return tb.trackId
 }
 
 // Layer returns the layer.
@@ -80,36 +59,26 @@ func (tb *TkhdBox) Matrix() []byte {
 	return tb.matrix
 }
 
-// TkhdWidthOrHeight represents either a width or height value.
-type TkhdWidthOrHeight uint32
-
-// IsSet returns true if applicable (if non-zero).
-func (twh TkhdWidthOrHeight) IsSet() bool {
-
-	// TODO(dustin): Add test
-
-	return twh > 0
-}
-
-// Decode returns the deconstructed value.
-func (twh TkhdWidthOrHeight) Decode() bmfcommon.FixedPoint32 {
-
-	// TODO(dustin): Add test
-
-	return bmfcommon.Uint32ToFixedPoint32(uint32(twh), 16, 16)
-}
-
 // Width returns the width.
-func (b *TkhdBox) Width() TkhdWidthOrHeight {
-	return b.width
+func (tb *TkhdBox) Width() uint32 {
+	return tb.width
 }
 
 // Height returns the height.
-func (b *TkhdBox) Height() TkhdWidthOrHeight {
-	return b.height
+func (tb *TkhdBox) Height() uint32 {
+	return tb.height
 }
 
-func (b *TkhdBox) parse() (err error) {
+// InlineString returns an undecorated string of field names and values.
+func (tb *TkhdBox) InlineString() string {
+	return fmt.Sprintf(
+		"%s VER=(0x%02x) FLAGS=(0x%08x) TRACK-ID=(%d]) LAYER=(%d) ALT-GROUP=(%d) VOLUME=[%s] MATRIX=(%d) W=(%d) H=(%d) %s",
+		tb.Box.InlineString(), tb.version, tb.flags, tb.trackId, tb.layer,
+		tb.AlternateGroup(), tb.volume, len(tb.matrix), tb.width, tb.height,
+		tb.Standard32TimeSupport.InlineString())
+}
+
+func (b *TkhdBox) parse(timeScale uint32) (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -127,16 +96,36 @@ func (b *TkhdBox) parse() (err error) {
 	}
 
 	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])
-	b.creationTime = bmfcommon.DefaultEndianness.Uint32(data[4:8])
-	b.modificationTime = bmfcommon.DefaultEndianness.Uint32(data[8:12])
-	b.trackID = bmfcommon.DefaultEndianness.Uint32(data[12:16])
-	b.duration = bmfcommon.DefaultEndianness.Uint32(data[20:24])
+
+	creationEpoch := bmfcommon.DefaultEndianness.Uint32(data[4:8])
+	modificationEpoch := bmfcommon.DefaultEndianness.Uint32(data[8:12])
+
+	b.trackId = bmfcommon.DefaultEndianness.Uint32(data[12:16])
+
+	duration := bmfcommon.DefaultEndianness.Uint32(data[20:24])
+
 	b.layer = bmfcommon.DefaultEndianness.Uint16(data[32:34])
 	b.alternateGroup = bmfcommon.DefaultEndianness.Uint16(data[34:36])
 	b.volume = bmfcommon.Volume(bmfcommon.DefaultEndianness.Uint16(data[36:38]))
 	b.matrix = data[40:76]
-	b.width = TkhdWidthOrHeight(bmfcommon.DefaultEndianness.Uint32(data[76:80]))
-	b.height = TkhdWidthOrHeight(bmfcommon.DefaultEndianness.Uint32(data[80:84]))
+
+	widthRaw := bmfcommon.DefaultEndianness.Uint32(data[76:80])
+	widthFp32 := bmfcommon.Uint32ToFixedPoint32(widthRaw, 16, 16)
+
+	// The numerator is the width. The denominator is often (always?) zero.
+	b.width, _ = widthFp32.Rational()
+
+	heightRaw := bmfcommon.DefaultEndianness.Uint32(data[80:84])
+	heightFp32 := bmfcommon.Uint32ToFixedPoint32(heightRaw, 16, 16)
+
+	// The numerator is the width. The denominator is often (always?) zero.
+	b.height, _ = heightFp32.Rational()
+
+	b.Standard32TimeSupport = bmfcommon.NewStandard32TimeSupport(
+		creationEpoch,
+		modificationEpoch,
+		duration,
+		timeScale)
 
 	return nil
 }
@@ -157,11 +146,21 @@ func (tkhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		}
 	}()
 
+	fbi := box.Index()
+
+	mvhdCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"moov.mvhd", 0}]
+	if found == false {
+		log.Panicf("TKHF box encountered before MVHD box")
+	}
+
 	tkhdBox := &TkhdBox{
 		Box: box,
 	}
 
-	err = tkhdBox.parse()
+	mvhd := mvhdCommonBox.(*MvhdBox)
+	timeScale := mvhd.TimeScale()
+
+	err = tkhdBox.parse(timeScale)
 	log.PanicIf(err)
 
 	return tkhdBox, nil

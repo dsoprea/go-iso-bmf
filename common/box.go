@@ -92,6 +92,15 @@ func (box Box) Parent() CommonBox {
 	return box.parent
 }
 
+// Index returns the FullBoxIndex for the file. It contains all previously-
+// loaded boxes.
+func (box Box) Index() FullBoxIndex {
+
+	// TODO(dustin): Add test
+
+	return box.file.Index()
+}
+
 // ReadBoxes bridges to the lower-level function that knows how to extract child-
 // boxes.
 func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {

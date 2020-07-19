@@ -141,6 +141,8 @@ func (f *File) Parse() (err error) {
 		}
 	}()
 
+	// TODO(dustin): !! Dump Parse() and move this to NewFile. This might break a lot of unit-tests.
+
 	boxes, err := readBoxes(f, nil, int64(0), f.size)
 	log.PanicIf(err)
 
