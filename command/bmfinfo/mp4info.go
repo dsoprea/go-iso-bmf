@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/dsoprea/go-logging"
@@ -49,5 +50,15 @@ func main() {
 	f, err := bmf.Open(arguments.Filepath)
 	log.PanicIf(err)
 
+	fmt.Printf("Tree:\n")
+	fmt.Printf("\n")
+
 	bmfcommon.Dump(f)
+
+	fmt.Printf("\n")
+	fmt.Printf("Index:\n")
+	fmt.Printf("\n")
+
+	fbi := f.Index()
+	fbi.Dump()
 }
