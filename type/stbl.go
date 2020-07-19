@@ -10,6 +10,7 @@ import (
 type StblBox struct {
 	bmfcommon.Box
 
+	// LoadedBoxIndex contains this boxes children.
 	bmfcommon.LoadedBoxIndex
 }
 

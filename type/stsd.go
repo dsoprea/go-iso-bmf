@@ -13,6 +13,7 @@ type StsdBox struct {
 	version byte
 	flags   uint32
 
+	// LoadedBoxIndex contains this boxes children.
 	bmfcommon.LoadedBoxIndex
 }
 

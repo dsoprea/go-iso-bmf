@@ -10,6 +10,7 @@ import (
 type EdtsBox struct {
 	bmfcommon.Box
 
+	// LoadedBoxIndex contains this boxes children.
 	bmfcommon.LoadedBoxIndex
 }
 

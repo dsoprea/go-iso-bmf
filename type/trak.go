@@ -17,6 +17,7 @@ type TrakBox struct {
 	// chunks []Chunk
 	// samples []Sample
 
+	// LoadedBoxIndex contains this boxes children.
 	bmfcommon.LoadedBoxIndex
 }
 

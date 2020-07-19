@@ -17,6 +17,7 @@ type MoovBox struct {
 	// TODO(dustin): Add test for this.
 	isFragmented bool
 
+	// LoadedBoxIndex contains this boxes children.
 	bmfcommon.LoadedBoxIndex
 }
 
