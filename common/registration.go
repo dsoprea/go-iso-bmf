@@ -30,6 +30,9 @@ type CommonBox interface {
 
 	// InlineString returns an undecorated string of field names and values.
 	InlineString() string
+
+	// Parent is the parent box
+	Parent() CommonBox
 }
 
 // BoxChildIndexer is a box that has children.

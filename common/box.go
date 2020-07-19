@@ -18,6 +18,7 @@ const (
 )
 
 var (
+	// DefaultEndianness is the default endianness of stored integers.
 	DefaultEndianness binary.ByteOrder = binary.BigEndian
 )
 
@@ -27,6 +28,8 @@ type Box struct {
 	start int64
 	size  int64
 	file  *File
+
+	parent CommonBox
 }
 
 func NewBox(name string, start, size int64, file *File) Box {
@@ -46,7 +49,15 @@ func (box Box) InlineString() string {
 
 	// TODO(dustin): Add test
 
-	return fmt.Sprintf("NAME=[%s] START=(%d) SIZE=(%d)", box.name, box.start, box.size)
+	var parentName string
+
+	if box.parent == nil {
+		parentName = "ROOT"
+	} else {
+		parentName = box.parent.Name()
+	}
+
+	return fmt.Sprintf("NAME=[%s] PARENT=[%s] START=(%d) SIZE=(%d)", box.name, parentName, box.start, box.size)
 }
 
 // Name returns the box name.
@@ -73,6 +84,16 @@ func (box Box) Start() int64 {
 	return box.start
 }
 
+// Parent returns the parent box.
+func (box Box) Parent() CommonBox {
+
+	// TODO(dustin): Add test
+
+	return box.parent
+}
+
+// ReadBoxes bridges to the lower-level function that knows how to extract child-
+// boxes.
 func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -85,8 +106,7 @@ func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {
 	start := box.Start() + BoxHeaderSize + int64(startDisplace)
 	size := box.Size() - BoxHeaderSize - int64(startDisplace)
 
-	boxes, err = readBoxes(box.file, start, size)
-
+	boxes, err = readBoxes(box.file, box, start, size)
 	log.PanicIf(err)
 
 	return boxes, err

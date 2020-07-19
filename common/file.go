@@ -37,7 +37,7 @@ func (f *File) Parse() (err error) {
 		}
 	}()
 
-	boxes, err := readBoxes(f, int64(0), f.size)
+	boxes, err := readBoxes(f, nil, int64(0), f.size)
 	log.PanicIf(err)
 
 	f.LoadedBoxIndex = boxes.Index()
@@ -98,7 +98,7 @@ func (f *File) ReadBaseBox(offset int64) (box Box, err error) {
 	return box, nil
 }
 
-func readBox(f *File, offset int64) (cb CommonBox, known bool, err error) {
+func readBox(f *File, parent CommonBox, offset int64) (cb CommonBox, known bool, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -111,6 +111,8 @@ func readBox(f *File, offset int64) (cb CommonBox, known bool, err error) {
 
 	box, err := f.ReadBaseBox(offset)
 	log.PanicIf(err)
+
+	box.parent = parent
 
 	name := box.Name()
 
@@ -129,7 +131,7 @@ func readBox(f *File, offset int64) (cb CommonBox, known bool, err error) {
 	return cb, true, nil
 }
 
-func readBoxes(f *File, start int64, totalSize int64) (boxes Boxes, err error) {
+func readBoxes(f *File, parent CommonBox, start int64, totalSize int64) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -140,7 +142,7 @@ func readBoxes(f *File, start int64, totalSize int64) (boxes Boxes, err error) {
 	for offset := start; offset < start+totalSize; {
 		fileLogger.Debugf(nil, "Reading box (%d) at offset (0x%016x).", i, offset)
 
-		cb, known, err := readBox(f, offset)
+		cb, known, err := readBox(f, parent, offset)
 		log.PanicIf(err)
 
 		if known == true {
