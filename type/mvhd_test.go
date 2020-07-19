@@ -68,7 +68,7 @@ func TestMvhdBox_InlineString(t *testing.T) {
 		volume:                44,
 	}
 
-	if mb.InlineString() != "NAME=[] START=(0) SIZE=(0) VER=(0x16) FLAGS=(0x0000000b) RATE=(33]) VOLUME=(44) DUR-S=[60.00]" {
+	if mb.InlineString() != "NAME=[] START=(0) SIZE=(0) VER=(0x16) FLAGS=(0x0000000b) RATE=(33]) VOLUME=[OFF] DUR-S=[60.00]" {
 		t.Fatalf("InlineString() is incorrect: [%s]", mb.InlineString())
 	}
 }

@@ -70,7 +70,7 @@ func ExampleOpen() {
 
 	fmt.Printf("mvhd Name: [%s]\n", mvhd.Name())
 	fmt.Printf("mvhd Version: (%d)\n", mvhd.Version())
-	fmt.Printf("mvhd Volume: (%d)\n", mvhd.Volume())
+	fmt.Printf("mvhd Volume: [%s]\n", mvhd.Volume())
 
 	trakBoxes := bmfcommon.ChildBoxes(moov, "trak")
 	trak0 := trakBoxes[0].(*bmftype.TrakBox)
@@ -93,7 +93,7 @@ func ExampleOpen() {
 	// moov Size: (3170)
 	// mvhd Name: [mvhd]
 	// mvhd Version: (0)
-	// mvhd Volume: (1)
+	// mvhd Volume: [FULL]
 	// trak (0) Size: (1517)
 	// trak (1) Size: (1439)
 	// mdat Size: (2872360)

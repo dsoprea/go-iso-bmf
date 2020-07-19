@@ -18,60 +18,95 @@ type TkhdBox struct {
 	duration         uint32
 	layer            uint16
 	alternateGroup   uint16
-	volume           uint16
+	volume           bmfcommon.Volume
 	matrix           []byte
-	width            uint32
-	height           uint32
+	width            TkhdWidthOrHeight
+	height           TkhdWidthOrHeight
 }
 
+// Version returns the version of the box
 func (tb *TkhdBox) Version() byte {
 	return tb.version
 }
 
+// Flags returns the flags of the box. The first byte is the version.
 func (tb *TkhdBox) Flags() uint32 {
 	return tb.flags
 }
 
+// CreationTime returns the creation time.
 func (tb *TkhdBox) CreationTime() uint32 {
+
+	// TODO(dustin): Finish converting this to return a time.Time .
+
 	return tb.creationTime
 }
 
+// ModificationTime returns the modification time.
 func (tb *TkhdBox) ModificationTime() uint32 {
+
+	// TODO(dustin): Finish converting this to return a time.Time .
+
 	return tb.modificationTime
 }
 
+// TrackID returns the track-ID.
 func (tb *TkhdBox) TrackID() uint32 {
 	return tb.trackID
 }
 
+// Duration returns the duration.
 func (tb *TkhdBox) Duration() uint32 {
 	return tb.duration
 }
 
+// Layer returns the layer.
 func (tb *TkhdBox) Layer() uint16 {
 	return tb.layer
 }
 
+// AlternateGroup returns the alternate group.
 func (tb *TkhdBox) AlternateGroup() uint16 {
 	return tb.alternateGroup
 }
 
-func (tb *TkhdBox) Volume() uint16 {
+// Volume returns the volume.
+func (tb *TkhdBox) Volume() bmfcommon.Volume {
 	return tb.volume
 }
 
+// Matrix returns the matrix.
 func (tb *TkhdBox) Matrix() []byte {
 	return tb.matrix
 }
 
-// Width returns a calculated tkhd width.
-func (b *TkhdBox) Width() uint32 {
-	return b.width / (1 << 16)
+// TkhdWidthOrHeight represents either a width or height value.
+type TkhdWidthOrHeight uint32
+
+// IsSet returns true if applicable (if non-zero).
+func (twh TkhdWidthOrHeight) IsSet() bool {
+
+	// TODO(dustin): Add test
+
+	return twh > 0
 }
 
-// Height returns a calculated tkhd height.
-func (b *TkhdBox) Height() uint32 {
-	return b.height / (1 << 16)
+// Decode returns the deconstructed value.
+func (twh TkhdWidthOrHeight) Decode() bmfcommon.FixedPoint32 {
+
+	// TODO(dustin): Add test
+
+	return bmfcommon.Uint32ToFixedPoint32(uint32(twh), 16, 16)
+}
+
+// Width returns the width.
+func (b *TkhdBox) Width() TkhdWidthOrHeight {
+	return b.width
+}
+
+// Height returns the height.
+func (b *TkhdBox) Height() TkhdWidthOrHeight {
+	return b.height
 }
 
 func (b *TkhdBox) parse() (err error) {
@@ -98,10 +133,10 @@ func (b *TkhdBox) parse() (err error) {
 	b.duration = bmfcommon.DefaultEndianness.Uint32(data[20:24])
 	b.layer = bmfcommon.DefaultEndianness.Uint16(data[32:34])
 	b.alternateGroup = bmfcommon.DefaultEndianness.Uint16(data[34:36])
-	b.volume = bmfcommon.DefaultEndianness.Uint16(data[36:38])
+	b.volume = bmfcommon.Volume(bmfcommon.DefaultEndianness.Uint16(data[36:38]))
 	b.matrix = data[40:76]
-	b.width = bmfcommon.DefaultEndianness.Uint32(data[76:80])
-	b.height = bmfcommon.DefaultEndianness.Uint32(data[80:84])
+	b.width = TkhdWidthOrHeight(bmfcommon.DefaultEndianness.Uint32(data[76:80]))
+	b.height = TkhdWidthOrHeight(bmfcommon.DefaultEndianness.Uint32(data[80:84]))
 
 	return nil
 }

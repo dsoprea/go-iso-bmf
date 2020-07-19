@@ -8,6 +8,38 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
+// MvhdRate represents the playback speed as a proportion of normal
+// speed.
+type MvhdRate uint32
+
+// Decode returns the deconstructed value.
+func (rate MvhdRate) Decode() bmfcommon.FixedPoint32 {
+
+	// TODO(dustin): Add test
+
+	return bmfcommon.Uint32ToFixedPoint32(uint32(rate), 16, 16)
+}
+
+// IsFullSpeed returns true if playback is running at normal speed.
+func (rate MvhdRate) IsFullSpeed() bool {
+
+	// TODO(dustin): Add test
+
+	return rate == 0x00010000
+}
+
+// String returns a human representation of the volume.
+func (rate MvhdRate) String() string {
+
+	// TODO(dustin): Add test
+
+	if rate.IsFullSpeed() == true {
+		return "NORMAL"
+	}
+
+	return fmt.Sprintf("%.5f", rate.Decode().Float())
+}
+
 // MvhdBox is a "Movie Header" box.
 //
 // This box defines overall information which is media-independent,
@@ -18,30 +50,34 @@ type MvhdBox struct {
 
 	flags   uint32
 	version uint8
-	rate    uint32
-	volume  uint16
+	rate    MvhdRate
+	volume  bmfcommon.Volume
 }
 
+// Flags returns the flags of the box. The first byte is the version.
 func (mb *MvhdBox) Flags() uint32 {
 	return mb.flags
 }
 
+// Version returns the version of the box
 func (mb *MvhdBox) Version() uint8 {
 	return mb.version
 }
 
-func (mb *MvhdBox) Rate() uint32 {
+// Rate returns the playback rate.
+func (mb *MvhdBox) Rate() MvhdRate {
 	return mb.rate
 }
 
-func (mb *MvhdBox) Volume() uint16 {
+// Volume returns the audio volume.
+func (mb *MvhdBox) Volume() bmfcommon.Volume {
 	return mb.volume
 }
 
 // InlineString returns an undecorated string of field names and values.
 func (mb *MvhdBox) InlineString() string {
 	return fmt.Sprintf(
-		"%s VER=(0x%02x) FLAGS=(0x%08x) RATE=(%d]) VOLUME=(%d) %s",
+		"%s VER=(0x%02x) FLAGS=(0x%08x) RATE=(%d]) VOLUME=[%s] %s",
 		mb.Box.InlineString(), mb.version, mb.flags, mb.rate, mb.volume,
 		mb.Standard32TimeSupport.InlineString())
 }
@@ -76,8 +112,8 @@ func (b *MvhdBox) parse() (err error) {
 		duration,
 		timeScale)
 
-	b.rate = bmfcommon.DefaultEndianness.Uint32(data[20:24])
-	b.volume = bmfcommon.DefaultEndianness.Uint16(data[24:26])
+	b.rate = MvhdRate(bmfcommon.DefaultEndianness.Uint32(data[20:24]))
+	b.volume = bmfcommon.Volume(bmfcommon.DefaultEndianness.Uint16(data[24:26]))
 
 	return nil
 }
