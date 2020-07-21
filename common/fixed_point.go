@@ -8,19 +8,19 @@ import (
 
 // FixedPoint16 encapsulates a uint32 and decodes it to a float32.
 type FixedPoint16 struct {
-	float32
-
 	rawValue       uint16
 	integerLength  int
 	mantissaLength int
 }
 
-// Float returns the embedded float (the actual value).
+// Float returns the effective float.
 func (fp16 FixedPoint16) Float() float32 {
 
 	// TODO(dustin): Add test
 
-	return fp16.float32
+	n, d := fp16.Rational()
+
+	return float32(n) / float32(d)
 }
 
 // Rational returns the individual numerator and denominator components.
@@ -29,7 +29,13 @@ func (fp16 FixedPoint16) Rational() (numerator uint16, denominator uint16) {
 	// TODO(dustin): Add test
 
 	numerator = fp16.rawValue >> fp16.mantissaLength
-	denominator = fp16.rawValue << fp16.integerLength
+
+	// Clear the bits in front of the denominator by shifting forward all of the
+	// way and then back.
+
+	shiftCount := (16 - fp16.integerLength)
+	denominatorShiftedLeft := fp16.rawValue << shiftCount
+	denominator = denominatorShiftedLeft >> shiftCount
 
 	return numerator, denominator
 }
@@ -42,9 +48,9 @@ func (fp16 FixedPoint16) String() string {
 	numerator, denominator := fp16.Rational()
 
 	return fmt.Sprintf(
-		"FixedPoint16<VAL=[%.2f] RAW=(%d) BITs=[%d.%d]> NUM=(%d) DEN=(%d)",
-		fp16.float32, fp16.rawValue, fp16.integerLength, fp16.mantissaLength,
-		numerator, denominator)
+		"FixedPoint16<RAW=(%d) BITs=[%d.%d]> NUM=(%d) DEN=(%d) VAL=[%.2f]>",
+		fp16.rawValue, fp16.integerLength, fp16.mantissaLength, numerator,
+		denominator, fp16.Float())
 }
 
 // FixedPoint16 returns a float produced by shifting bits in the uint16. Several
@@ -58,11 +64,7 @@ func Uint16ToFixedPoint16(x uint16, integerLength, mantissaLength int) FixedPoin
 		log.Panicf("integer bits and mantissa bits do not equal 32")
 	}
 
-	n := float32(x >> mantissaLength)
-	m := float32(x << integerLength)
-
 	return FixedPoint16{
-		float32:        n / m,
 		rawValue:       x,
 		integerLength:  integerLength,
 		mantissaLength: mantissaLength,
@@ -71,19 +73,19 @@ func Uint16ToFixedPoint16(x uint16, integerLength, mantissaLength int) FixedPoin
 
 // FixedPoint32 encapsulates a uint32 and decodes it to a float32.
 type FixedPoint32 struct {
-	float32
-
 	rawValue       uint32
 	integerLength  int
 	mantissaLength int
 }
 
-// Float returns the embedded float (the actual value).
+// Float returns the effective float.
 func (fp32 FixedPoint32) Float() float32 {
 
 	// TODO(dustin): Add test
 
-	return fp32.float32
+	n, d := fp32.Rational()
+
+	return float32(n) / float32(d)
 }
 
 // Rational returns the individual numerator and denominator components.
@@ -92,7 +94,13 @@ func (fp32 FixedPoint32) Rational() (numerator uint32, denominator uint32) {
 	// TODO(dustin): Add test
 
 	numerator = fp32.rawValue >> fp32.mantissaLength
-	denominator = fp32.rawValue << fp32.integerLength
+
+	// Clear the bits in front of the denominator by shifting forward all of the
+	// way and then back.
+
+	shiftCount := (32 - fp32.integerLength)
+	denominatorShiftedLeft := fp32.rawValue << shiftCount
+	denominator = denominatorShiftedLeft >> shiftCount
 
 	return numerator, denominator
 }
@@ -105,9 +113,9 @@ func (fp32 FixedPoint32) String() string {
 	numerator, denominator := fp32.Rational()
 
 	return fmt.Sprintf(
-		"FixedPoint32<VAL=[%.2f] RAW=(%d) BITs=[%d.%d] NUM=(%d) DEN=(%d)>",
-		fp32.float32, fp32.rawValue, fp32.integerLength, fp32.mantissaLength,
-		numerator, denominator)
+		"FixedPoint32<RAW=(%d) BITs=[%d.%d] NUM=(%d) DEN=(%d) VAL=[%.2f]>",
+		fp32.rawValue, fp32.integerLength, fp32.mantissaLength, numerator,
+		denominator, fp32.Float())
 }
 
 // FixedPoint32 returns an encapsulated float produced by shifting bits in the
@@ -123,11 +131,7 @@ func Uint32ToFixedPoint32(x uint32, integerLength, mantissaLength int) FixedPoin
 		log.Panicf("integer bits and mantissa bits do not equal 32")
 	}
 
-	n := float32(x >> mantissaLength)
-	m := float32(x << integerLength)
-
 	return FixedPoint32{
-		float32:        n / m,
 		rawValue:       x,
 		integerLength:  integerLength,
 		mantissaLength: mantissaLength,

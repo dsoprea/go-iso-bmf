@@ -2,9 +2,14 @@ package bmfcommon
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/dsoprea/go-logging"
+)
+
+var (
+	epochTime = time.Date(1904, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
 // Standard32TimeSupport packages some common time-handling fields and
@@ -107,4 +112,55 @@ func (sts Standard32TimeSupport) InlineString() string {
 	return fmt.Sprintf(
 		"DUR-S=[%.02f]%s",
 		float64(sts.Duration())/float64(time.Second), optional)
+}
+
+// TimeToEpoch returns the number of seconds since the MP4 epoch.
+func TimeToEpoch(t time.Time) uint32 {
+
+	// TODO(dustin): Add test
+
+	d := t.Sub(epochTime)
+
+	return uint32(math.Floor(float64(d.Seconds())))
+}
+
+// EpochToTime returns a the given MP4 epoch as a `time.Time`.
+func EpochToTime(epoch uint32) time.Time {
+
+	// TODO(dustin): Add test
+
+	duration := time.Second * time.Duration(epoch)
+	t := epochTime.Add(duration)
+
+	return t
+}
+
+// NowTime returns a UTC time.Time that has been rounded to the nearest second.
+func NowTime() time.Time {
+
+	// TODO(dustin): Add test
+
+	return time.Now().UTC().Round(time.Second)
+}
+
+// GetDurationString Helper function to print a duration value in the form
+// H:MM:SS.MS .
+func GetDurationString(duration uint32, timescale uint32) string {
+
+	durationSec := float64(duration) / float64(timescale)
+
+	hours := math.Floor(durationSec / 3600)
+	durationSec -= hours * 3600
+
+	minutes := math.Floor(durationSec / 60)
+	durationSec -= minutes * 60
+
+	msec := durationSec * 1000
+	durationSec = math.Floor(durationSec)
+	msec -= durationSec * 1000
+	msec = math.Floor(msec)
+
+	str := fmt.Sprintf("%02.0f:%02.0f:%02.0f:%.0f", hours, minutes, durationSec, msec)
+
+	return str
 }

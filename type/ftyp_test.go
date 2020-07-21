@@ -52,7 +52,7 @@ func TestFtypBox_String(t *testing.T) {
 		compatibleBrands: []string{"abc", "def"},
 	}
 
-	if fb.String() != "ftyp<NAME=[abcd] START=(1234) SIZE=(5678) MAJOR-BRAND=[efgh] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[abc,def]>" {
+	if fb.String() != "ftyp<NAME=[abcd] PARENT=[ROOT] START=(1234) SIZE=(5678) MAJOR-BRAND=[efgh] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[abc,def]>" {
 		t.Fatalf("String() not correct: [%s]", fb.String())
 	}
 }
@@ -67,7 +67,7 @@ func TestFtypBox_InlineString(t *testing.T) {
 		compatibleBrands: []string{"abc", "def"},
 	}
 
-	if fb.InlineString() != "NAME=[abcd] START=(1234) SIZE=(5678) MAJOR-BRAND=[efgh] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[abc,def]" {
+	if fb.InlineString() != "NAME=[abcd] PARENT=[ROOT] START=(1234) SIZE=(5678) MAJOR-BRAND=[efgh] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[abc,def]" {
 		t.Fatalf("InlineString() not correct: [%s]", fb.String())
 	}
 }
@@ -121,7 +121,7 @@ func TestFtypBoxFactory_New(t *testing.T) {
 		t.Fatalf("MinorVersion() not correct.")
 	} else if reflect.DeepEqual(fb.CompatibleBrands(), brands) != true {
 		t.Fatalf("CompatibleBrands() not correct.")
-	} else if fb.String() != "ftyp<NAME=[elst] START=(0) SIZE=(24) MAJOR-BRAND=[abcd] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[efgh,ijkl]>" {
+	} else if fb.String() != "ftyp<NAME=[elst] PARENT=[ROOT] START=(0) SIZE=(24) MAJOR-BRAND=[abcd] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[efgh,ijkl]>" {
 		t.Fatalf("String() not correct: [%s]", fb.String())
 	}
 }

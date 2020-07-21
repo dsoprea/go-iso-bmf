@@ -8,7 +8,7 @@ import (
 
 func getTestStandard32Time() (now time.Time, sts bmfcommon.Standard32TimeSupport) {
 	now = bmfcommon.NowTime()
-	epoch := bmfcommon.EpochDelta(now)
+	epoch := bmfcommon.TimeToEpoch(now)
 
 	sts = bmfcommon.NewStandard32TimeSupport(
 		epoch,

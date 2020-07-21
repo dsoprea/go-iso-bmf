@@ -5,14 +5,6 @@ import (
 	"testing"
 )
 
-func TestGetDurationString(t *testing.T) {
-	s := GetDurationString(123456789, 12345)
-
-	if s != "02:46:40:549" {
-		t.Fatalf("Duration string not correct.")
-	}
-}
-
 func TestPushBox_One(t *testing.T) {
 	b := make([]byte, 0)
 

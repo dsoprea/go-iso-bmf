@@ -15,7 +15,7 @@ func TestStandard32TimeSupport_HasCreationTime_False(t *testing.T) {
 
 func TestStandard32TimeSupport_HasCreationTime_True(t *testing.T) {
 	now := NowTime()
-	creationEpoch := EpochDelta(now)
+	creationEpoch := TimeToEpoch(now)
 
 	sts := Standard32TimeSupport{
 		creationEpoch: creationEpoch,
@@ -28,7 +28,7 @@ func TestStandard32TimeSupport_HasCreationTime_True(t *testing.T) {
 
 func TestStandard32TimeSupport_CreationTime(t *testing.T) {
 	now := NowTime()
-	creationEpoch := EpochDelta(now)
+	creationEpoch := TimeToEpoch(now)
 
 	sts := Standard32TimeSupport{
 		creationEpoch: creationEpoch,
@@ -49,7 +49,7 @@ func TestStandard32TimeSupport_HasModificationTime_False(t *testing.T) {
 
 func TestStandard32TimeSupport_HasModificationTime_True(t *testing.T) {
 	now := NowTime()
-	modificationEpoch := EpochDelta(now)
+	modificationEpoch := TimeToEpoch(now)
 
 	sts := Standard32TimeSupport{
 		modificationEpoch: modificationEpoch,
@@ -62,7 +62,7 @@ func TestStandard32TimeSupport_HasModificationTime_True(t *testing.T) {
 
 func TestStandard32TimeSupport_ModificationTime(t *testing.T) {
 	now := NowTime()
-	modificationEpoch := EpochDelta(now)
+	modificationEpoch := TimeToEpoch(now)
 
 	sts := Standard32TimeSupport{
 		modificationEpoch: modificationEpoch,
@@ -125,5 +125,13 @@ func TestStandard32TimeSupport_Duration(t *testing.T) {
 	d := time.Second * 10
 	if sts.Duration() != d {
 		t.Fatalf("Duration() not correct: [%s] != [%s]", sts.Duration(), d)
+	}
+}
+
+func TestGetDurationString(t *testing.T) {
+	s := GetDurationString(123456789, 12345)
+
+	if s != "02:46:40:549" {
+		t.Fatalf("Duration string not correct.")
 	}
 }

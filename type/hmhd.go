@@ -49,13 +49,11 @@ func (b *HmhdBox) parse() (err error) {
 	data, err := b.ReadBoxData()
 	log.PanicIf(err)
 
-	// TODO(dustin): !! We're not convinced this is right as it steals a byte from the maxPDUSize. Typically, the version byte comes from the first byte of a flags field, but this seems like we're compromising actual data.
 	b.version = data[0]
-
-	b.maxPDUSize = bmfcommon.DefaultEndianness.Uint16(data[0:2])
-	b.avgPDUSize = bmfcommon.DefaultEndianness.Uint16(data[2:4])
-	b.maxBitrate = bmfcommon.DefaultEndianness.Uint32(data[4:8])
-	b.avgBitrate = bmfcommon.DefaultEndianness.Uint32(data[8:12])
+	b.maxPDUSize = bmfcommon.DefaultEndianness.Uint16(data[1:3])
+	b.avgPDUSize = bmfcommon.DefaultEndianness.Uint16(data[3:5])
+	b.maxBitrate = bmfcommon.DefaultEndianness.Uint32(data[5:9])
+	b.avgBitrate = bmfcommon.DefaultEndianness.Uint32(data[9:13])
 
 	return nil
 }

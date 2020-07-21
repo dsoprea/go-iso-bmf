@@ -102,6 +102,8 @@ func (b *TkhdBox) parse(timeScale uint32) (err error) {
 
 	b.trackId = bmfcommon.DefaultEndianness.Uint32(data[12:16])
 
+	// There are four reserved bytes here.
+
 	duration := bmfcommon.DefaultEndianness.Uint32(data[20:24])
 
 	b.layer = bmfcommon.DefaultEndianness.Uint16(data[32:34])
