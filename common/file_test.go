@@ -75,13 +75,13 @@ func TestFile_readBoxAt_Front(t *testing.T) {
 
 	file := NewFile(sb, int64(len(data)))
 
-	boxSize, boxType, err := file.readBoxAt(0)
+	box, err := file.readBoxAt(0)
 	log.PanicIf(err)
 
-	if boxSize != int64(0x01020304) {
-		t.Fatalf("Size not correct: (%d)", boxSize)
-	} else if boxType != "abcd" {
-		t.Fatalf("Type not correct: [%s]", boxType)
+	if box.Size() != int64(0x01020304) {
+		t.Fatalf("Size not correct: (%d)", box.Size())
+	} else if box.Name() != "abcd" {
+		t.Fatalf("Type not correct: [%s]", box.Name())
 	}
 }
 
@@ -97,13 +97,13 @@ func TestFile_readBoxAt_Middle(t *testing.T) {
 
 	file := NewFile(sb, int64(len(data)))
 
-	boxSize, boxType, err := file.readBoxAt(4)
+	box, err := file.readBoxAt(4)
 	log.PanicIf(err)
 
-	if boxSize != int64(0x01020304) {
-		t.Fatalf("Size not correct: (%d)", boxSize)
-	} else if boxType != "abcd" {
-		t.Fatalf("Type not correct: [%s]", boxType)
+	if box.Size() != int64(0x01020304) {
+		t.Fatalf("Size not correct: (%d)", box.Size())
+	} else if box.Name() != "abcd" {
+		t.Fatalf("Type not correct: [%s]", box.Name())
 	}
 }
 

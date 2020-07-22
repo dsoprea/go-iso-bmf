@@ -177,7 +177,7 @@ func (f *File) readBytesAt(offset int64, n int64) (b []byte, err error) {
 }
 
 // readBoxAt reads a box from an offset.
-func (f *File) readBoxAt(offset int64) (boxSize int64, boxType string, err error) {
+func (f *File) readBoxAt(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -194,7 +194,7 @@ func (f *File) readBoxAt(offset int64) (boxSize int64, boxType string, err error
 	err = binary.Read(f.rs, DefaultEndianness, &rawBoxSize)
 	log.PanicIf(err)
 
-	boxSize = int64(rawBoxSize)
+	boxSize := int64(rawBoxSize)
 
 	// Read box-type.
 
@@ -203,10 +203,19 @@ func (f *File) readBoxAt(offset int64) (boxSize int64, boxType string, err error
 	_, err = io.ReadFull(f.rs, boxTypeRaw)
 	log.PanicIf(err)
 
-	boxType = string(boxTypeRaw)
+	boxType := string(boxTypeRaw)
 
-	if boxSize == 1 {
-		// We actually have a 64-bit box-size. It follows the size and type.
+	var headerSize int64
+
+	if boxSize > 1 {
+		// We have an alternative 32-bit box-size.
+
+		headerSize = 8
+	} else if boxSize == 1 {
+		// We have an alternative 64-bit box-size. It follows the size and
+		// type.
+
+		headerSize = 16
 
 		fileLogger.Debugf(nil,
 			"Box [%s] at offset (0x%016x) has a 64-bit size.",
@@ -227,7 +236,9 @@ func (f *File) readBoxAt(offset int64) (boxSize int64, boxType string, err error
 		log.Panicf("box [%s] size is (0) and unhandled", boxType)
 	}
 
-	return boxSize, boxType, nil
+	box = NewBox(boxType, offset, boxSize, headerSize, f)
+
+	return box, nil
 }
 
 func (f *File) ReadBaseBox(offset int64) (box Box, err error) {
@@ -239,10 +250,8 @@ func (f *File) ReadBaseBox(offset int64) (box Box, err error) {
 
 	// TODO(dustin): Add test
 
-	size, name, err := f.readBoxAt(offset)
+	box, err = f.readBoxAt(offset)
 	log.PanicIf(err)
-
-	box = NewBox(name, offset, size, f)
 
 	return box, nil
 }
@@ -291,7 +300,7 @@ func readBoxes(f *File, parent CommonBox, start int64, totalSize int64) (boxes B
 
 	i := 0
 	for offset := start; offset < start+totalSize; {
-		fileLogger.Debugf(nil, "[%s] Reading child (%d) at offset (0x%016x).", parentName, i, offset)
+		fileLogger.Debugf(nil, "[%s] Reading child (%d) box at offset (0x%016x).", parentName, i, offset)
 
 		cb, known, err := readBox(f, parent, offset)
 		log.PanicIf(err)

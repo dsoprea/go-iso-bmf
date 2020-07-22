@@ -12,11 +12,6 @@ var (
 	boxLogger = log.NewLogger("mp4.bmfcommon.box")
 )
 
-const (
-	// BoxHeaderSize is the size of box header.
-	BoxHeaderSize = int64(8)
-)
-
 var (
 	// DefaultEndianness is the default endianness of stored integers.
 	DefaultEndianness binary.ByteOrder = binary.BigEndian
@@ -24,23 +19,25 @@ var (
 
 // Box defines an Atom Box structure.
 type Box struct {
-	name  string
-	start int64
-	size  int64
-	file  *File
+	name       string
+	start      int64
+	size       int64
+	headerSize int64
+	file       *File
 
 	parent CommonBox
 }
 
-func NewBox(name string, start, size int64, file *File) Box {
+func NewBox(name string, start, size, headerSize int64, file *File) Box {
 
 	// TODO(dustin): Add test
 
 	return Box{
-		name:  name,
-		start: start,
-		size:  size,
-		file:  file,
+		name:       name,
+		start:      start,
+		size:       size,
+		headerSize: headerSize,
+		file:       file,
 	}
 }
 
@@ -70,6 +67,14 @@ func (box Box) Size() int64 {
 	// TODO(dustin): Add test
 
 	return box.size
+}
+
+// HeaderSize is the effective size of the header.
+func (box Box) HeaderSize() int64 {
+
+	// TODO(dustin): Add test
+
+	return box.headerSize
 }
 
 // Start returns the box start offset.
@@ -108,8 +113,8 @@ func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {
 
 	// TODO(dustin): Add test
 
-	start := box.Start() + BoxHeaderSize + int64(startDisplace)
-	size := box.Size() - BoxHeaderSize - int64(startDisplace)
+	start := box.Start() + box.HeaderSize() + int64(startDisplace)
+	size := box.Size() - box.HeaderSize() - int64(startDisplace)
 
 	boxes, err = readBoxes(box.file, box, start, size)
 	log.PanicIf(err)
@@ -137,13 +142,21 @@ func (box Box) ReadBoxData() (data []byte, err error) {
 
 	// TODO(dustin): Add test
 
-	if box.size <= BoxHeaderSize {
+	headerSize := box.HeaderSize()
+
+	if box.size < headerSize {
+		log.Panicf(
+			"box [%s] total-size (%d) is smaller then box header-size (%d)",
+			box.Name(), box.size, headerSize)
+	}
+
+	if box.size == headerSize {
 		return nil, nil
 	}
 
 	data, err = box.file.readBytesAt(
-		box.start+BoxHeaderSize,
-		box.size-BoxHeaderSize)
+		box.start+headerSize,
+		box.size-headerSize)
 
 	log.PanicIf(err)
 

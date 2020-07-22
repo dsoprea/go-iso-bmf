@@ -50,7 +50,7 @@ func TestHdlrBox_HdlrName(t *testing.T) {
 }
 
 func TestHdlrBox_String(t *testing.T) {
-	box := bmfcommon.NewBox("abcd", 1234, 5678, nil)
+	box := bmfcommon.NewBox("abcd", 1234, 5678, 8, nil)
 
 	hb := HdlrBox{
 		Box:      box,
@@ -66,7 +66,7 @@ func TestHdlrBox_String(t *testing.T) {
 }
 
 func TestHdlrBox_InlineString(t *testing.T) {
-	box := bmfcommon.NewBox("abcd", 1234, 5678, nil)
+	box := bmfcommon.NewBox("abcd", 1234, 5678, 8, nil)
 
 	hb := HdlrBox{
 		Box:      box,

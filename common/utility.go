@@ -36,9 +36,13 @@ func PushBox(buffer *[]byte, name string, data []byte) {
 	extension := make([]byte, 8+len(data))
 	*buffer = append(*buffer, extension...)
 
+	// We'll just push 32-bit box-sizes (4-byte size + 4-byte type, but no
+	// follow-up 8-byte size).
+	boxHeaderSize := 8
+
 	DefaultEndianness.PutUint32(
 		(*buffer)[start:start+4],
-		uint32(len(data))+uint32(BoxHeaderSize))
+		uint32(len(data))+uint32(boxHeaderSize))
 
 	copy((*buffer)[start+4:], []byte(name))
 	copy((*buffer)[start+8:], data)

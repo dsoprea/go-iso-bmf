@@ -66,7 +66,7 @@ func (b *HdlrBox) parse() (err error) {
 
 	// TODO(dustin): Skipping over data, here?
 
-	boxDataSize := b.Size() - bmfcommon.BoxHeaderSize
+	boxDataSize := b.Size() - b.HeaderSize()
 	b.hdlrName = string(data[24:boxDataSize])
 
 	return nil

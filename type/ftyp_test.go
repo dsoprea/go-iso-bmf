@@ -43,7 +43,7 @@ func TestFtypBox_CompatibleBrands(t *testing.T) {
 }
 
 func TestFtypBox_String(t *testing.T) {
-	box := bmfcommon.NewBox("abcd", 1234, 5678, nil)
+	box := bmfcommon.NewBox("abcd", 1234, 5678, 8, nil)
 
 	fb := FtypBox{
 		Box:              box,
@@ -58,7 +58,7 @@ func TestFtypBox_String(t *testing.T) {
 }
 
 func TestFtypBox_InlineString(t *testing.T) {
-	box := bmfcommon.NewBox("abcd", 1234, 5678, nil)
+	box := bmfcommon.NewBox("abcd", 1234, 5678, 8, nil)
 
 	fb := FtypBox{
 		Box:              box,

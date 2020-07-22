@@ -174,7 +174,7 @@ func TestMdhdBox_getLanguageString(t *testing.T) {
 }
 
 func TestMdhdBox_String(t *testing.T) {
-	box := bmfcommon.NewBox("mdhd", 1234, 5678, nil)
+	box := bmfcommon.NewBox("mdhd", 1234, 5678, 8, nil)
 
 	epoch := uint32(3677725917)
 
@@ -202,7 +202,7 @@ func TestMdhdBox_String(t *testing.T) {
 }
 
 func TestMdhdBox_InlineString(t *testing.T) {
-	box := bmfcommon.NewBox("mdhd", 1234, 5678, nil)
+	box := bmfcommon.NewBox("mdhd", 1234, 5678, 8, nil)
 
 	epoch := uint32(3677725917)
 
