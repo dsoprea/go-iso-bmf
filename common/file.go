@@ -205,6 +205,15 @@ func (f *File) readBoxAt(offset int64) (box Box, err error) {
 
 	boxType := string(boxTypeRaw)
 
+	// We'll interpret everything as data. So, if there is good data
+	// followed by garbage, we may interpret the garbage as well. So, if we
+	// see a box with an invalid name, panic as soon as possible.
+	if BoxNameIsValid(boxType) == false {
+		log.Panicf(
+			"box starting at offset (0x%016x) looks like garbage",
+			offset)
+	}
+
 	var headerSize int64
 
 	if boxSize > 1 {
@@ -249,6 +258,7 @@ func (f *File) ReadBaseBox(offset int64) (box Box, err error) {
 	}()
 
 	// TODO(dustin): Add test
+	// TODO(dustin): Drop this method
 
 	box, err = f.readBoxAt(offset)
 	log.PanicIf(err)
@@ -305,26 +315,16 @@ func readBoxes(f *File, parent CommonBox, start int64, totalSize int64) (boxes B
 		cb, known, err := readBox(f, parent, offset)
 		log.PanicIf(err)
 
-		// We'll interpret everything as data. So, if there is good data
-		// followed by garbage, we'll interpret the garbage as well. So, if we
-		// see a box with an invalid name, skip it and stop reading any further.
-
-		name := cb.Name()
-		if BoxNameIsValid(name) == false {
-			log.Panicf(
-				"box (%d) in sequence starting at offset (0x%016x) looks like garbage",
-				i, offset)
-		}
-
 		if known == true {
 			boxes = append(boxes, cb)
 		}
 
-		boxSize := cb.Size()
+		name := cb.Name()
+		size := cb.Size()
 
-		fileLogger.Debugf(nil, "[%s] Child (%d) box size is (%d).", parentName, i, boxSize)
+		fileLogger.Debugf(nil, "[%s] Child (%d) box has name [%s] and size (%d).", parentName, i, name, size)
 
-		offset += int64(boxSize)
+		offset += int64(size)
 		i++
 	}
 
