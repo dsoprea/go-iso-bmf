@@ -126,7 +126,7 @@ func TestTkhdBox_InlineString(t *testing.T) {
 		height:         0x109,
 	}
 
-	if tb.InlineString() != "NAME=[] PARENT=[ROOT] START=(0) SIZE=(0) VER=(0x11) FLAGS=(0x11223344) TRACK-ID=(85]) LAYER=(102) ALT-GROUP=(119) VOLUME=[OFF] MATRIX=(3) W=(153) H=(265) DUR-S=[60.00]" {
+	if tb.InlineString() != "NAME=[] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(0) VER=(0x11) FLAGS=(0x11223344) TRACK-ID=(85) LAYER=(102) ALT-GROUP=(119) VOLUME=[OFF] MATRIX=(3) W=(153) H=(265) DUR-S=[60.00]" {
 		t.Fatalf("InlineString() not correct: [%s]", tb.InlineString())
 	}
 }

@@ -60,7 +60,7 @@ func TestHdlrBox_String(t *testing.T) {
 		hdlrName: "name_test",
 	}
 
-	if hb.String() != "hdlr<NAME=[abcd] PARENT=[ROOT] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x0000000b) HANDLER=[handler_test] HDLR-NAME=[name_test]>" {
+	if hb.String() != "hdlr<NAME=[abcd] PARENT=[ROOT] START=(0x00000000000004d2) SIZE=(5678) VER=(0x0b) FLAGS=(0x0000000b) HANDLER=[handler_test] HDLR-NAME=[name_test]>" {
 		t.Fatalf("String() not correct: [%s]", hb.String())
 	}
 }
@@ -76,7 +76,7 @@ func TestHdlrBox_InlineString(t *testing.T) {
 		hdlrName: "name_test",
 	}
 
-	if hb.InlineString() != "NAME=[abcd] PARENT=[ROOT] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x0000000b) HANDLER=[handler_test] HDLR-NAME=[name_test]" {
+	if hb.InlineString() != "NAME=[abcd] PARENT=[ROOT] START=(0x00000000000004d2) SIZE=(5678) VER=(0x0b) FLAGS=(0x0000000b) HANDLER=[handler_test] HDLR-NAME=[name_test]" {
 		t.Fatalf("InlineString() not correct: [%s]", hb.InlineString())
 	}
 }
@@ -146,11 +146,11 @@ func TestHdlrBoxFactory_New(t *testing.T) {
 		t.Fatalf("HdlrName() not correct.")
 	}
 
-	if hb.String() != "hdlr<NAME=[hdlr] PARENT=[ROOT] START=(0) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=[testname]>" {
+	if hb.String() != "hdlr<NAME=[hdlr] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=[testname]>" {
 		t.Fatalf("String() not correct: [%s]", hb.String())
 	}
 
-	if hb.InlineString() != "NAME=[hdlr] PARENT=[ROOT] START=(0) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=[testname]" {
+	if hb.InlineString() != "NAME=[hdlr] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=[testname]" {
 		t.Fatalf("InlineString() not correct: [%s]", hb.InlineString())
 	}
 }

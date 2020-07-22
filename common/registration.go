@@ -2,6 +2,8 @@ package bmfcommon
 
 import (
 	"errors"
+	"strings"
+	"unicode"
 
 	"github.com/dsoprea/go-logging"
 )
@@ -14,6 +16,31 @@ var (
 var (
 	boxMapping = make(map[string]BoxFactory)
 )
+
+// BoxNameIsValid returns true if no invalid characters are in the box-name.
+// This is a strategy to determine if there is garbage at the end of the ISO
+// 14496-12 data, since we'll just keep reading boxes until we reach the end of
+// the allotment.
+func BoxNameIsValid(name string) bool {
+	// Trim right-side spacing. Spacing is valid on the right side, and this
+	// will simplify things.
+	name = strings.TrimRight(name, " ")
+
+	// Name needs to be non-empty.
+	if name == "" {
+		return false
+	}
+
+	// Name needs to have only letters. Note that this will also fail if there
+	// were spaces *in the middle* of the name.
+	for _, r := range name {
+		if unicode.IsLetter(r) == false && unicode.IsDigit(r) == false {
+			return false
+		}
+	}
+
+	return true
+}
 
 // bmfcommon.CommonBox is one parsed box.
 type CommonBox interface {
@@ -33,6 +60,15 @@ type CommonBox interface {
 
 	// Parent is the parent box
 	Parent() CommonBox
+}
+
+// GetParentBoxName returns the name of the given CB. If nil, returns "ROOT".
+func GetParentBoxName(cb CommonBox) string {
+	if cb == nil {
+		return "ROOT"
+	}
+
+	return cb.Name()
 }
 
 // BoxChildIndexer is a box that has children.

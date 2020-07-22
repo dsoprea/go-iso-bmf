@@ -196,7 +196,7 @@ func TestMdhdBox_String(t *testing.T) {
 		language: 0b001000010100110,
 	}
 
-	if mb.String() != "mdhd<NAME=[mdhd] PARENT=[ROOT] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) LANG=[def] DUR-S=[10.00] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]>" {
+	if mb.String() != "mdhd<NAME=[mdhd] PARENT=[ROOT] START=(0x00000000000004d2) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) LANG=[def] DUR-S=[10.00] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]>" {
 		t.Fatalf("String() not correct: [%s]", mb.String())
 	}
 }
@@ -218,7 +218,7 @@ func TestMdhdBox_InlineString(t *testing.T) {
 		language: 0b001000010100110,
 	}
 
-	if mb.InlineString() != "NAME=[mdhd] PARENT=[ROOT] START=(1234) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) LANG=[def] DUR-S=[10.00] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]" {
+	if mb.InlineString() != "NAME=[mdhd] PARENT=[ROOT] START=(0x00000000000004d2) SIZE=(5678) VER=(0x0b) FLAGS=(0x00000016) LANG=[def] DUR-S=[10.00] CTIME=[2020-07-16 06:31:57 +0000 UTC] MTIME=[2020-07-16 06:31:58 +0000 UTC]" {
 		t.Fatalf("InlineString() not correct: [%s]", mb.InlineString())
 	}
 }

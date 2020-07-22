@@ -78,7 +78,7 @@ func TestFile_readBoxAt_Front(t *testing.T) {
 	boxSize, boxType, err := file.readBoxAt(0)
 	log.PanicIf(err)
 
-	if boxSize != uint32(0x01020304) {
+	if boxSize != int64(0x01020304) {
 		t.Fatalf("Size not correct: (%d)", boxSize)
 	} else if boxType != "abcd" {
 		t.Fatalf("Type not correct: [%s]", boxType)
@@ -100,7 +100,7 @@ func TestFile_readBoxAt_Middle(t *testing.T) {
 	boxSize, boxType, err := file.readBoxAt(4)
 	log.PanicIf(err)
 
-	if boxSize != uint32(0x01020304) {
+	if boxSize != int64(0x01020304) {
 		t.Fatalf("Size not correct: (%d)", boxSize)
 	} else if boxType != "abcd" {
 		t.Fatalf("Type not correct: [%s]", boxType)

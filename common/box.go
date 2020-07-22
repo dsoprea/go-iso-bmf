@@ -49,15 +49,11 @@ func (box Box) InlineString() string {
 
 	// TODO(dustin): Add test
 
-	var parentName string
+	parentName := GetParentBoxName(box.parent)
 
-	if box.parent == nil {
-		parentName = "ROOT"
-	} else {
-		parentName = box.parent.Name()
-	}
-
-	return fmt.Sprintf("NAME=[%s] PARENT=[%s] START=(%d) SIZE=(%d)", box.name, parentName, box.start, box.size)
+	return fmt.Sprintf(
+		"NAME=[%s] PARENT=[%s] START=(0x%016x) SIZE=(%d)",
+		box.name, parentName, box.start, box.size)
 }
 
 // Name returns the box name.
@@ -102,7 +98,7 @@ func (box Box) Index() FullBoxIndex {
 }
 
 // ReadBoxes bridges to the lower-level function that knows how to extract child-
-// boxes.
+// boxes. This also asserts that all box names look valid.
 func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -117,6 +113,16 @@ func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {
 
 	boxes, err = readBoxes(box.file, box, start, size)
 	log.PanicIf(err)
+
+	// Check box names. This is a poor-man's structural check.
+
+	for i, box := range boxes {
+		name := box.Name()
+		if BoxNameIsValid(name) == false {
+			log.Panicf("box (%d) in sequence starting at offset (%d) has invalid name [%s]",
+				i, startDisplace, name)
+		}
+	}
 
 	return boxes, err
 }

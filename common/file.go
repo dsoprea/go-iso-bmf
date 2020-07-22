@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strings"
 
+	"encoding/binary"
+
 	"github.com/dsoprea/go-logging"
 )
 
@@ -143,8 +145,12 @@ func (f *File) Parse() (err error) {
 
 	// TODO(dustin): !! Dump Parse() and move this to NewFile. This might break a lot of unit-tests.
 
+	fileLogger.Debugf(nil, "Parsing stream with (%d) bytes.", f.size)
+
 	boxes, err := readBoxes(f, nil, int64(0), f.size)
 	log.PanicIf(err)
+
+	fileLogger.Debugf(nil, "(%d) root boxes were found.", len(boxes))
 
 	f.LoadedBoxIndex = boxes.Index()
 
@@ -171,18 +177,55 @@ func (f *File) readBytesAt(offset int64, n int64) (b []byte, err error) {
 }
 
 // readBoxAt reads a box from an offset.
-func (f *File) readBoxAt(offset int64) (boxSize uint32, boxType string, err error) {
+func (f *File) readBoxAt(offset int64) (boxSize int64, boxType string, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
 
-	buf, err := f.readBytesAt(offset, BoxHeaderSize)
+	_, err = f.rs.Seek(offset, io.SeekStart)
 	log.PanicIf(err)
 
-	boxSize = DefaultEndianness.Uint32(buf[0:4])
-	boxType = string(buf[4:8])
+	// Read 32-bit box-size.
+
+	var rawBoxSize uint32
+
+	err = binary.Read(f.rs, DefaultEndianness, &rawBoxSize)
+	log.PanicIf(err)
+
+	boxSize = int64(rawBoxSize)
+
+	// Read box-type.
+
+	boxTypeRaw := make([]byte, 4)
+
+	_, err = io.ReadFull(f.rs, boxTypeRaw)
+	log.PanicIf(err)
+
+	boxType = string(boxTypeRaw)
+
+	if boxSize == 1 {
+		// We actually have a 64-bit box-size. It follows the size and type.
+
+		fileLogger.Debugf(nil,
+			"Box [%s] at offset (0x%016x) has a 64-bit size.",
+			boxType, offset)
+
+		var rawBoxSize uint64
+
+		err = binary.Read(f.rs, DefaultEndianness, &rawBoxSize)
+		log.PanicIf(err)
+
+		if rawBoxSize > 0x7FFFFFFFFFFFFFFF {
+			log.Panicf("box-size too large for int64")
+		}
+
+		boxSize = int64(rawBoxSize)
+	} else if boxSize == 0 {
+		// TODO(dustin): Come back to this.
+		log.Panicf("box [%s] size is (0) and unhandled", boxType)
+	}
 
 	return boxSize, boxType, nil
 }
@@ -199,7 +242,7 @@ func (f *File) ReadBaseBox(offset int64) (box Box, err error) {
 	size, name, err := f.readBoxAt(offset)
 	log.PanicIf(err)
 
-	box = NewBox(name, offset, int64(size), f)
+	box = NewBox(name, offset, size, f)
 
 	return box, nil
 }
@@ -213,8 +256,6 @@ func readBox(f *File, parent CommonBox, offset int64) (cb CommonBox, known bool,
 
 	// TODO(dustin): Add test
 
-	fileLogger.Debugf(nil, "Reading box at offset (0x%016x).", offset)
-
 	box, err := f.ReadBaseBox(offset)
 	log.PanicIf(err)
 
@@ -225,7 +266,7 @@ func readBox(f *File, parent CommonBox, offset int64) (cb CommonBox, known bool,
 	bf := GetFactory(name)
 
 	if bf == nil {
-		boxLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
+		fileLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
 		return box, false, nil
 	}
 
@@ -246,21 +287,33 @@ func readBoxes(f *File, parent CommonBox, start int64, totalSize int64) (boxes B
 		}
 	}()
 
+	parentName := GetParentBoxName(parent)
+
 	i := 0
 	for offset := start; offset < start+totalSize; {
-		fileLogger.Debugf(nil, "Reading box (%d) at offset (0x%016x).", i, offset)
+		fileLogger.Debugf(nil, "[%s] Reading child (%d) at offset (0x%016x).", parentName, i, offset)
 
 		cb, known, err := readBox(f, parent, offset)
 		log.PanicIf(err)
 
+		// We'll interpret everything as data. So, if there is good data
+		// followed by garbage, we'll interpret the garbage as well. So, if we
+		// see a box with an invalid name, skip it and stop reading any further.
+
+		name := cb.Name()
+		if BoxNameIsValid(name) == false {
+			log.Panicf(
+				"box (%d) in sequence starting at offset (0x%016x) looks like garbage",
+				i, offset)
+		}
+
 		if known == true {
 			boxes = append(boxes, cb)
-		} else {
-			name := cb.Name()
-			boxLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
 		}
 
 		boxSize := cb.Size()
+
+		fileLogger.Debugf(nil, "[%s] Child (%d) box size is (%d).", parentName, i, boxSize)
 
 		offset += int64(boxSize)
 		i++

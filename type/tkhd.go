@@ -72,7 +72,7 @@ func (tb *TkhdBox) Height() uint32 {
 // InlineString returns an undecorated string of field names and values.
 func (tb *TkhdBox) InlineString() string {
 	return fmt.Sprintf(
-		"%s VER=(0x%02x) FLAGS=(0x%08x) TRACK-ID=(%d]) LAYER=(%d) ALT-GROUP=(%d) VOLUME=[%s] MATRIX=(%d) W=(%d) H=(%d) %s",
+		"%s VER=(0x%02x) FLAGS=(0x%08x) TRACK-ID=(%d) LAYER=(%d) ALT-GROUP=(%d) VOLUME=[%s] MATRIX=(%d) W=(%d) H=(%d) %s",
 		tb.Box.InlineString(), tb.version, tb.flags, tb.trackId, tb.layer,
 		tb.AlternateGroup(), tb.volume, len(tb.matrix), tb.width, tb.height,
 		tb.Standard32TimeSupport.InlineString())
