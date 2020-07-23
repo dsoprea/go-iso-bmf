@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	fileLogger = log.NewLogger("mp4.bmfcommon.file")
+	fileLogger = log.NewLogger("bmfcommon.file")
 )
 
 // FullyQualifiedBoxName is the name of a box fully-qualified with its parents.

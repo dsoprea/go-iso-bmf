@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	boxLogger = log.NewLogger("mp4.bmfcommon.box")
+	boxLogger = log.NewLogger("bmfcommon.box")
 )
 
 var (

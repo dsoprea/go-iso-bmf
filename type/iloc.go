@@ -164,8 +164,6 @@ func (ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 
 	version := data[0]
 
-	ilocLogger.Debugf(nil, "ILOC: VERSION=(%d)", version)
-
 	if version != 1 && version != 2 {
 		log.Panicf("version of ILOC not supported: (%d)", version)
 	}
@@ -207,10 +205,6 @@ func (ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 			log.Panicf("index-size is not valid: (%d)", indexSize)
 		}
 	}
-
-	ilocLogger.Debugf(nil,
-		"ILOC: OFFSET-SIZE=(%d) LEN-SIZE=(%d) BASE-OFFSET-SIZE=(%d) INDEX-SIZE=(%d)",
-		offsetSize, lengthSize, baseOffsetSize, indexSize)
 
 	var itemCount uint32
 
