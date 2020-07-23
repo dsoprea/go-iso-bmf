@@ -4,16 +4,64 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"unicode"
 )
 
-// bmfcommon.DumpBytes prints a list of hex-encoded bytes.
+// DumpBytes prints a list of hex-encoded bytes.
 func DumpBytes(data []byte) {
 
 	// TODO(dustin): Add test
 
-	fmt.Printf("DUMP: ")
-	for _, x := range data {
-		fmt.Printf("%02x ", x)
+	fmt.Printf("DUMP:\n")
+	mod := 20
+	gappedat := 5
+	column := 0
+	buffer := make([]byte, mod)
+
+	flushLine := func() {
+		// If this is the last line, add spacing to align with the rest.
+		for i := column; i < mod; i++ {
+			fmt.Printf("   ")
+		}
+
+		for i, r := range buffer {
+			if unicode.IsPrint(rune(r)) == true {
+				fmt.Printf("%c", r)
+			} else {
+				fmt.Printf(".")
+			}
+
+			if i > 0 && (i+1)%gappedat == 0 {
+				fmt.Printf(" ")
+			}
+		}
+
+		column = 0
+		buffer = make([]byte, mod)
+		fmt.Printf("\n")
+	}
+
+	for i, r := range data {
+		if column == 0 {
+			fmt.Printf("0x%08x ", i)
+		}
+
+		buffer[column] = r
+		fmt.Printf("%02x ", r)
+
+		if (column+1)%gappedat == 0 {
+			fmt.Printf(" ")
+		}
+
+		column++
+
+		if column >= mod {
+			flushLine()
+		}
+	}
+
+	if column > 0 {
+		flushLine()
 	}
 
 	fmt.Printf("\n")
