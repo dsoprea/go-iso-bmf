@@ -24,7 +24,7 @@ func dump(box interface{}, level int) {
 			fmt.Printf("%s> [ROOT]\n", indent)
 		} else {
 			cb := t.(CommonBox)
-			fmt.Printf("%s> %s  %s  [PARENT]\n", indent, cb.Name(), cb.InlineString())
+			fmt.Printf("%s> %s  %s\n", indent, cb.Name(), cb.InlineString())
 		}
 
 		names := t.ChildrenTypes()
