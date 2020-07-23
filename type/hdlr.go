@@ -19,18 +19,22 @@ type HdlrBox struct {
 	hdlrName string
 }
 
+// Version is the box version.
 func (hb *HdlrBox) Version() byte {
 	return hb.version
 }
 
+// Flags are flags.
 func (hb *HdlrBox) Flags() uint32 {
 	return hb.flags
 }
 
+// Handler is the type of media.
 func (hb *HdlrBox) Handler() string {
 	return hb.handler
 }
 
+// HdlrName is an optional description for debugging.
 func (hb *HdlrBox) HdlrName() string {
 	return hb.hdlrName
 }
@@ -43,8 +47,8 @@ func (hb *HdlrBox) String() string {
 // InlineString returns an undecorated string of field names and values.
 func (hb *HdlrBox) InlineString() string {
 	return fmt.Sprintf(
-		"%s VER=(0x%02x) FLAGS=(0x%08x) HANDLER=[%s] HDLR-NAME=[%s]",
-		hb.Box.InlineString(), hb.version, hb.flags, hb.handler, hb.hdlrName)
+		"%s VER=(0x%02x) FLAGS=(0x%08x) HANDLER=[%s] HDLR-NAME=(%d)[%s]",
+		hb.Box.InlineString(), hb.version, hb.flags, hb.handler, len(hb.hdlrName), hb.hdlrName)
 }
 
 func (b *HdlrBox) parse() (err error) {
