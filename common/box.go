@@ -104,7 +104,7 @@ func (box Box) Index() FullBoxIndex {
 
 // ReadBoxes bridges to the lower-level function that knows how to extract child-
 // boxes. This also asserts that all box names look valid.
-func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {
+func (box Box) ReadBoxes(startDisplace int, parent CommonBox) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -116,7 +116,7 @@ func (box Box) ReadBoxes(startDisplace int) (boxes Boxes, err error) {
 	start := box.Start() + box.HeaderSize() + int64(startDisplace)
 	size := box.Size() - box.HeaderSize() - int64(startDisplace)
 
-	boxes, err = readBoxes(box.file, box, start, size)
+	boxes, err = readBoxes(box.file, parent, start, size)
 	log.PanicIf(err)
 
 	// Check box names. This is a poor-man's structural check.

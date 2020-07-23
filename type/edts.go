@@ -21,7 +21,7 @@ func (b *EdtsBox) parse() (err error) {
 		}
 	}()
 
-	boxes, err := b.Box.ReadBoxes(0)
+	boxes, err := b.Box.ReadBoxes(0, b)
 	log.PanicIf(err)
 
 	b.LoadedBoxIndex = boxes.Index()

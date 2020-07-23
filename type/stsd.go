@@ -39,7 +39,7 @@ func (b *StsdBox) parse() (err error) {
 	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])
 
 	// Skip extra 8 bytes.
-	boxes, err := b.Box.ReadBoxes(8)
+	boxes, err := b.Box.ReadBoxes(8, b)
 	log.PanicIf(err)
 
 	b.LoadedBoxIndex = boxes.Index()

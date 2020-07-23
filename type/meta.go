@@ -38,15 +38,14 @@ func (metaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 
 	// Boxes follow the four-bytes with the version/flags.
 
-	boxes, err := box.ReadBoxes(4)
+	metaBox := &MetaBox{
+		Box: box,
+	}
+
+	boxes, err := box.ReadBoxes(4, metaBox)
 	log.PanicIf(err)
 
-	index := boxes.Index()
-
-	metaBox := &MetaBox{
-		Box:            box,
-		LoadedBoxIndex: index,
-	}
+	metaBox.LoadedBoxIndex = boxes.Index()
 
 	return metaBox, nil
 }
