@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// MdiaBox is a "Media" box.
+// MdiaBox is the "Media" box.
 //
 // The media declaration container contains all the objects that declare information
 // about the media data within a track.

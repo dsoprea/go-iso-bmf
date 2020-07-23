@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// StblBox is a "Sample Table" box.
+// StblBox is the "Sample Table" box.
 type StblBox struct {
 	bmfcommon.Box
 

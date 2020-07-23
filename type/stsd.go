@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// StsdBox is a "Sample Description" box.
+// StsdBox is the "Sample Description" box.
 type StsdBox struct {
 	bmfcommon.Box
 

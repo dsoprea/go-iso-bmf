@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// HmhdBox is a "Hint Media Header" box.
+// HmhdBox is the "Hint Media Header" box.
 //
 // Contains general information, independent of the protocol, for hint tracks.
 type HmhdBox struct {

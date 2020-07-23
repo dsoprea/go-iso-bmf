@@ -8,7 +8,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// MdhdBox is a "Media Header" box.
+// MdhdBox is the "Media Header" box.
 //
 // The media header declares overall information that is media-independent,
 // and relevant to characteristics of the media in a track.

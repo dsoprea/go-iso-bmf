@@ -6,8 +6,9 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// MetaBox is a "Track" box.
+// MetaBox is the "Meta" box.
 type MetaBox struct {
+	// Box is the base inner box.
 	bmfcommon.Box
 
 	// LoadedBoxIndex contains this boxes children.

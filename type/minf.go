@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// MinfBox is a "Media Information" box.
+// MinfBox is the "Media Information" box.
 //
 // This box contains all the objects that declare characteristics information of
 // the media in the track.

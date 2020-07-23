@@ -8,7 +8,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// TkhdBox is a "Track Header" box.
+// TkhdBox is the "Track Header" box.
 type TkhdBox struct {
 	bmfcommon.Box
 	bmfcommon.Standard32TimeSupport

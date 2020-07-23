@@ -8,7 +8,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// HdlrBox is a "Handler Reference" box.
+// HdlrBox is the "Handler Reference" box.
 type HdlrBox struct {
 	bmfcommon.Box
 

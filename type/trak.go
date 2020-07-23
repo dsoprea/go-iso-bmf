@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// TrakBox is a "Track" box.
+// TrakBox is the "Track" box.
 type TrakBox struct {
 	bmfcommon.Box
 

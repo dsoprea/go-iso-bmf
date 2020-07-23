@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// SttsBox is a "Decoding Time to Sample" box.
+// SttsBox is the "Decoding Time to Sample" box.
 type SttsBox struct {
 	bmfcommon.Box
 

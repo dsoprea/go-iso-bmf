@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// EdtsBox is an "Edit" box.
+// EdtsBox is the "Edit" box.
 type EdtsBox struct {
 	bmfcommon.Box
 

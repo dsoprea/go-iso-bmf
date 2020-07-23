@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// MoovBox is a "Movie" box.
+// MoovBox is the "Movie" box.
 //
 // The metadata for a presentation is stored in the single Movie bmfcommon.Box which occurs
 // at the top-level of a file. Normally this box is close to the beginning or end

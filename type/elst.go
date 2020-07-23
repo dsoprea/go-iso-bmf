@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// ElstBox is a "Edit List" box.
+// ElstBox is the "Edit List" box.
 type ElstBox struct {
 	bmfcommon.Box
 

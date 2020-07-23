@@ -6,7 +6,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// MdatBox is a "Media Data" box.
+// MdatBox is the "Media Data" box.
 //
 // A container box which can hold the actual media data for a presentation
 // (mdat).

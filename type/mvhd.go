@@ -40,7 +40,7 @@ func (rate MvhdRate) String() string {
 	return fmt.Sprintf("%.5f", rate.Decode().Float())
 }
 
-// MvhdBox is a "Movie Header" box.
+// MvhdBox is the "Movie Header" box.
 //
 // This box defines overall information which is media-independent,
 // and relevant to the entire presentationconsidered as a whole.

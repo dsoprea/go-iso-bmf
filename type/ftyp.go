@@ -9,7 +9,7 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-// FtypBox is a file-type box.
+// FtypBox is the "File Type" box.
 type FtypBox struct {
 	bmfcommon.Box
 
