@@ -83,11 +83,14 @@ type InfeBox struct {
 
 	version byte
 
-	itemId              uint32
+	itemId uint32
+
+	// TODO(dustin): This indicates that some protection might obscure metadata access.
 	itemProtectionIndex uint16
-	itemName            string
-	contentType         string
-	contentEncoding     string
+
+	itemName        string
+	contentType     string
+	contentEncoding string
 
 	extensionType uint32
 
