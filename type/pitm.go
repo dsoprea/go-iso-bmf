@@ -21,8 +21,16 @@ func (pitm *PitmBox) InlineString() string {
 	// TODO(dustin): Add test
 
 	return fmt.Sprintf(
-		"%s ID=(0x%08x)",
+		"%s ID=(%d)",
 		pitm.Box.InlineString(), pitm.itemId)
+}
+
+// ItemId returns the primary item ID.
+func (pitm *PitmBox) ItemId() uint32 {
+
+	// TODO(dustin): Add test
+
+	return pitm.itemId
 }
 
 type pitmBoxFactory struct {
