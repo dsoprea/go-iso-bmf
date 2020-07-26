@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"os"
 
+	"io/ioutil"
+
 	"github.com/dsoprea/go-logging"
 	"github.com/jessevdk/go-flags"
 
 	"github.com/dsoprea/go-iso-bmf"
 	"github.com/dsoprea/go-iso-bmf/common"
 
-	_ "github.com/dsoprea/go-iso-bmf/type"
+	"github.com/dsoprea/go-iso-bmf/type"
 )
 
 type parameters struct {
@@ -50,15 +52,24 @@ func main() {
 	f, err := bmf.Open(arguments.Filepath)
 	log.PanicIf(err)
 
-	fmt.Printf("Tree:\n")
-	fmt.Printf("\n")
-
-	bmfcommon.Dump(f)
-
-	fmt.Printf("\n")
-	fmt.Printf("Index:\n")
-	fmt.Printf("\n")
-
 	fbi := f.Index()
-	fbi.Dump()
+
+	ilocCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iloc", 0}]
+	if found == false {
+		log.Panicf("Could not find ILOC in index.")
+	}
+
+	iloc := ilocCommonBox.(*bmftype.IlocBox)
+
+	tempPath, err := ioutil.TempDir("", "")
+	log.PanicIf(err)
+
+	fmt.Printf("\n")
+	fmt.Printf("Writing extents to [%s].\n", tempPath)
+	fmt.Printf("\n")
+
+	err = iloc.WriteExtents(tempPath)
+	log.PanicIf(err)
+
+	fmt.Printf("\n")
 }

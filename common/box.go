@@ -102,6 +102,22 @@ func (box Box) Index() FullBoxIndex {
 	return box.file.Index()
 }
 
+// ReadBytesAt reads a box at n and offset.
+func (box Box) ReadBytesAt(offset int64, n int64) (b []byte, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	// TODO(dustin): Add test
+
+	b, err = box.file.readBytesAt(offset, n)
+	log.PanicIf(err)
+
+	return b, nil
+}
+
 // ReadBoxes bridges to the lower-level function that knows how to extract child-
 // boxes. This also asserts that all box names look valid.
 func (box Box) ReadBoxes(startDisplace int, parent CommonBox) (boxes Boxes, err error) {
