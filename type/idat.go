@@ -37,7 +37,7 @@ func (idatBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (idatBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (idatBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -54,7 +54,7 @@ func (idatBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		data: data,
 	}
 
-	return idat, nil
+	return idat, -1, nil
 }
 
 var (

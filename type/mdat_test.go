@@ -39,7 +39,7 @@ func TestMdatBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := mdatBoxFactory{}.New(box)
+	cb, _, err := mdatBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	// Nothing else we can validate.

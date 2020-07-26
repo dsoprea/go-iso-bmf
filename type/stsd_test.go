@@ -70,7 +70,7 @@ func TestStsdBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := stsdBoxFactory{}.New(box)
+	cb, _, err := stsdBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	mb := cb.(*StsdBox)

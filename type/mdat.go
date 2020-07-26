@@ -8,8 +8,9 @@ import (
 
 // MdatBox is the "Media Data" box.
 //
-// A container box which can hold the actual media data for a presentation
-// (mdat).
+// A container box which can hold all of the actual media data. This is just a
+// big space where the EXIF and image data offsets refer and has little value in
+// being directly referenced.
 type MdatBox struct {
 	bmfcommon.Box
 }
@@ -22,8 +23,10 @@ func (mdatBoxFactory) Name() string {
 	return "mdat"
 }
 
-// New returns a new value instance.
-func (mdatBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+// New returns a new value instance. Since mdat is just the general space where
+// all data referred to by everything is hosted, we don't capture it or directly
+// referenced it. It's not generally useful.
+func (mdatBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -34,7 +37,7 @@ func (mdatBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		Box: box,
 	}
 
-	return mdatBox, nil
+	return mdatBox, -1, nil
 }
 
 var (

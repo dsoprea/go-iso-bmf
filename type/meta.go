@@ -15,6 +15,16 @@ type MetaBox struct {
 	bmfcommon.LoadedBoxIndex
 }
 
+// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
+// and the children have been parsed. This allows parent boxes to be
+// registered before the child boxes can look for them.
+func (meta *MetaBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
+
+	// TODO(dustin): !! Add test
+
+	meta.LoadedBoxIndex = lbi
+}
+
 type metaBoxFactory struct {
 }
 
@@ -27,7 +37,7 @@ func (metaBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (metaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (metaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -42,12 +52,7 @@ func (metaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		Box: box,
 	}
 
-	boxes, err := box.ReadBoxes(4, metaBox)
-	log.PanicIf(err)
-
-	metaBox.LoadedBoxIndex = boxes.Index()
-
-	return metaBox, nil
+	return metaBox, 4, nil
 }
 
 var (

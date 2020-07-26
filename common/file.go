@@ -291,10 +291,20 @@ func readBox(f *File, parent CommonBox, offset int64) (cb CommonBox, known bool,
 
 	// Construct the type-specific box.
 
-	cb, err = bf.New(box)
+	cb, childBoxSeriesOffset, err := bf.New(box)
 	log.PanicIf(err)
 
 	f.fullBoxIndex.Add(cb)
+
+	if childBoxSeriesOffset >= 0 {
+		boxes, err := box.ReadBoxes(childBoxSeriesOffset, cb)
+		log.PanicIf(err)
+
+		cbis := cb.(ChildBoxIndexSetter)
+
+		fbi := boxes.Index()
+		cbis.SetLoadedBoxIndex(fbi)
+	}
 
 	return cb, true, nil
 }

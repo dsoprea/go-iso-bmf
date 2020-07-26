@@ -30,7 +30,7 @@ func TestMdiaBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := mdiaBoxFactory{}.New(box)
+	cb, _, err := mdiaBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	// Nothing else we can validate.

@@ -69,7 +69,7 @@ func (sttsBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (sttsBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (sttsBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -83,7 +83,7 @@ func (sttsBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 	err = sttsBox.parse()
 	log.PanicIf(err)
 
-	return sttsBox, nil
+	return sttsBox, -1, nil
 }
 
 var (

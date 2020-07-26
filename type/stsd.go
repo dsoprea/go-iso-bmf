@@ -38,13 +38,17 @@ func (b *StsdBox) parse() (err error) {
 	b.version = data[0]
 	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])
 
-	// Skip extra 8 bytes.
-	boxes, err := b.Box.ReadBoxes(8, b)
-	log.PanicIf(err)
-
-	b.LoadedBoxIndex = boxes.Index()
-
 	return nil
+}
+
+// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
+// and the children have been parsed. This allows parent boxes to be
+// registered before the child boxes can look for them.
+func (stsd *StsdBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
+
+	// TODO(dustin): !! Add test
+
+	stsd.LoadedBoxIndex = lbi
 }
 
 type stsdBoxFactory struct {
@@ -56,7 +60,7 @@ func (stsdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (stsdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (stsdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -70,7 +74,7 @@ func (stsdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 	err = stsdBox.parse()
 	log.PanicIf(err)
 
-	return stsdBox, nil
+	return stsdBox, 8, nil
 }
 
 var (

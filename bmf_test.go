@@ -16,6 +16,15 @@ const (
 )
 
 func TestOpen_Mp4(t *testing.T) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+			log.PrintError(err)
+
+			t.Fatalf("Test failed.")
+		}
+	}()
+
 	s, err := Open(testMp4Filepath)
 	log.PanicIf(err)
 
@@ -32,6 +41,15 @@ func TestOpen_Mp4(t *testing.T) {
 }
 
 func TestOpen_Heic(t *testing.T) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+			log.PrintError(err)
+
+			t.Fatalf("Test failed.")
+		}
+	}()
+
 	s, err := Open(testHeicFilepath)
 	log.PanicIf(err)
 

@@ -30,7 +30,7 @@ func TestMoovBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := moovBoxFactory{}.New(box)
+	cb, _, err := moovBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	// Nothing else we can validate.

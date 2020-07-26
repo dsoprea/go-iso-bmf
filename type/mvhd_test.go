@@ -121,7 +121,7 @@ func TestMvhdBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := mvhdBoxFactory{}.New(box)
+	cb, _, err := mvhdBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	mb := cb.(*MvhdBox)

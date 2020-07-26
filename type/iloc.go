@@ -150,7 +150,7 @@ func (iiw IlocIntegerWidth) IsValid() bool {
 }
 
 // New returns a new value instance.
-func (ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -340,7 +340,7 @@ func (ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		itemsIndex: itemsIndex,
 	}
 
-	return iloc, nil
+	return iloc, -1, nil
 }
 
 var (

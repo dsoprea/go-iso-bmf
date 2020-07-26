@@ -45,7 +45,7 @@ func (pitmBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (pitmBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (pitmBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -73,7 +73,7 @@ func (pitmBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		itemId: itemId,
 	}
 
-	return pitm, nil
+	return pitm, -1, nil
 }
 
 var (

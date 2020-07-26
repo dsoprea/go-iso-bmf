@@ -68,6 +68,16 @@ func (iinf *IinfBox) InlineString() string {
 		iinf.Box.InlineString(), iinf.entryCount, iinf.loadedCount, len(iinf.itemIndex))
 }
 
+// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
+// and the children have been parsed. This allows parent boxes to be
+// registered before the child boxes can look for them.
+func (iinf *IinfBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
+
+	// TODO(dustin): !! Add test
+
+	iinf.LoadedBoxIndex = lbi
+}
+
 type iinfBoxFactory struct {
 }
 
@@ -80,7 +90,7 @@ func (iinfBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (iinfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (iinfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, skipBytes int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -101,7 +111,7 @@ func (iinfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		itemIndex: itemIndex,
 	}
 
-	skipBytes := 4
+	skipBytes = 4
 
 	if version == 0 {
 		size := 2
@@ -119,12 +129,7 @@ func (iinfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		skipBytes += size
 	}
 
-	boxes, err := box.ReadBoxes(skipBytes, iinf)
-	log.PanicIf(err)
-
-	iinf.LoadedBoxIndex = boxes.Index()
-
-	return iinf, nil
+	return iinf, skipBytes, nil
 }
 
 var (

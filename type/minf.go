@@ -17,19 +17,14 @@ type MinfBox struct {
 	bmfcommon.LoadedBoxIndex
 }
 
-func (b *MinfBox) parse() (err error) {
-	defer func() {
-		if errRaw := recover(); errRaw != nil {
-			err = log.Wrap(errRaw.(error))
-		}
-	}()
+// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
+// and the children have been parsed. This allows parent boxes to be
+// registered before the child boxes can look for them.
+func (minf *MinfBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
 
-	boxes, err := b.Box.ReadBoxes(0, b)
-	log.PanicIf(err)
+	// TODO(dustin): !! Add test
 
-	b.LoadedBoxIndex = boxes.Index()
-
-	return nil
+	minf.LoadedBoxIndex = lbi
 }
 
 type minfBoxFactory struct {
@@ -41,7 +36,7 @@ func (minfBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (minfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (minfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -52,10 +47,7 @@ func (minfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		Box: box,
 	}
 
-	err = minfBox.parse()
-	log.PanicIf(err)
-
-	return minfBox, nil
+	return minfBox, 0, nil
 }
 
 var (

@@ -26,17 +26,22 @@ func (mv MoovBox) IsFragmented() bool {
 	return mv.isFragmented
 }
 
+// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
+// and the children have been parsed. This allows parent boxes to be
+// registered before the child boxes can look for them.
+func (moov *MoovBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
+
+	// TODO(dustin): !! Add test
+
+	moov.LoadedBoxIndex = lbi
+}
+
 func (b *MoovBox) parse() (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
-
-	boxes, err := b.Box.ReadBoxes(0, b)
-	log.PanicIf(err)
-
-	b.LoadedBoxIndex = boxes.Index()
 
 	_, b.isFragmented = b.LoadedBoxIndex["mvex"]
 
@@ -52,7 +57,7 @@ func (moovBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (moovBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (moovBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -63,10 +68,7 @@ func (moovBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		Box: box,
 	}
 
-	err = moovBox.parse()
-	log.PanicIf(err)
-
-	return moovBox, nil
+	return moovBox, 0, nil
 }
 
 var (

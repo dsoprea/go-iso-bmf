@@ -110,7 +110,7 @@ func TestFtypBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := ftypBoxFactory{}.New(box)
+	cb, _, err := ftypBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	fb := cb.(*FtypBox)

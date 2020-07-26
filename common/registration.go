@@ -95,7 +95,7 @@ func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
 type BoxFactory interface {
 	// New reads, parses, loads, and returns the value struct given the common
 	// box info.
-	New(box Box) (cb CommonBox, err error)
+	New(box Box) (cb CommonBox, childBoxSeriesOffset int, err error)
 
 	// Name returns the name of the box-type that this factory knows how to
 	// parse.

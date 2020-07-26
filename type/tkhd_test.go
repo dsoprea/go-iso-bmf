@@ -226,7 +226,7 @@ func TestTkhdBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := tkhdBoxFactory{}.New(box)
+	cb, _, err := tkhdBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	tb := cb.(*TkhdBox)

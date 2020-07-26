@@ -85,7 +85,7 @@ func (hdlrBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (hdlrBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (hdlrBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -99,7 +99,7 @@ func (hdlrBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 	err = hdlrBox.parse()
 	log.PanicIf(err)
 
-	return hdlrBox, nil
+	return hdlrBox, -1, nil
 }
 
 var (

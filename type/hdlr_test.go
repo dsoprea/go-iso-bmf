@@ -125,7 +125,7 @@ func TestHdlrBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := hdlrBoxFactory{}.New(box)
+	cb, _, err := hdlrBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	hb := cb.(*HdlrBox)

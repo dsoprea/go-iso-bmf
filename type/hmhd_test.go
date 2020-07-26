@@ -89,7 +89,7 @@ func TestHmhdBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := hmhdBoxFactory{}.New(box)
+	cb, _, err := hmhdBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	hb := cb.(*HmhdBox)

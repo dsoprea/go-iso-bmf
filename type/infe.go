@@ -160,7 +160,7 @@ func (infeBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -292,7 +292,7 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 	iinf := iinfCommon.(*IinfBox)
 	iinf.loadItem(infe)
 
-	return infe, nil
+	return infe, -1, nil
 }
 
 var (

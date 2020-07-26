@@ -30,7 +30,7 @@ func TestMinfBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := minfBoxFactory{}.New(box)
+	cb, _, err := minfBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	// Nothing else we can validate.

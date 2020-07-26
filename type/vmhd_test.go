@@ -80,7 +80,7 @@ func TestVmhdBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := vmhdBoxFactory{}.New(box)
+	cb, _, err := vmhdBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	vb := cb.(*VmhdBox)

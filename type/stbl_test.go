@@ -30,7 +30,7 @@ func TestStblBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := stblBoxFactory{}.New(box)
+	cb, _, err := stblBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	// Nothing else we can validate.

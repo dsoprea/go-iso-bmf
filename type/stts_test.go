@@ -100,7 +100,7 @@ func TestSttsBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := sttsBoxFactory{}.New(box)
+	cb, _, err := sttsBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	sd := cb.(*SttsBox)

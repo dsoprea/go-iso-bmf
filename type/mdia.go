@@ -17,19 +17,14 @@ type MdiaBox struct {
 	bmfcommon.LoadedBoxIndex
 }
 
-func (b *MdiaBox) parse() (err error) {
-	defer func() {
-		if errRaw := recover(); errRaw != nil {
-			err = log.Wrap(errRaw.(error))
-		}
-	}()
+// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
+// and the children have been parsed. This allows parent boxes to be
+// registered before the child boxes can look for them.
+func (mdia *MdiaBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
 
-	boxes, err := b.Box.ReadBoxes(0, b)
-	log.PanicIf(err)
+	// TODO(dustin): !! Add test
 
-	b.LoadedBoxIndex = boxes.Index()
-
-	return nil
+	mdia.LoadedBoxIndex = lbi
 }
 
 type mdiaBoxFactory struct {
@@ -41,7 +36,7 @@ func (mdiaBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (mdiaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (mdiaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -52,10 +47,7 @@ func (mdiaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		Box: box,
 	}
 
-	err = mdiaBox.parse()
-	log.PanicIf(err)
-
-	return mdiaBox, nil
+	return mdiaBox, 0, nil
 }
 
 var (

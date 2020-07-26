@@ -78,7 +78,7 @@ func TestElstBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, err := elstBoxFactory{}.New(box)
+	cb, _, err := elstBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	elst := cb.(*ElstBox)

@@ -141,7 +141,7 @@ func (tkhdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (tkhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (tkhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -155,17 +155,17 @@ func (tkhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 		log.Panicf("TKHF box encountered before MVHD box")
 	}
 
+	mvhd := mvhdCommonBox.(*MvhdBox)
+	timeScale := mvhd.TimeScale()
+
 	tkhdBox := &TkhdBox{
 		Box: box,
 	}
 
-	mvhd := mvhdCommonBox.(*MvhdBox)
-	timeScale := mvhd.TimeScale()
-
 	err = tkhdBox.parse(timeScale)
 	log.PanicIf(err)
 
-	return tkhdBox, nil
+	return tkhdBox, -1, nil
 }
 
 var (

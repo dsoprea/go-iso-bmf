@@ -101,7 +101,7 @@ func (mdhdBoxFactory) Name() string {
 }
 
 // New returns a new value instance.
-func (mdhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error) {
+func (mdhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSeriesOffset int, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -115,7 +115,7 @@ func (mdhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, err error)
 	err = mdhdBox.parse()
 	log.PanicIf(err)
 
-	return mdhdBox, nil
+	return mdhdBox, -1, nil
 }
 
 var (
