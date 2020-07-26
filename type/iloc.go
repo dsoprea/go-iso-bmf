@@ -6,8 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path"
+	"sort"
+	"strings"
 
 	"encoding/binary"
+	"io/ioutil"
 
 	"github.com/dsoprea/go-logging"
 
@@ -35,14 +39,15 @@ type IlocBox struct {
 	baseOffsetSize IlocIntegerWidth
 	indexSize      IlocIntegerWidth
 
-	itemCount uint32
-
 	items      []IlocItem
 	itemsIndex map[uint32]IlocItem
 }
 
 // GetWithId returns the location record for the item with the given ID.
 func (ib IlocBox) GetWithId(itemId uint32) (ii IlocItem, err error) {
+
+	// TODO(dustin): Add test
+
 	ii, found := ib.itemsIndex[itemId]
 	if found == false {
 		return ii, ErrLocationItemNotFound
@@ -51,14 +56,143 @@ func (ib IlocBox) GetWithId(itemId uint32) (ii IlocItem, err error) {
 	return ii, nil
 }
 
+// sortedItemIds returns a list of sorted item-IDs. Note that, in order to
+// simply do this, they are converted from []uint32 to []int. There is no risk
+// of overflow.
+func (iloc IlocBox) sortedItemIds() []int {
+
+	// TODO(dustin): Add test
+
+	itemIds := make([]int, len(iloc.itemsIndex))
+
+	i := 0
+	for key, _ := range iloc.itemsIndex {
+		itemIds[i] = int(key)
+		i++
+	}
+
+	sort.Ints(itemIds)
+
+	return itemIds
+}
+
+// Dump prints the item map and the extent info for each.
+func (iloc IlocBox) Dump() (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	// TODO(dustin): Add test
+
+	itemIds := iloc.sortedItemIds()
+	fbi := iloc.Index()
+	for _, itemId := range itemIds {
+		// Get item information provided by its reference record in this ILOC
+		// box.
+
+		ii, err := iloc.GetWithId(uint32(itemId))
+		log.PanicIf(err)
+
+		// Get IINF box so that we can get the INFE box for this item (so we can
+		// get its type).
+
+		iinfCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iinf", 0}]
+		if found == false {
+			log.Panicf("Could not find IINF box from ILOC box dump")
+		}
+
+		iinf := iinfCommonBox.(*IinfBox)
+
+		// Get the INFE box for this item.
+
+		infe, err := iinf.GetItemWithId(uint32(itemId))
+		log.PanicIf(err)
+
+		fmt.Printf("%s TYPE=[%s]\n", ii.InlineString(), infe.ItemType().String())
+
+		for _, ie := range ii.Extents() {
+			fmt.Printf("- %s\n", ie.InlineString())
+		}
+
+		fmt.Printf("\n")
+	}
+
+	return nil
+}
+
+// WriteExtents writes each of the extents out to files for surgical debugging.
+func (iloc IlocBox) WriteExtents(outPath string) (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	// TODO(dustin): Add test
+
+	itemIds := iloc.sortedItemIds()
+	fbi := iloc.Index()
+	for _, itemId := range itemIds {
+		// Get item information provided by its reference record in this ILOC
+		// box.
+
+		ii, err := iloc.GetWithId(uint32(itemId))
+		log.PanicIf(err)
+
+		// Get IINF box so that we can get the INFE box for this item (so we can
+		// get its type).
+
+		iinfCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iinf", 0}]
+		if found == false {
+			log.Panicf("Could not find IINF box from ILOC box dump")
+		}
+
+		iinf := iinfCommonBox.(*IinfBox)
+
+		// Get the INFE box for this item.
+
+		infe, err := iinf.GetItemWithId(uint32(itemId))
+		log.PanicIf(err)
+
+		for i, ie := range ii.Extents() {
+			offset := int64(ie.Offset())
+			length := int64(ie.Length())
+
+			extentData, err := iloc.ReadBytesAt(offset, length)
+			log.PanicIf(err)
+
+			filename := fmt.Sprintf("extent.%d.%d.%s", itemId, i, infe.ItemType().String())
+			filepath := path.Join(outPath, filename)
+
+			fmt.Printf("Writing [%s] (%d bytes).\n", filepath, ie.Length())
+
+			err = ioutil.WriteFile(filepath, extentData, 0644)
+			log.PanicIf(err)
+		}
+	}
+
+	return nil
+}
+
 // InlineString returns an undecorated string of field names and values.
 func (iloc *IlocBox) InlineString() string {
 
 	// TODO(dustin): Add test
 
+	itemIds := iloc.sortedItemIds()
+	itemsPhrases := make([]string, len(itemIds))
+
+	for j, key := range itemIds {
+		itemsPhrases[j] = fmt.Sprintf("%d", key)
+	}
+
+	itemsPhrase := strings.Join(itemsPhrases, ",")
+
 	return fmt.Sprintf(
-		"%s OFFSET-SIZE=(%d) LENGTH-SIZE=(%d) BASE-OFFSET-SIZE=(%d) INDEX-SIZE=(%d) ITEM-COUNT=(%d)",
-		iloc.Box.InlineString(), iloc.offsetSize, iloc.lengthSize, iloc.baseOffsetSize, iloc.indexSize, iloc.itemCount)
+		"%s OFFSET-SIZE=(%d) LENGTH-SIZE=(%d) BASE-OFFSET-SIZE=(%d) INDEX-SIZE=(%d) ITEMS=(%d)[%s]",
+		iloc.Box.InlineString(), iloc.offsetSize, iloc.lengthSize, iloc.baseOffsetSize, iloc.indexSize, len(itemsPhrases), itemsPhrase)
 }
 
 type ilocBoxFactory struct {
@@ -103,14 +237,22 @@ func (ie IlocExtent) Length() uint64 {
 	return ie.extentLength
 }
 
+// InlineString returns an undecorated string of field names and values.
+func (ie IlocExtent) InlineString() string {
+
+	// TODO(dustin): Add test
+
+	return fmt.Sprintf(
+		"OFFSET=(0x%016x) LENGTH=(0x%016x) INDEX=(0x%016x)",
+		ie.extentOffset, ie.extentLength, ie.extentIndex)
+}
+
 // String returns a stringified description of an iloc extent.
 func (ie IlocExtent) String() string {
 
 	// TODO(dustin): Add test
 
-	return fmt.Sprintf(
-		"IlocExtent<INDEX=(0x%016x) OFFSET=(0x%016x) LENGTH=(0x%016x)>",
-		ie.extentIndex, ie.extentOffset, ie.extentLength)
+	return fmt.Sprintf("IlocExtent<%s>", ie.InlineString())
 }
 
 // IlocItem is one iloc location item.
@@ -118,7 +260,6 @@ type IlocItem struct {
 	itemId             uint32
 	dataReferenceIndex uint16
 	baseOffset         []byte
-	extentCount        uint16
 	extents            []IlocExtent
 }
 
@@ -130,12 +271,20 @@ func (ii IlocItem) Extents() []IlocExtent {
 	return ii.extents
 }
 
+// InlineString returns an undecorated string of field names and values.
+func (ii IlocItem) InlineString() string {
+
+	// TODO(dustin): Add test
+
+	return fmt.Sprintf("ID=(%d) DATA-REF-INDEX=(%d) BASE-OFFSET=(0x%04x) EXTENT-COUNT=(%d)", ii.itemId, ii.dataReferenceIndex, ii.baseOffset, len(ii.extents))
+}
+
 // String returns a stringified description of an iloc item.
 func (ii IlocItem) String() string {
 
 	// TODO(dustin): Add test
 
-	return fmt.Sprintf("IlocItem<ID=(%d) DATA-REF-INDEX=(%d) BASE-OFFSET=(0x%04x) EXTENT-COUNT=(%d)>", ii.itemId, ii.dataReferenceIndex, ii.baseOffset, ii.extentCount)
+	return fmt.Sprintf("IlocItem<%s>", ii.InlineString())
 }
 
 // IlocIntegerWidth describes how many bytes an integer will be.
@@ -268,16 +417,16 @@ func (ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 
 		// extentCount
 
-		err = binary.Read(br, bmfcommon.DefaultEndianness, &ii.extentCount)
+		var extentCount uint16
+
+		err = binary.Read(br, bmfcommon.DefaultEndianness, &extentCount)
 		log.PanicIf(err)
 
 		// Load the extents.
 
-		ii.extents = make([]IlocExtent, int(ii.extentCount))
+		ii.extents = make([]IlocExtent, int(extentCount))
 
-		for j := 0; j < int(ii.extentCount); j++ {
-			// ilocLogger.Debugf(nil, "[%d/%d] Loading ILOC item (ID (%d)) extent (%d)/(%d).", i+1, itemCount, ii.itemId, j+1, ii.extentCount)
-
+		for j := 0; j < int(extentCount); j++ {
 			ie := IlocExtent{}
 
 			if (version == 1 || version == 2) && indexSize > 0 {
@@ -334,7 +483,6 @@ func (ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		baseOffsetSize: baseOffsetSize,
 
 		indexSize: indexSize,
-		itemCount: itemCount,
 
 		items:      items,
 		itemsIndex: itemsIndex,
