@@ -8,7 +8,6 @@ import (
 	"io"
 	"path"
 	"sort"
-	"strings"
 
 	"encoding/binary"
 	"io/ioutil"
@@ -181,18 +180,9 @@ func (iloc *IlocBox) InlineString() string {
 
 	// TODO(dustin): Add test
 
-	itemIds := iloc.sortedItemIds()
-	itemsPhrases := make([]string, len(itemIds))
-
-	for j, key := range itemIds {
-		itemsPhrases[j] = fmt.Sprintf("%d", key)
-	}
-
-	itemsPhrase := strings.Join(itemsPhrases, ",")
-
 	return fmt.Sprintf(
-		"%s OFFSET-SIZE=(%d) LENGTH-SIZE=(%d) BASE-OFFSET-SIZE=(%d) INDEX-SIZE=(%d) ITEMS=(%d)[%s]",
-		iloc.Box.InlineString(), iloc.offsetSize, iloc.lengthSize, iloc.baseOffsetSize, iloc.indexSize, len(itemsPhrases), itemsPhrase)
+		"%s OFFSET-SIZE=(%d) LENGTH-SIZE=(%d) BASE-OFFSET-SIZE=(%d) INDEX-SIZE=(%d) ITEMS=(%d)",
+		iloc.Box.InlineString(), iloc.offsetSize, iloc.lengthSize, iloc.baseOffsetSize, iloc.indexSize, len(iloc.items))
 }
 
 type ilocBoxFactory struct {
