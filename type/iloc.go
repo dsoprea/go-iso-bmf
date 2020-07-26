@@ -243,7 +243,7 @@ func (ie IlocExtent) InlineString() string {
 	// TODO(dustin): Add test
 
 	return fmt.Sprintf(
-		"OFFSET=(0x%016x) LENGTH=(0x%016x) INDEX=(0x%016x)",
+		"OFFSET=(0x%016x) LENGTH=(%d) INDEX=(0x%016x)",
 		ie.extentOffset, ie.extentLength, ie.extentIndex)
 }
 
