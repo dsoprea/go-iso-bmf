@@ -104,8 +104,8 @@ func (fbi FullBoxIndex) Dump() {
 	}
 }
 
-// File defines a file structure.
-type File struct {
+// BmfResource defines a file structure.
+type BmfResource struct {
 	rs           io.ReadSeeker
 	size         int64
 	isFragmented bool
@@ -116,11 +116,11 @@ type File struct {
 	LoadedBoxIndex
 }
 
-// NewFile returns a new File struct.
-func NewFile(rs io.ReadSeeker, size int64) *File {
+// NewBmfResource returns a new BmfResource struct.
+func NewBmfResource(rs io.ReadSeeker, size int64) *BmfResource {
 	fullBoxIndex := make(FullBoxIndex)
 
-	return &File{
+	return &BmfResource{
 		rs:           rs,
 		size:         size,
 		fullBoxIndex: fullBoxIndex,
@@ -128,7 +128,7 @@ func NewFile(rs io.ReadSeeker, size int64) *File {
 }
 
 // Index returns the complete index of the boxes found in the parsed file.
-func (f *File) Index() FullBoxIndex {
+func (f *BmfResource) Index() FullBoxIndex {
 
 	// TODO(dustin): Add test
 
@@ -136,14 +136,14 @@ func (f *File) Index() FullBoxIndex {
 }
 
 // Parse reads an MP4 file for bmfcommon boxes.
-func (f *File) Parse() (err error) {
+func (f *BmfResource) Parse() (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
 
-	// TODO(dustin): !! Dump Parse() and move this to NewFile. This might break a lot of unit-tests.
+	// TODO(dustin): !! Dump Parse() and move this to NewBmfResource. This might break a lot of unit-tests.
 
 	fileLogger.Debugf(nil, "Parsing stream with (%d) bytes.", f.size)
 
@@ -158,7 +158,7 @@ func (f *File) Parse() (err error) {
 }
 
 // readBytesAt reads a box at n and offset.
-func (f *File) readBytesAt(offset int64, n int64) (b []byte, err error) {
+func (f *BmfResource) readBytesAt(offset int64, n int64) (b []byte, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -177,7 +177,7 @@ func (f *File) readBytesAt(offset int64, n int64) (b []byte, err error) {
 }
 
 // readBoxAt reads a box from an offset.
-func (f *File) readBoxAt(offset int64) (box Box, err error) {
+func (f *BmfResource) readBoxAt(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -250,7 +250,7 @@ func (f *File) readBoxAt(offset int64) (box Box, err error) {
 	return box, nil
 }
 
-func (f *File) ReadBaseBox(offset int64) (box Box, err error) {
+func (f *BmfResource) ReadBaseBox(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -266,7 +266,7 @@ func (f *File) ReadBaseBox(offset int64) (box Box, err error) {
 	return box, nil
 }
 
-func readBox(f *File, parent CommonBox, offset int64) (cb CommonBox, known bool, err error) {
+func readBox(f *BmfResource, parent CommonBox, offset int64) (cb CommonBox, known bool, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -309,7 +309,7 @@ func readBox(f *File, parent CommonBox, offset int64) (cb CommonBox, known bool,
 	return cb, true, nil
 }
 
-func readBoxes(f *File, parent CommonBox, start int64, totalSize int64) (boxes Boxes, err error) {
+func readBoxes(f *BmfResource, parent CommonBox, start int64, totalSize int64) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))

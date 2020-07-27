@@ -53,7 +53,7 @@ func main() {
 
 	size := s.Size()
 
-	file := bmfcommon.NewFile(f, size)
+	file := bmfcommon.NewBmfResource(f, size)
 
 	err = file.Parse()
 	log.PanicIf(err)

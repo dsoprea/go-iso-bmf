@@ -120,7 +120,7 @@ func TestHdlrBoxFactory_New(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file := bmfcommon.NewFile(sb, int64(len(b)))
+	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
 
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)

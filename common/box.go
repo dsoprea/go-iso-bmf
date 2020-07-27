@@ -23,12 +23,12 @@ type Box struct {
 	start      int64
 	size       int64
 	headerSize int64
-	file       *File
+	resource   *BmfResource
 
 	parent CommonBox
 }
 
-func NewBox(name string, start, size, headerSize int64, file *File) Box {
+func NewBox(name string, start, size, headerSize int64, resource *BmfResource) Box {
 
 	// TODO(dustin): Add test
 
@@ -37,7 +37,7 @@ func NewBox(name string, start, size, headerSize int64, file *File) Box {
 		start:      start,
 		size:       size,
 		headerSize: headerSize,
-		file:       file,
+		resource:   resource,
 	}
 }
 
@@ -93,13 +93,13 @@ func (box Box) Parent() CommonBox {
 	return box.parent
 }
 
-// Index returns the FullBoxIndex for the file. It contains all previously-
+// Index returns the FullBoxIndex for the resource. It contains all previously-
 // loaded boxes.
 func (box Box) Index() FullBoxIndex {
 
 	// TODO(dustin): Add test
 
-	return box.file.Index()
+	return box.resource.Index()
 }
 
 // ReadBytesAt reads a box at n and offset.
@@ -112,7 +112,7 @@ func (box Box) ReadBytesAt(offset int64, n int64) (b []byte, err error) {
 
 	// TODO(dustin): Add test
 
-	b, err = box.file.readBytesAt(offset, n)
+	b, err = box.resource.readBytesAt(offset, n)
 	log.PanicIf(err)
 
 	return b, nil
@@ -132,7 +132,7 @@ func (box Box) ReadBoxes(startDisplace int, parent CommonBox) (boxes Boxes, err 
 	start := box.Start() + box.HeaderSize() + int64(startDisplace)
 	size := box.Size() - box.HeaderSize() - int64(startDisplace)
 
-	boxes, err = readBoxes(box.file, parent, start, size)
+	boxes, err = readBoxes(box.resource, parent, start, size)
 	log.PanicIf(err)
 
 	// Check box names. This is a poor-man's structural check.
@@ -170,7 +170,7 @@ func (box Box) ReadBoxData() (data []byte, err error) {
 		return nil, nil
 	}
 
-	data, err = box.file.readBytesAt(
+	data, err = box.resource.readBytesAt(
 		box.start+headerSize,
 		box.size-headerSize)
 

@@ -8,7 +8,7 @@ import (
 	"github.com/dsoprea/go-utility/filesystem"
 )
 
-func TestFile_readBytesAt_Front(t *testing.T) {
+func TestBmfResource_readBytesAt_Front(t *testing.T) {
 	data := []byte{
 		1, 2, 3, 4, 5,
 		0, 0, 0, 0, 0,
@@ -16,7 +16,7 @@ func TestFile_readBytesAt_Front(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewFile(sb, int64(len(data)))
+	file := NewBmfResource(sb, int64(len(data)))
 
 	recovered, err := file.readBytesAt(0, 5)
 	log.PanicIf(err)
@@ -26,7 +26,7 @@ func TestFile_readBytesAt_Front(t *testing.T) {
 	}
 }
 
-func TestFile_readBytesAt_Middle(t *testing.T) {
+func TestBmfResource_readBytesAt_Middle(t *testing.T) {
 	data := []byte{
 		0, 0, 0, 0, 0,
 		1, 2, 3, 4, 5,
@@ -35,7 +35,7 @@ func TestFile_readBytesAt_Middle(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewFile(sb, int64(len(data)))
+	file := NewBmfResource(sb, int64(len(data)))
 
 	recovered, err := file.readBytesAt(5, 5)
 	log.PanicIf(err)
@@ -45,7 +45,7 @@ func TestFile_readBytesAt_Middle(t *testing.T) {
 	}
 }
 
-func TestFile_readBytesAt_MiddleToEnd(t *testing.T) {
+func TestBmfResource_readBytesAt_MiddleToEnd(t *testing.T) {
 	data := []byte{
 		0, 0, 0, 0, 0,
 		1, 2, 3, 4, 5,
@@ -54,7 +54,7 @@ func TestFile_readBytesAt_MiddleToEnd(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewFile(sb, int64(len(data)))
+	file := NewBmfResource(sb, int64(len(data)))
 
 	recovered, err := file.readBytesAt(5, 10)
 	log.PanicIf(err)
@@ -64,7 +64,7 @@ func TestFile_readBytesAt_MiddleToEnd(t *testing.T) {
 	}
 }
 
-func TestFile_readBoxAt_Front(t *testing.T) {
+func TestBmfResource_readBoxAt_Front(t *testing.T) {
 	data := []byte{
 		0x1, 0x2, 0x3, 0x4,
 		'a', 'b', 'c', 'd',
@@ -73,7 +73,7 @@ func TestFile_readBoxAt_Front(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewFile(sb, int64(len(data)))
+	file := NewBmfResource(sb, int64(len(data)))
 
 	box, err := file.readBoxAt(0)
 	log.PanicIf(err)
@@ -85,7 +85,7 @@ func TestFile_readBoxAt_Front(t *testing.T) {
 	}
 }
 
-func TestFile_readBoxAt_Middle(t *testing.T) {
+func TestBmfResource_readBoxAt_Middle(t *testing.T) {
 	data := []byte{
 		0, 0, 0, 0,
 		0x1, 0x2, 0x3, 0x4,
@@ -95,7 +95,7 @@ func TestFile_readBoxAt_Middle(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewFile(sb, int64(len(data)))
+	file := NewBmfResource(sb, int64(len(data)))
 
 	box, err := file.readBoxAt(4)
 	log.PanicIf(err)
@@ -163,7 +163,7 @@ func TestFile_readBoxAt_Middle(t *testing.T) {
 
 // 	size := int64(len(data))
 
-// 	file := NewFile(sb, size)
+// 	file := NewBmfResource(sb, size)
 
 // 	boxes, err := readBoxes(file, 0, size)
 // 	log.PanicIf(err)

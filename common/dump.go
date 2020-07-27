@@ -18,7 +18,7 @@ func dump(box interface{}, level int) {
 
 	switch t := box.(type) {
 	case BoxChildIndexer:
-		_, isRoot := t.(*File)
+		_, isRoot := t.(*BmfResource)
 
 		if isRoot == true {
 			fmt.Printf("%s> [ROOT]\n", indent)
