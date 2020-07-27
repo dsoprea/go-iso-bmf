@@ -9,9 +9,7 @@ import (
 	"github.com/dsoprea/go-logging"
 	"github.com/jessevdk/go-flags"
 
-	"github.com/dsoprea/go-iso-bmf"
 	"github.com/dsoprea/go-iso-bmf/common"
-
 	"github.com/dsoprea/go-iso-bmf/type"
 )
 
@@ -49,10 +47,20 @@ func main() {
 		log.LoadConfiguration(scp)
 	}
 
-	f, err := bmf.Open(arguments.Filepath)
+	f, err := os.Open(arguments.Filepath)
 	log.PanicIf(err)
 
-	fbi := f.Index()
+	s, err := f.Stat()
+	log.PanicIf(err)
+
+	size := s.Size()
+
+	file := bmfcommon.NewFile(f, size)
+
+	err = file.Parse()
+	log.PanicIf(err)
+
+	fbi := file.Index()
 
 	ilocCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iloc", 0}]
 	if found == false {
