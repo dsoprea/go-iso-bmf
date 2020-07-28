@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/dsoprea/go-logging"
 )
 
 // FullyQualifiedBoxName is the name of a box fully-qualified with its parents.
@@ -93,4 +95,52 @@ func (fbi FullBoxIndex) Dump() {
 		cb := fbi[ibe]
 		fmt.Printf("%s: [%s] %s\n", namePhrase, cb.Name(), cb.InlineString())
 	}
+}
+
+// LoadedBoxIndex provides a GetChildBoxes() method that returns a child box if
+// present or panics with a descriptive error.
+type LoadedBoxIndex map[string][]CommonBox
+
+// GetChildBoxes returns the given child box or panics. If box does not support
+// children this should return ErrNoChildren.
+func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	// TODO(dustin): Add test
+
+	boxes, found := lbi[name]
+	if found == false {
+		log.Panicf("child box not found: [%s]", name)
+	}
+
+	return boxes, nil
+}
+
+// ChildrenTypes returns a slice with the names of all children with registered
+// types.
+func (lbi LoadedBoxIndex) ChildrenTypes() (names []string) {
+
+	// TODO(dustin): Add test
+
+	names = make([]string, len(lbi))
+	i := 0
+	for name, _ := range lbi {
+		names[i] = name
+		i++
+	}
+
+	return names
+}
+
+// ChildBoxIndexSetter is a box that is known to support children and will be
+// called, after they were parsed, to store them.
+type ChildBoxIndexSetter interface {
+	// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
+	// and the children have been parsed. This allows parent boxes to be
+	// registered before the child boxes can look for them.
+	SetLoadedBoxIndex(lbi LoadedBoxIndex)
 }
