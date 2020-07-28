@@ -1,10 +1,7 @@
 package bmfcommon
 
 import (
-	"fmt"
 	"io"
-	"sort"
-	"strings"
 
 	"encoding/binary"
 
@@ -12,102 +9,12 @@ import (
 )
 
 var (
-	fileLogger = log.NewLogger("bmfcommon.file")
+	resourceLogger = log.NewLogger("bmfcommon.resource")
 )
-
-// FullyQualifiedBoxName is the name of a box fully-qualified with its parents.
-type FullyQualifiedBoxName []string
-
-// String returns the name in dotted notation.
-func (fqbn FullyQualifiedBoxName) String() string {
-	return strings.Join(fqbn, ".")
-}
-
-// IndexedBoxEntry represents a unique entry in a FullBoxIndex.
-type IndexedBoxEntry struct {
-	// Name is a box-name fully-qualified with dots.
-	NamePhrase string
-
-	// SequenceNumber is the instance number (starting at zero). Unique entries
-	// will only be zero but sequence will have identical names with ascending
-	// sequence numbers.
-	SequenceNumber int
-}
-
-// String returns a simply, stringified name for the index entry (dotted
-// notation with numeric sequence number appended).
-func (ibe IndexedBoxEntry) String() string {
-
-	// TODO(dustin): Add test
-
-	return fmt.Sprintf("%s(%d)", ibe.NamePhrase, ibe.SequenceNumber)
-}
-
-// fullBoxIndex describes all boxes encountered (immediately loaded, and loaded
-// in the order encountered such that one box's parsing logic will be able to
-// reference earlier siblings).
-type FullBoxIndex map[IndexedBoxEntry]CommonBox
-
-func (fbi FullBoxIndex) getBoxName(cb CommonBox) (fqbn FullyQualifiedBoxName) {
-
-	// TODO(dustin): Add test
-
-	fqbn = make(FullyQualifiedBoxName, 0)
-	for current := cb; current != nil; current = current.Parent() {
-		fqbn = append(FullyQualifiedBoxName{current.Name()}, fqbn...)
-	}
-
-	return fqbn
-}
-
-// Add adds one CommonBox to the index.
-func (fbi FullBoxIndex) Add(cb CommonBox) {
-
-	// TODO(dustin): Add test
-
-	name := fbi.getBoxName(cb)
-
-	for i := 0; ; i++ {
-		ibe := IndexedBoxEntry{
-			NamePhrase:     name.String(),
-			SequenceNumber: i,
-		}
-
-		if _, found := fbi[ibe]; found == false {
-			fbi[ibe] = cb
-			break
-		}
-	}
-}
-
-// Dump prints the contents of the full box index.
-func (fbi FullBoxIndex) Dump() {
-
-	// TODO(dustin): Add test
-
-	namePhrases := make([]string, len(fbi))
-	flatIndex := make(map[string]IndexedBoxEntry)
-	i := 0
-	for ibe, _ := range fbi {
-		namePhrase := ibe.String()
-		flatIndex[namePhrase] = ibe
-		namePhrases[i] = namePhrase
-		i++
-	}
-
-	sort.Strings(namePhrases)
-
-	for _, namePhrase := range namePhrases {
-		ibe := flatIndex[namePhrase]
-		cb := fbi[ibe]
-		fmt.Printf("%s: [%s] %s\n", namePhrase, cb.Name(), cb.InlineString())
-	}
-}
 
 // BmfResource defines a file structure.
 type BmfResource struct {
 	rs           io.ReadSeeker
-	size         int64
 	isFragmented bool
 
 	fullBoxIndex FullBoxIndex
@@ -120,11 +27,21 @@ type BmfResource struct {
 func NewBmfResource(rs io.ReadSeeker, size int64) *BmfResource {
 	fullBoxIndex := make(FullBoxIndex)
 
-	return &BmfResource{
+	resource := &BmfResource{
 		rs:           rs,
-		size:         size,
 		fullBoxIndex: fullBoxIndex,
 	}
+
+	resourceLogger.Debugf(nil, "Parsing stream with (%d) bytes.", size)
+
+	boxes, err := readBoxes(resource, nil, int64(0), size)
+	log.PanicIf(err)
+
+	resourceLogger.Debugf(nil, "(%d) root boxes were found.", len(boxes))
+
+	resource.LoadedBoxIndex = boxes.Index()
+
+	return resource
 }
 
 // Index returns the complete index of the boxes found in the parsed file.
@@ -133,28 +50,6 @@ func (f *BmfResource) Index() FullBoxIndex {
 	// TODO(dustin): Add test
 
 	return f.fullBoxIndex
-}
-
-// Parse reads an MP4 file for bmfcommon boxes.
-func (f *BmfResource) Parse() (err error) {
-	defer func() {
-		if errRaw := recover(); errRaw != nil {
-			err = log.Wrap(errRaw.(error))
-		}
-	}()
-
-	// TODO(dustin): !! Dump Parse() and move this to NewBmfResource. This might break a lot of unit-tests.
-
-	fileLogger.Debugf(nil, "Parsing stream with (%d) bytes.", f.size)
-
-	boxes, err := readBoxes(f, nil, int64(0), f.size)
-	log.PanicIf(err)
-
-	fileLogger.Debugf(nil, "(%d) root boxes were found.", len(boxes))
-
-	f.LoadedBoxIndex = boxes.Index()
-
-	return nil
 }
 
 // readBytesAt reads a box at n and offset.
@@ -226,7 +121,7 @@ func (f *BmfResource) readBoxAt(offset int64) (box Box, err error) {
 
 		headerSize = 16
 
-		fileLogger.Debugf(nil,
+		resourceLogger.Debugf(nil,
 			"Box [%s] at offset (0x%016x) has a 64-bit size.",
 			boxType, offset)
 
@@ -285,7 +180,7 @@ func readBox(f *BmfResource, parent CommonBox, offset int64) (cb CommonBox, know
 	bf := GetFactory(name)
 
 	if bf == nil {
-		fileLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
+		resourceLogger.Warningf(nil, "No factory registered for box-type [%s].", name)
 		return box, false, nil
 	}
 
@@ -320,7 +215,7 @@ func readBoxes(f *BmfResource, parent CommonBox, start int64, totalSize int64) (
 
 	i := 0
 	for offset := start; offset < start+totalSize; {
-		fileLogger.Debugf(nil, "[%s] Reading child (%d) box at offset (0x%016x).", parentName, i, offset)
+		resourceLogger.Debugf(nil, "[%s] Reading child (%d) box at offset (0x%016x).", parentName, i, offset)
 
 		cb, known, err := readBox(f, parent, offset)
 		log.PanicIf(err)
@@ -332,7 +227,7 @@ func readBoxes(f *BmfResource, parent CommonBox, start int64, totalSize int64) (
 		name := cb.Name()
 		size := cb.Size()
 
-		fileLogger.Debugf(nil, "[%s] Child (%d) box has name [%s] and size (%d).", parentName, i, name, size)
+		resourceLogger.Debugf(nil, "[%s] Child (%d) box has name [%s] and size (%d).", parentName, i, name, size)
 
 		offset += int64(size)
 		i++

@@ -198,7 +198,7 @@ func TestTkhdBoxFactory_New(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file := bmfcommon.NewBmfResource(sb, 0)
 
 	// Register an MVHD so the TKHD factory can find it.
 

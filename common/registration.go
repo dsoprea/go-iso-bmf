@@ -42,6 +42,26 @@ func BoxNameIsValid(name string) bool {
 	return true
 }
 
+// GetParentBoxName returns the name of the given CB. If nil, returns "ROOT".
+func GetParentBoxName(cb CommonBox) string {
+	if cb == nil {
+		return "ROOT"
+	}
+
+	return cb.Name()
+}
+
+// ChildBoxes is a simple wrapper that gets all children of the given type or
+// panics if none.
+func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
+	boxes, err := bci.GetChildBoxes(name)
+	log.PanicIf(err)
+
+	// TODO(dustin): Add test
+
+	return boxes
+}
+
 // bmfcommon.CommonBox is one parsed box.
 type CommonBox interface {
 	// TODO(dustin): Rename to Data()
@@ -62,15 +82,6 @@ type CommonBox interface {
 	Parent() CommonBox
 }
 
-// GetParentBoxName returns the name of the given CB. If nil, returns "ROOT".
-func GetParentBoxName(cb CommonBox) string {
-	if cb == nil {
-		return "ROOT"
-	}
-
-	return cb.Name()
-}
-
 // BoxChildIndexer is a box that has children.
 type BoxChildIndexer interface {
 	// GetChildBoxes returns all found child boxes of the given type.
@@ -81,17 +92,7 @@ type BoxChildIndexer interface {
 	ChildrenTypes() (names []string)
 }
 
-// ChildBoxes is a simple wrapper that gets all children of the given type or
-// panics if none.
-func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
-	boxes, err := bci.GetChildBoxes(name)
-	log.PanicIf(err)
-
-	// TODO(dustin): Add test
-
-	return boxes
-}
-
+// BoxFactory knows how to construct a box struct.
 type BoxFactory interface {
 	// New reads, parses, loads, and returns the value struct given the common
 	// box info.

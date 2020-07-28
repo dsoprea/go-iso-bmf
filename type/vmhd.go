@@ -73,7 +73,7 @@ func (vmhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 	err = vmhdBox.parse()
 	log.PanicIf(err)
 
-	return vmhdBox, childBoxSeriesOffset, nil
+	return vmhdBox, -1, nil
 }
 
 var (

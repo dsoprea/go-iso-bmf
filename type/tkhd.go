@@ -152,7 +152,7 @@ func (tkhdBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 
 	mvhdCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"moov.mvhd", 0}]
 	if found == false {
-		log.Panicf("TKHF box encountered before MVHD box")
+		log.Panicf("TKHD box encountered before MVHD box")
 	}
 
 	mvhd := mvhdCommonBox.(*MvhdBox)

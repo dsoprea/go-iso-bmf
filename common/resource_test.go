@@ -10,32 +10,33 @@ import (
 
 func TestBmfResource_readBytesAt_Front(t *testing.T) {
 	data := []byte{
+		0, 0, 0, 0,
 		1, 2, 3, 4, 5,
 		0, 0, 0, 0, 0,
 	}
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewBmfResource(sb, int64(len(data)))
+	file := NewBmfResource(sb, 0)
 
-	recovered, err := file.readBytesAt(0, 5)
+	recovered, err := file.readBytesAt(4, 5)
 	log.PanicIf(err)
 
-	if bytes.Equal(recovered, data[:5]) != true {
+	if bytes.Equal(recovered, data[4:9]) != true {
 		t.Fatalf("Read bytes not correct.")
 	}
 }
 
 func TestBmfResource_readBytesAt_Middle(t *testing.T) {
 	data := []byte{
-		0, 0, 0, 0, 0,
+		0, 0, 0, 0,
 		1, 2, 3, 4, 5,
 		0, 0, 0, 0, 0,
 	}
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewBmfResource(sb, int64(len(data)))
+	file := NewBmfResource(sb, 0)
 
 	recovered, err := file.readBytesAt(5, 5)
 	log.PanicIf(err)
@@ -47,26 +48,26 @@ func TestBmfResource_readBytesAt_Middle(t *testing.T) {
 
 func TestBmfResource_readBytesAt_MiddleToEnd(t *testing.T) {
 	data := []byte{
-		0, 0, 0, 0, 0,
+		0, 0, 0, 0,
 		1, 2, 3, 4, 5,
 		6, 7, 8, 9, 10,
 	}
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	file := NewBmfResource(sb, int64(len(data)))
+	file := NewBmfResource(sb, 0)
 
-	recovered, err := file.readBytesAt(5, 10)
+	recovered, err := file.readBytesAt(4, 10)
 	log.PanicIf(err)
 
-	if bytes.Equal(recovered, data[5:15]) != true {
+	if bytes.Equal(recovered, data[4:14]) != true {
 		t.Fatalf("Read bytes not correct.")
 	}
 }
 
 func TestBmfResource_readBoxAt_Front(t *testing.T) {
 	data := []byte{
-		0x1, 0x2, 0x3, 0x4,
+		0, 0, 0, 12,
 		'a', 'b', 'c', 'd',
 		6, 7, 8, 9,
 	}
@@ -78,7 +79,7 @@ func TestBmfResource_readBoxAt_Front(t *testing.T) {
 	box, err := file.readBoxAt(0)
 	log.PanicIf(err)
 
-	if box.Size() != int64(0x01020304) {
+	if box.Size() != int64(12) {
 		t.Fatalf("Size not correct: (%d)", box.Size())
 	} else if box.Name() != "abcd" {
 		t.Fatalf("Type not correct: [%s]", box.Name())
@@ -87,22 +88,25 @@ func TestBmfResource_readBoxAt_Front(t *testing.T) {
 
 func TestBmfResource_readBoxAt_Middle(t *testing.T) {
 	data := []byte{
-		0, 0, 0, 0,
-		0x1, 0x2, 0x3, 0x4,
+		0, 0, 0, 12,
 		'a', 'b', 'c', 'd',
 		6, 7, 8, 9,
+
+		0, 0, 0, 16,
+		'e', 'f', 'g', 'h',
+		10, 11, 12, 13, 14, 15, 16, 17,
 	}
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
 	file := NewBmfResource(sb, int64(len(data)))
 
-	box, err := file.readBoxAt(4)
+	box, err := file.readBoxAt(12)
 	log.PanicIf(err)
 
-	if box.Size() != int64(0x01020304) {
+	if box.Size() != int64(16) {
 		t.Fatalf("Size not correct: (%d)", box.Size())
-	} else if box.Name() != "abcd" {
+	} else if box.Name() != "efgh" {
 		t.Fatalf("Type not correct: [%s]", box.Name())
 	}
 }

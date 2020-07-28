@@ -55,9 +55,6 @@ func main() {
 
 	file := bmfcommon.NewBmfResource(f, size)
 
-	err = file.Parse()
-	log.PanicIf(err)
-
 	fmt.Printf("Tree:\n")
 	fmt.Printf("\n")
 

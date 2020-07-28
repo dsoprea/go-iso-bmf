@@ -81,6 +81,15 @@ func TestFtypBoxFactory_Name(t *testing.T) {
 }
 
 func TestFtypBoxFactory_New(t *testing.T) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+			log.PrintError(err)
+
+			t.Fatalf("Test failed.")
+		}
+	}()
+
 	// Load
 
 	var data []byte
@@ -99,7 +108,7 @@ func TestFtypBoxFactory_New(t *testing.T) {
 	}
 
 	var b []byte
-	bmfcommon.PushBox(&b, "elst", data)
+	bmfcommon.PushBox(&b, "ftyp", data)
 
 	// Parse.
 
@@ -121,7 +130,7 @@ func TestFtypBoxFactory_New(t *testing.T) {
 		t.Fatalf("MinorVersion() not correct.")
 	} else if reflect.DeepEqual(fb.CompatibleBrands(), brands) != true {
 		t.Fatalf("CompatibleBrands() not correct.")
-	} else if fb.String() != "ftyp<NAME=[elst] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(24) MAJOR-BRAND=[abcd] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[efgh,ijkl]>" {
+	} else if fb.String() != "ftyp<NAME=[ftyp] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(24) MAJOR-BRAND=[abcd] MINOR-VER=(0x0000000b) COMPAT-BRANDS=[efgh,ijkl]>" {
 		t.Fatalf("String() not correct: [%s]", fb.String())
 	}
 }

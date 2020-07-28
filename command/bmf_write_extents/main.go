@@ -57,9 +57,6 @@ func main() {
 
 	file := bmfcommon.NewBmfResource(f, size)
 
-	err = file.Parse()
-	log.PanicIf(err)
-
 	fbi := file.Index()
 
 	ilocCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iloc", 0}]
