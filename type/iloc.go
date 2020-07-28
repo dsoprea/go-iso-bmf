@@ -65,7 +65,7 @@ func (iloc IlocBox) sortedItemIds() []int {
 	itemIds := make([]int, len(iloc.itemsIndex))
 
 	i := 0
-	for key, _ := range iloc.itemsIndex {
+	for key := range iloc.itemsIndex {
 		itemIds[i] = int(key)
 		i++
 	}

@@ -36,7 +36,7 @@ func (ibe IndexedBoxEntry) String() string {
 	return fmt.Sprintf("%s(%d)", ibe.NamePhrase, ibe.SequenceNumber)
 }
 
-// fullBoxIndex describes all boxes encountered (immediately loaded, and loaded
+// FullBoxIndex describes all boxes encountered (immediately loaded, and loaded
 // in the order encountered such that one box's parsing logic will be able to
 // reference earlier siblings).
 type FullBoxIndex map[IndexedBoxEntry]CommonBox
@@ -81,7 +81,7 @@ func (fbi FullBoxIndex) Dump() {
 	namePhrases := make([]string, len(fbi))
 	flatIndex := make(map[string]IndexedBoxEntry)
 	i := 0
-	for ibe, _ := range fbi {
+	for ibe := range fbi {
 		namePhrase := ibe.String()
 		flatIndex[namePhrase] = ibe
 		namePhrases[i] = namePhrase
@@ -128,7 +128,7 @@ func (lbi LoadedBoxIndex) ChildrenTypes() (names []string) {
 
 	names = make([]string, len(lbi))
 	i := 0
-	for name, _ := range lbi {
+	for name := range lbi {
 		names[i] = name
 		i++
 	}

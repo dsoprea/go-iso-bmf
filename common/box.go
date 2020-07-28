@@ -28,6 +28,7 @@ type Box struct {
 	parent CommonBox
 }
 
+// NewBox returns a new Box struct.
 func NewBox(name string, start, size, headerSize int64, resource *BmfResource) Box {
 	return Box{
 		name:       name,

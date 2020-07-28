@@ -29,6 +29,7 @@ type Standard32TimeSupport struct {
 	timeScale uint32
 }
 
+// NewStandard32TimeSupport returns a new Standard32TimeSupport struct.
 func NewStandard32TimeSupport(creationEpoch, modificationEpoch uint32, scaledDuration, timeScale uint32) Standard32TimeSupport {
 
 	// TODO(dustin): Add test.
@@ -63,7 +64,7 @@ func (sts Standard32TimeSupport) HasModificationTime() bool {
 	return sts.modificationEpoch > 0
 }
 
-// timeScale returns the time-scale.
+// TimeScale returns the time-scale.
 func (sts Standard32TimeSupport) TimeScale() uint32 {
 	return sts.timeScale
 }
@@ -73,7 +74,7 @@ func (sts Standard32TimeSupport) HasDuration() bool {
 	return sts.scaledDuration > 0
 }
 
-// scaledDuration returns the duration in timescale units (divide this number by
+// ScaledDuration returns the duration in timescale units (divide this number by
 // the time-scale to get the number of seconds).
 func (sts Standard32TimeSupport) ScaledDuration() uint32 {
 	if sts.HasDuration() == false {

@@ -145,6 +145,7 @@ func (f *BmfResource) readBoxAt(offset int64) (box Box, err error) {
 	return box, nil
 }
 
+// ReadBaseBox reads the base box at the given offset.
 func (f *BmfResource) ReadBaseBox(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {

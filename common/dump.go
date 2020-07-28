@@ -41,6 +41,7 @@ func dump(box interface{}, level int) {
 	}
 }
 
+// Dump prints the box hierarchy.
 func Dump(box interface{}) {
 
 	// TODO(dustin): Add test

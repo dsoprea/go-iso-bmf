@@ -53,9 +53,9 @@ func (fp16 FixedPoint16) String() string {
 		denominator, fp16.Float())
 }
 
-// FixedPoint16 returns a float produced by shifting bits in the uint16. Several
-// box types have values that are encoded as integers but must be decoded to
-// floats before using.
+// Uint16ToFixedPoint16 returns a float produced by shifting bits in the uint16.
+// Several box types have values that are encoded as integers but must be
+// decoded to floats before using.
 func Uint16ToFixedPoint16(x uint16, integerLength, mantissaLength int) FixedPoint16 {
 
 	// TODO(dustin): Add test
@@ -118,8 +118,8 @@ func (fp32 FixedPoint32) String() string {
 		denominator, fp32.Float())
 }
 
-// FixedPoint32 returns an encapsulated float produced by shifting bits in the
-// uint32.
+// Uint32ToFixedPoint32 returns an encapsulated float produced by shifting bits
+// in the uint32.
 //
 // Several box types have values that are encoded as integers but must be
 // decoded to floats before using.

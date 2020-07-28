@@ -67,6 +67,7 @@ func DumpBytes(data []byte) {
 	fmt.Printf("\n")
 }
 
+// PushBox pushes a box to the given byte-slice pointer.
 func PushBox(buffer *[]byte, name string, data []byte) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -96,6 +97,7 @@ func PushBox(buffer *[]byte, name string, data []byte) {
 	copy((*buffer)[start+8:], data)
 }
 
+// PushBytes encodes the given integer and pushes to the byte-slice pointer.
 func PushBytes(buffer *[]byte, x interface{}) {
 	var encoded []byte
 

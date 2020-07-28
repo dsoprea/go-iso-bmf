@@ -22,8 +22,8 @@ func TestElstBox_Version(t *testing.T) {
 
 func TestElstBox_Entries(t *testing.T) {
 	entries := []elstEntry{
-		elstEntry{segmentDuration: 11, mediaTime: 22, mediaRate: 33, mediaRateFraction: 44},
-		elstEntry{segmentDuration: 55, mediaTime: 66, mediaRate: 77, mediaRateFraction: 88},
+		{segmentDuration: 11, mediaTime: 22, mediaRate: 33, mediaRateFraction: 44},
+		{segmentDuration: 55, mediaTime: 66, mediaRate: 77, mediaRateFraction: 88},
 	}
 
 	eb := &ElstBox{
@@ -88,8 +88,8 @@ func TestElstBoxFactory_New(t *testing.T) {
 	}
 
 	entries := []elstEntry{
-		elstEntry{segmentDuration: 11, mediaTime: 22, mediaRate: 33, mediaRateFraction: 44},
-		elstEntry{segmentDuration: 55, mediaTime: 66, mediaRate: 77, mediaRateFraction: 88},
+		{segmentDuration: 11, mediaTime: 22, mediaRate: 33, mediaRateFraction: 44},
+		{segmentDuration: 55, mediaTime: 66, mediaRate: 77, mediaRateFraction: 88},
 	}
 
 	if reflect.DeepEqual(elst.Entries(), entries) != true {
