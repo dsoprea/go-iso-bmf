@@ -67,8 +67,12 @@ func DumpBytes(data []byte) {
 	fmt.Printf("\n")
 }
 
+// Data64BitDescribed indicates that the data should be written with a 32-bit
+// size.
+type Data64BitDescribed []byte
+
 // PushBox pushes a box to the given byte-slice pointer.
-func PushBox(buffer *[]byte, name string, data []byte) {
+func PushBox(buffer *[]byte, name string, data interface{}) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err := errRaw.(error)
@@ -82,19 +86,51 @@ func PushBox(buffer *[]byte, name string, data []byte) {
 		data = make([]byte, 0)
 	}
 
-	extension := make([]byte, 8+len(data))
+	var asBytes []byte
+
+	boxHeaderSize := 0
+	is64Bit := false
+
+	if d64bd, ok := data.(Data64BitDescribed); ok == true {
+		// 64-bit
+		//
+		// (4-byte size + 4-byte type + 8-byte size).
+		boxHeaderSize = 16
+		is64Bit = true
+
+		asBytes = []byte(d64bd)
+	} else {
+		// 32-bit
+		//
+		// (4-byte size + 4-byte type)
+		boxHeaderSize = 8
+
+		asBytes = data.([]byte)
+	}
+
+	extension := make([]byte, boxHeaderSize+len(asBytes))
 	*buffer = append(*buffer, extension...)
 
-	// We'll just push 32-bit box-sizes (4-byte size + 4-byte type, but no
-	// follow-up 8-byte size).
-	boxHeaderSize := 8
+	if is64Bit == true {
+		DefaultEndianness.PutUint32(
+			(*buffer)[start:start+4],
+			1)
 
-	DefaultEndianness.PutUint32(
-		(*buffer)[start:start+4],
-		uint32(len(data))+uint32(boxHeaderSize))
+		copy((*buffer)[start+4:start+8], []byte(name))
 
-	copy((*buffer)[start+4:], []byte(name))
-	copy((*buffer)[start+8:], data)
+		DefaultEndianness.PutUint64(
+			(*buffer)[start+8:start+16],
+			uint64(len(asBytes))+uint64(boxHeaderSize))
+
+		copy((*buffer)[start+16:], asBytes)
+	} else {
+		DefaultEndianness.PutUint32(
+			(*buffer)[start:start+4],
+			uint32(len(asBytes))+uint32(boxHeaderSize))
+
+		copy((*buffer)[start+4:], []byte(name))
+		copy((*buffer)[start+8:], asBytes)
+	}
 }
 
 // PushBytes encodes the given integer and pushes to the byte-slice pointer.

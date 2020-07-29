@@ -130,9 +130,9 @@ func TestBox_ReadBoxes(t *testing.T) {
 	var data2 []byte
 	data2 = append(data2, 'a', 'b', 'c', 'd')
 	data2 = append(data2, 'e', 'f', 'g', 'h')
-	PushBox(&b, "tb2 ", data2)
 
-	PushBox(&b, "tb1 ", nil)
+	pushTestBox2(&b, data2)
+	pushTestBox1(&b)
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 	resource := NewBmfResource(sb, 0)

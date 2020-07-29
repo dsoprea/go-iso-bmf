@@ -11,6 +11,7 @@ import (
 // The media declaration container contains all the objects that declare information
 // about the media data within a track.
 type MdiaBox struct {
+	// Box is the base box.
 	bmfcommon.Box
 
 	// LoadedBoxIndex contains this boxes children.

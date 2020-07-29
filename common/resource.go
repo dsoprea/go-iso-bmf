@@ -17,14 +17,16 @@ type BmfResource struct {
 	rs           io.ReadSeeker
 	isFragmented bool
 
+	// fullBoxIndex has all [known] boxes encountered in the stream.
 	fullBoxIndex FullBoxIndex
 
-	// LoadedBoxIndex contains this boxes children.
+	// LoadedBoxIndex contains this box's children.
 	LoadedBoxIndex
 }
 
 // NewBmfResource returns a new BmfResource struct.
 func NewBmfResource(rs io.ReadSeeker, size int64) *BmfResource {
+	// This has all [known] boxes encountered in the stream.
 	fullBoxIndex := make(FullBoxIndex)
 
 	resource := &BmfResource{
@@ -39,6 +41,7 @@ func NewBmfResource(rs io.ReadSeeker, size int64) *BmfResource {
 
 	resourceLogger.Debugf(nil, "(%d) root boxes were found.", len(boxes))
 
+	// This has the root boxes from the stream.
 	resource.LoadedBoxIndex = boxes.Index()
 
 	return resource
@@ -46,9 +49,6 @@ func NewBmfResource(rs io.ReadSeeker, size int64) *BmfResource {
 
 // Index returns the complete index of the boxes found in the parsed file.
 func (f *BmfResource) Index() FullBoxIndex {
-
-	// TODO(dustin): Add test
-
 	return f.fullBoxIndex
 }
 
@@ -71,8 +71,8 @@ func (f *BmfResource) readBytesAt(offset int64, n int64) (b []byte, err error) {
 	return b, nil
 }
 
-// readBoxAt reads a box from an offset.
-func (f *BmfResource) readBoxAt(offset int64) (box Box, err error) {
+// readBaseBox reads a box from an offset.
+func (f *BmfResource) readBaseBox(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -136,7 +136,7 @@ func (f *BmfResource) readBoxAt(offset int64) (box Box, err error) {
 
 		boxSize = int64(rawBoxSize)
 	} else if boxSize == 0 {
-		// TODO(dustin): Come back to this.
+		// TODO(dustin): Come back to this when we have a supporting example.
 		log.Panicf("box [%s] size is (0) and unhandled", boxType)
 	}
 
@@ -145,7 +145,7 @@ func (f *BmfResource) readBoxAt(offset int64) (box Box, err error) {
 	return box, nil
 }
 
-// ReadBaseBox reads the base box at the given offset.
+// ReadBaseBox reads the base box at the given offset. Supports testing.
 func (f *BmfResource) ReadBaseBox(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -153,10 +153,7 @@ func (f *BmfResource) ReadBaseBox(offset int64) (box Box, err error) {
 		}
 	}()
 
-	// TODO(dustin): Add test
-	// TODO(dustin): Drop this method
-
-	box, err = f.readBoxAt(offset)
+	box, err = f.readBaseBox(offset)
 	log.PanicIf(err)
 
 	return box, nil
@@ -168,8 +165,6 @@ func readBox(f *BmfResource, parent CommonBox, offset int64) (cb CommonBox, know
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
-
-	// TODO(dustin): Add test
 
 	box, err := f.ReadBaseBox(offset)
 	log.PanicIf(err)

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestPushBox_One(t *testing.T) {
+func TestPushBox_32(t *testing.T) {
 	b := make([]byte, 0)
 
 	PushBox(&b, "abcd", []byte{1, 2, 3, 4})
@@ -17,6 +17,27 @@ func TestPushBox_One(t *testing.T) {
 	expected := []byte{
 		sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3],
 		'a', 'b', 'c', 'd',
+		1, 2, 3, 4,
+	}
+
+	if bytes.Equal(b, expected) != true {
+		t.Fatalf("Bytes not correct: %x\n", b)
+	}
+}
+
+func TestPushBox_64(t *testing.T) {
+	b := make([]byte, 0)
+
+	PushBox(&b, "abcd", Data64BitDescribed{1, 2, 3, 4})
+
+	sizeBytes := make([]byte, 8)
+
+	DefaultEndianness.PutUint64(sizeBytes, 20)
+
+	expected := []byte{
+		0, 0, 0, 1,
+		'a', 'b', 'c', 'd',
+		sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3], sizeBytes[4], sizeBytes[5], sizeBytes[6], sizeBytes[7],
 		1, 2, 3, 4,
 	}
 
