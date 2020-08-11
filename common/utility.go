@@ -2,9 +2,10 @@ package bmfcommon
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"unicode"
+
+	"github.com/dsoprea/go-logging"
 )
 
 // DumpBytes prints a list of hex-encoded bytes.

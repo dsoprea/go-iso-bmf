@@ -30,10 +30,7 @@ type Standard32TimeSupport struct {
 }
 
 // NewStandard32TimeSupport returns a new Standard32TimeSupport struct.
-func NewStandard32TimeSupport(creationEpoch, modificationEpoch uint32, scaledDuration, timeScale uint32) Standard32TimeSupport {
-
-	// TODO(dustin): Add test.
-
+func NewStandard32TimeSupport(creationEpoch, modificationEpoch, scaledDuration, timeScale uint32) Standard32TimeSupport {
 	return Standard32TimeSupport{
 		creationEpoch:     creationEpoch,
 		modificationEpoch: modificationEpoch,
@@ -97,9 +94,6 @@ func (sts Standard32TimeSupport) Duration() time.Duration {
 
 // InlineString returns an undecorated string of field names and values.
 func (sts Standard32TimeSupport) InlineString() string {
-
-	// TODO(dustin): Add test.
-
 	optional := ""
 
 	if sts.HasCreationTime() == true {
@@ -117,9 +111,6 @@ func (sts Standard32TimeSupport) InlineString() string {
 
 // TimeToEpoch returns the number of seconds since the MP4 epoch.
 func TimeToEpoch(t time.Time) uint32 {
-
-	// TODO(dustin): Add test
-
 	d := t.Sub(epochTime)
 
 	return uint32(math.Floor(float64(d.Seconds())))
@@ -127,9 +118,6 @@ func TimeToEpoch(t time.Time) uint32 {
 
 // EpochToTime returns a the given MP4 epoch as a `time.Time`.
 func EpochToTime(epoch uint32) time.Time {
-
-	// TODO(dustin): Add test
-
 	duration := time.Second * time.Duration(epoch)
 	t := epochTime.Add(duration)
 
@@ -138,9 +126,6 @@ func EpochToTime(epoch uint32) time.Time {
 
 // NowTime returns a UTC time.Time that has been rounded to the nearest second.
 func NowTime() time.Time {
-
-	// TODO(dustin): Add test
-
 	return time.Now().UTC().Round(time.Second)
 }
 

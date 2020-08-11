@@ -10,7 +10,7 @@ type testBox1 struct {
 	Box
 }
 
-func (testBox1) InlineString() string {
+func (*testBox1) InlineString() string {
 	return "TestBox1"
 }
 
@@ -46,15 +46,15 @@ type testBox2 struct {
 	string2 string
 }
 
-func (testBox2) InlineString() string {
+func (*testBox2) InlineString() string {
 	return "TestBox2"
 }
 
-func (tb2 testBox2) String1() string {
+func (tb2 *testBox2) String1() string {
 	return tb2.string1
 }
 
-func (tb2 testBox2) String2() string {
+func (tb2 *testBox2) String2() string {
 	return tb2.string2
 }
 
@@ -143,4 +143,25 @@ func pushTestBox3(b *[]byte, encodedChildBoxes []byte) {
 
 func pushUnknownBox(b *[]byte, data []byte) {
 	PushBox(b, "wxyz", data)
+}
+
+// testBox4 has no fields but does have children.
+type testBox4 struct {
+	// Box is the base box.
+	Box
+
+	// LoadedBoxIndex provides a GetChildBoxes() method that returns a child box
+	// if present or panics with a descriptive error.
+	LoadedBoxIndex
+}
+
+func newTestBox4(box Box, lbi LoadedBoxIndex) *testBox4 {
+	return &testBox4{
+		Box:            box,
+		LoadedBoxIndex: lbi,
+	}
+}
+
+func (*testBox4) InlineString() string {
+	return "TestBox4"
 }

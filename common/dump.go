@@ -8,12 +8,6 @@ import (
 )
 
 func dump(box interface{}, level int) {
-
-	// TODO(dustin): Add test
-
-	// TODO(dustin): Not sure if this makes sense. Since all Box structs are a BoxChildIndexer, we're not sure if the CommonBox condition is being hit. On the other hand, things should fail if we try to get children on a non-children box. However, nothing iscurrently failing. However, the dump output is not correct (based on the parents that we print from the New() functions). Plus, we get some weird disordering *whenever we print that parent* from the New() functions.
-	// -> However, maybe we were just predeterming the children, storing into an inex initial, and then just enumerating this from the dump function every time. This would imply that this is all simply a bug in the indexing routine.
-
 	indent := strings.Repeat("  ", level)
 
 	switch t := box.(type) {
@@ -43,8 +37,5 @@ func dump(box interface{}, level int) {
 
 // Dump prints the box hierarchy.
 func Dump(box interface{}) {
-
-	// TODO(dustin): Add test
-
 	dump(box, 0)
 }

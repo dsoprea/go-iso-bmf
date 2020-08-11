@@ -3,6 +3,8 @@ package bmfcommon
 import (
 	"bytes"
 	"testing"
+
+	"github.com/dsoprea/go-logging"
 )
 
 func TestPushBox_32(t *testing.T) {
@@ -203,4 +205,61 @@ func TestPushBytes_64_ToNonEmpty(t *testing.T) {
 	if bytes.Equal(b, expected) != true {
 		t.Fatalf("Bytes not correct: %x", b)
 	}
+}
+
+func TestPushBytes_Bytes_ToEmpty(t *testing.T) {
+	value := []byte{1, 2, 3, 4, 5}
+
+	var b []byte
+	PushBytes(&b, value)
+
+	if len(b) != 5 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	if bytes.Equal(b, value) != true {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
+func TestPushBytes_Bytes_ToNonEmpty(t *testing.T) {
+	value := []byte{1, 2, 3, 4, 5}
+
+	b := make([]byte, 4)
+	PushBytes(&b, value)
+
+	if len(b) != 9 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	if bytes.Equal(b[4:], value) != true {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
+func TestPushBytes_UnsupportedType(t *testing.T) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+			if err.Error() != "can not encode [int64] [11]" {
+				log.Panic(err)
+			}
+		} else {
+			t.Fatalf("Expected panic.")
+		}
+	}()
+
+	b := make([]byte, 0)
+	PushBytes(&b, int64(11))
+}
+
+func TestDumpBytes(t *testing.T) {
+	b := []byte{
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+		10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+		20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+	}
+
+	DumpBytes(b)
 }

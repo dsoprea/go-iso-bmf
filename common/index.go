@@ -30,9 +30,6 @@ type IndexedBoxEntry struct {
 // String returns a simply, stringified name for the index entry (dotted
 // notation with numeric sequence number appended).
 func (ibe IndexedBoxEntry) String() string {
-
-	// TODO(dustin): Add test
-
 	return fmt.Sprintf("%s(%d)", ibe.NamePhrase, ibe.SequenceNumber)
 }
 
@@ -42,9 +39,6 @@ func (ibe IndexedBoxEntry) String() string {
 type FullBoxIndex map[IndexedBoxEntry]CommonBox
 
 func (fbi FullBoxIndex) getBoxName(cb CommonBox) (fqbn FullyQualifiedBoxName) {
-
-	// TODO(dustin): Add test
-
 	fqbn = make(FullyQualifiedBoxName, 0)
 	for current := cb; current != nil; current = current.Parent() {
 		fqbn = append(FullyQualifiedBoxName{current.Name()}, fqbn...)
@@ -55,9 +49,6 @@ func (fbi FullBoxIndex) getBoxName(cb CommonBox) (fqbn FullyQualifiedBoxName) {
 
 // Add adds one CommonBox to the index.
 func (fbi FullBoxIndex) Add(cb CommonBox) {
-
-	// TODO(dustin): Add test
-
 	name := fbi.getBoxName(cb)
 
 	for i := 0; ; i++ {
@@ -75,9 +66,6 @@ func (fbi FullBoxIndex) Add(cb CommonBox) {
 
 // Dump prints the contents of the full box index.
 func (fbi FullBoxIndex) Dump() {
-
-	// TODO(dustin): Add test
-
 	namePhrases := make([]string, len(fbi))
 	flatIndex := make(map[string]IndexedBoxEntry)
 	i := 0
@@ -110,8 +98,6 @@ func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err err
 		}
 	}()
 
-	// TODO(dustin): Add test
-
 	boxes, found := lbi[name]
 	if found == false {
 		log.Panicf("child box not found: [%s]", name)
@@ -123,15 +109,14 @@ func (lbi LoadedBoxIndex) GetChildBoxes(name string) (boxes []CommonBox, err err
 // ChildrenTypes returns a slice with the names of all children with registered
 // types.
 func (lbi LoadedBoxIndex) ChildrenTypes() (names []string) {
-
-	// TODO(dustin): Add test
-
 	names = make([]string, len(lbi))
 	i := 0
 	for name := range lbi {
 		names[i] = name
 		i++
 	}
+
+	sort.Strings(names)
 
 	return names
 }

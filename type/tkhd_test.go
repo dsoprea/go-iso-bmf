@@ -120,7 +120,7 @@ func TestTkhdBox_InlineString(t *testing.T) {
 		trackId:        0x55,
 		layer:          0x66,
 		alternateGroup: 0x77,
-		volume:         0x88,
+		volume:         0x0,
 		matrix:         []byte{1, 2, 3},
 		width:          0x99,
 		height:         0x109,

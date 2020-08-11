@@ -52,11 +52,28 @@ func (fp16 FixedPoint16) String() string {
 func Uint16ToFixedPoint16(x uint16, integerLength, mantissaLength int) FixedPoint16 {
 
 	if integerLength+mantissaLength != 16 {
-		log.Panicf("integer bits and mantissa bits do not equal 32")
+		log.Panicf("integer bits and mantissa bits do not equal 16")
 	}
 
 	return FixedPoint16{
 		rawValue:       x,
+		integerLength:  integerLength,
+		mantissaLength: mantissaLength,
+	}
+}
+
+// RationalUint16ToFixedPoint16 returns a FixedPoint16 given the rational and
+// encoding-parameters.
+func RationalUint16ToFixedPoint16(numerator, denominator uint16, integerLength, mantissaLength int) FixedPoint16 {
+	if integerLength+mantissaLength != 16 {
+		log.Panicf("bit lengths do not equal 16")
+	}
+
+	shiftedNumerator := numerator << integerLength
+	rawValue := shiftedNumerator + denominator
+
+	return FixedPoint16{
+		rawValue:       rawValue,
 		integerLength:  integerLength,
 		mantissaLength: mantissaLength,
 	}
@@ -115,6 +132,23 @@ func Uint32ToFixedPoint32(x uint32, integerLength, mantissaLength int) FixedPoin
 
 	return FixedPoint32{
 		rawValue:       x,
+		integerLength:  integerLength,
+		mantissaLength: mantissaLength,
+	}
+}
+
+// RationalUint32ToFixedPoint32 returns a FixedPoint16 given the rational and
+// encoding-parameters.
+func RationalUint32ToFixedPoint32(numerator, denominator uint32, integerLength, mantissaLength int) FixedPoint32 {
+	if integerLength+mantissaLength != 32 {
+		log.Panicf("bit lengths do not equal 32")
+	}
+
+	shiftedNumerator := numerator << integerLength
+	rawValue := shiftedNumerator + denominator
+
+	return FixedPoint32{
+		rawValue:       rawValue,
 		integerLength:  integerLength,
 		mantissaLength: mantissaLength,
 	}

@@ -19,10 +19,24 @@ var (
 
 // ClearRegistrations drops all registrations. This supports testing.
 func ClearRegistrations() {
-
-	// TODO(dustin): Add test
-
 	boxMapping = make(map[string]BoxFactory)
+}
+
+// RegisterBoxType registers the factory for a box-type.
+func RegisterBoxType(bf BoxFactory) {
+	name := bf.Name()
+
+	if _, found := boxMapping[name]; found == true {
+		log.Panicf("box-factory already registered: [%s]", name)
+	}
+
+	boxMapping[name] = bf
+}
+
+// GetFactory returns the factory for the given box-type. Will return `nil` if
+// not known.
+func GetFactory(name string) BoxFactory {
+	return boxMapping[name]
 }
 
 // BoxNameIsValid returns true if no invalid characters are in the box-name.
@@ -30,9 +44,6 @@ func ClearRegistrations() {
 // 14496-12 data, since we'll just keep reading boxes until we reach the end of
 // the allotment.
 func BoxNameIsValid(name string) bool {
-
-	// TODO(dustin): Add test
-
 	// Trim right-side spacing. Spacing is valid on the right side, and this
 	// will simplify things.
 	name = strings.TrimRight(name, " ")
@@ -55,9 +66,6 @@ func BoxNameIsValid(name string) bool {
 
 // GetParentBoxName returns the name of the given CB. If nil, returns "ROOT".
 func GetParentBoxName(cb CommonBox) string {
-
-	// TODO(dustin): Add test
-
 	if cb == nil {
 		return "ROOT"
 	}
@@ -68,9 +76,6 @@ func GetParentBoxName(cb CommonBox) string {
 // ChildBoxes is a simple wrapper that gets all children of the given type or
 // panics if none.
 func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
-
-	// TODO(dustin): Add test
-
 	boxes, err := bci.GetChildBoxes(name)
 	log.PanicIf(err)
 
@@ -80,6 +85,7 @@ func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
 // CommonBox is one parsed box.
 type CommonBox interface {
 	// TODO(dustin): Rename to Data()
+
 	// ReadBoxData returns the bytes that were encapsulated in this box.
 	ReadBoxData() (data []byte, err error)
 
@@ -116,27 +122,4 @@ type BoxFactory interface {
 	// Name returns the name of the box-type that this factory knows how to
 	// parse.
 	Name() string
-}
-
-// RegisterBoxType registers the factory for a box-type.
-func RegisterBoxType(bf BoxFactory) {
-
-	// TODO(dustin): Add test
-
-	name := bf.Name()
-
-	if _, found := boxMapping[name]; found == true {
-		log.Panicf("box-factory already registered: [%s]", name)
-	}
-
-	boxMapping[name] = bf
-}
-
-// GetFactory returns the factory for the given box-type. Will return `nil` if
-// not known.
-func GetFactory(name string) BoxFactory {
-
-	// TODO(dustin): Add test
-
-	return boxMapping[name]
 }

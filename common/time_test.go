@@ -5,6 +5,25 @@ import (
 	"time"
 )
 
+func TestNewStandard32TimeSupport(t *testing.T) {
+	creationEpoch := uint32(1)
+	modificationEpoch := uint32(2)
+	scaledDuration := uint32(3)
+	timeScale := uint32(4)
+
+	sts := NewStandard32TimeSupport(creationEpoch, modificationEpoch, scaledDuration, timeScale)
+
+	if sts.creationEpoch != creationEpoch {
+		t.Fatalf("createdEpoch is not correct.")
+	} else if sts.modificationEpoch != modificationEpoch {
+		t.Fatalf("modificationEpoch is not correct.")
+	} else if sts.scaledDuration != scaledDuration {
+		t.Fatalf("scaledDuration is not correct.")
+	} else if sts.timeScale != timeScale {
+		t.Fatalf("timeScale is not correct.")
+	}
+}
+
 func TestStandard32TimeSupport_HasCreationTime_False(t *testing.T) {
 	sts := Standard32TimeSupport{}
 
@@ -125,6 +144,58 @@ func TestStandard32TimeSupport_Duration(t *testing.T) {
 	d := time.Second * 10
 	if sts.Duration() != d {
 		t.Fatalf("Duration() not correct: [%s] != [%s]", sts.Duration(), d)
+	}
+}
+
+func TestStandard32TimeSupport_InlineString(t *testing.T) {
+	creationEpoch := uint32(1)
+	modificationEpoch := creationEpoch + 1
+
+	timeScale := uint32(60)
+
+	sts := Standard32TimeSupport{
+		creationEpoch:     creationEpoch,
+		modificationEpoch: modificationEpoch,
+		timeScale:         timeScale,
+		scaledDuration:    timeScale * 10,
+	}
+
+	if sts.InlineString() != "DUR-S=[10.00] CTIME=[1904-01-01 00:00:01 +0000 UTC] MTIME=[1904-01-01 00:00:02 +0000 UTC]" {
+		t.Fatalf("InlineString() not correct: [%s]", sts.InlineString())
+	}
+}
+
+func TestTimeToEpoch(t *testing.T) {
+	originalTime := time.Unix(1, 0).UTC()
+	epoch := TimeToEpoch(originalTime)
+	if epoch != 2082844801 {
+		t.Fatalf("Epoch not correct.")
+	}
+
+	recovered := EpochToTime(epoch)
+
+	if recovered != originalTime {
+		t.Fatalf("Recovered time not correct.")
+	}
+}
+
+func TestEpochToTime(t *testing.T) {
+	originalTime := time.Unix(1, 0).UTC()
+
+	epoch := uint32(2082844801)
+
+	recovered := EpochToTime(epoch)
+	if recovered != originalTime {
+		t.Fatalf("Time not correct: %s != %s", recovered, originalTime)
+	}
+}
+
+func TestNowTime(t *testing.T) {
+	actual := NowTime()
+	expected := time.Now().UTC().Round(time.Second)
+
+	if actual != expected {
+		t.Fatalf("Time not expected: %s != %s", actual, expected)
 	}
 }
 
