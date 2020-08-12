@@ -14,7 +14,7 @@ type MdiaBox struct {
 	// Box is the base box.
 	bmfcommon.Box
 
-	// LoadedBoxIndex contains this boxes children.
+	// LoadedBoxIndex contains this box's children.
 	bmfcommon.LoadedBoxIndex
 }
 

@@ -14,7 +14,7 @@ type IrefBox struct {
 
 	version byte
 
-	// LoadedBoxIndex contains this boxes children.
+	// LoadedBoxIndex contains this box's children.
 	bmfcommon.LoadedBoxIndex
 }
 

@@ -20,7 +20,7 @@ type IinfBox struct {
 	// Box is the base inner box.
 	bmfcommon.Box
 
-	// LoadedBoxIndex contains this boxes children.
+	// LoadedBoxIndex contains this box's children.
 	bmfcommon.LoadedBoxIndex
 
 	entryCount  uint32
