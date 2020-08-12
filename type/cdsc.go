@@ -21,9 +21,6 @@ type CdscBox struct {
 
 // InlineString returns an undecorated string of field names and values.
 func (cdsc *CdscBox) InlineString() string {
-
-	// TODO(dustin): Add test
-
 	toItemIds := make([]int, len(cdsc.toItemIds))
 
 	for i, toItemId := range cdsc.toItemIds {
@@ -49,9 +46,6 @@ type cdscBoxFactory struct {
 
 // Name returns the name of the type.
 func (cdscBoxFactory) Name() string {
-
-	// TODO(dustin): Add test
-
 	return "cdsc"
 }
 
@@ -65,8 +59,6 @@ func (cdscBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
-
-	// TODO(dustin): Add test
 
 	data, err := box.ReadBoxData()
 	log.PanicIf(err)

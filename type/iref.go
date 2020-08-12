@@ -20,17 +20,11 @@ type IrefBox struct {
 
 // Version retrns the structural version of the IREF box.
 func (iref IrefBox) Version() byte {
-
-	// TODO(dustin): Add test
-
 	return iref.version
 }
 
 // InlineString returns an undecorated string of field names and values.
 func (iref *IrefBox) InlineString() string {
-
-	// TODO(dustin): Add test
-
 	return fmt.Sprintf(
 		"%s",
 		// "%s VER=(%d) FROM-ITEM-ID=(%d) TO-ITEM-IDS=(%d)[%v]",
@@ -43,9 +37,6 @@ func (iref *IrefBox) InlineString() string {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (iref *IrefBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	iref.LoadedBoxIndex = lbi
 }
 
@@ -54,9 +45,6 @@ type irefBoxFactory struct {
 
 // Name returns the name of the type.
 func (irefBoxFactory) Name() string {
-
-	// TODO(dustin): Add test
-
 	return "iref"
 }
 
@@ -70,8 +58,6 @@ func (irefBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
-
-	// TODO(dustin): Add test
 
 	data, err := box.ReadBoxData()
 	log.PanicIf(err)
