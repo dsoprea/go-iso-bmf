@@ -23,40 +23,55 @@ type IinfBox struct {
 	// LoadedBoxIndex contains this box's children.
 	bmfcommon.LoadedBoxIndex
 
-	entryCount  uint32
-	loadedCount int
+	entryCount uint32
 
 	itemsById   map[uint32]*InfeBox
-	itemsByName map[string][]*InfeBox
+	itemsByName map[string]*InfeBox
 }
 
-func (iinf *IinfBox) loadItem(infe *InfeBox) {
+func newIinfBox(box bmfcommon.Box) *IinfBox {
+	itemsById := make(map[uint32]*InfeBox)
+	itemsByName := make(map[string]*InfeBox)
 
-	// TODO(dustin): Add test
+	return &IinfBox{
+		Box:         box,
+		itemsById:   itemsById,
+		itemsByName: itemsByName,
+	}
+}
+
+// loadItem indexes one item. This is called from the INFE box factory, which
+// always occurs after the IINF box.
+
+// Each ID and name must be unique. Since the specification implies and does not
+// guarantee that each ID and each name occurs just once, this method has
+// assertions that will fail if we were wrong rather than just cover up the
+// mistake.
+func (iinf *IinfBox) loadItem(infe *InfeBox) {
 
 	// Load by-ID index.
 
 	itemId := infe.ItemId()
-	iinf.itemsById[itemId] = infe
+
+	if _, found := iinf.itemsById[itemId]; found == true {
+		log.Panicf("item ID (%d) occurs more than once", itemId)
+	} else {
+		iinf.itemsById[itemId] = infe
+	}
 
 	// Load by-name index.
 
 	key := infe.ItemType().String()
 
-	if existing, found := iinf.itemsByName[key]; found == true {
-		iinf.itemsByName[key] = append(existing, infe)
+	if _, found := iinf.itemsByName[key]; found == true {
+		log.Panicf("item with name [%s] occurs more than once", key)
 	} else {
-		iinf.itemsByName[key] = []*InfeBox{infe}
+		iinf.itemsByName[key] = infe
 	}
-
-	iinf.loadedCount++
 }
 
 // GetItemWithId returns the item with the given ID.
 func (iinf *IinfBox) GetItemWithId(itemId uint32) (infe *InfeBox, err error) {
-
-	// TODO(dustin): Add test
-
 	infe, found := iinf.itemsById[itemId]
 	if found == false {
 		return nil, ErrNoItemsFound
@@ -65,37 +80,28 @@ func (iinf *IinfBox) GetItemWithId(itemId uint32) (infe *InfeBox, err error) {
 	return infe, nil
 }
 
-// GetItemsWithName returns all metadata items with the given name or
+// GetItemWithName returns the item with the given name or
 // ErrNoItemsFound if none.
-func (iinf *IinfBox) GetItemsWithName(typeName string) (collected []*InfeBox, err error) {
-
-	// TODO(dustin): Add test
-
-	collected, found := iinf.itemsByName[typeName]
+func (iinf *IinfBox) GetItemWithName(typeName string) (infe *InfeBox, err error) {
+	infe, found := iinf.itemsByName[typeName]
 	if found == false {
 		return nil, ErrNoItemsFound
 	}
 
-	return collected, nil
+	return infe, nil
 }
 
 // InlineString returns an undecorated string of field names and values.
 func (iinf *IinfBox) InlineString() string {
-
-	// TODO(dustin): Add test
-
 	return fmt.Sprintf(
-		"%s ENTRY-COUNT=(%d) LOADED-TYPES=(%d) LOADED-ITEMS=(%d) INDEXED-TYPES=(%d)",
-		iinf.Box.InlineString(), iinf.entryCount, iinf.loadedCount, len(iinf.itemsById), len(iinf.itemsByName))
+		"%s ENTRY-COUNT=(%d) LOADED-ITEMS=(%d)",
+		iinf.Box.InlineString(), iinf.entryCount, len(iinf.itemsById))
 }
 
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (iinf *IinfBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	iinf.LoadedBoxIndex = lbi
 }
 
@@ -104,9 +110,6 @@ type iinfBoxFactory struct {
 
 // Name returns the name of the type.
 func (iinfBoxFactory) Name() string {
-
-	// TODO(dustin): Add test
-
 	return "iinf"
 }
 
@@ -118,21 +121,12 @@ func (iinfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, skipBytes 
 		}
 	}()
 
-	// TODO(dustin): Add test
-
 	data, err := box.ReadBoxData()
 	log.PanicIf(err)
 
 	version := data[0]
 
-	itemsById := make(map[uint32]*InfeBox)
-	itemsByName := make(map[string][]*InfeBox)
-
-	iinf := &IinfBox{
-		Box:         box,
-		itemsById:   itemsById,
-		itemsByName: itemsByName,
-	}
+	iinf := newIinfBox(box)
 
 	skipBytes = 4
 

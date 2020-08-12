@@ -17,9 +17,6 @@ type IdatBox struct {
 
 // InlineString returns an undecorated string of field names and values.
 func (idat *IdatBox) InlineString() string {
-
-	// TODO(dustin): Add test
-
 	return fmt.Sprintf(
 		"%s DATA-SIZE=(%d)",
 		idat.Box.InlineString(), len(idat.data))
@@ -30,9 +27,6 @@ type idatBoxFactory struct {
 
 // Name returns the name of the type.
 func (idatBoxFactory) Name() string {
-
-	// TODO(dustin): Add test
-
 	return "idat"
 }
 
@@ -43,8 +37,6 @@ func (idatBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
-
-	// TODO(dustin): Add test
 
 	data, err := box.ReadBoxData()
 	log.PanicIf(err)

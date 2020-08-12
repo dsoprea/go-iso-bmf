@@ -18,6 +18,13 @@ import (
 // simple string.
 type InfeItemType uint32
 
+// InfeItemTypeFromBytes converts four-bytes to a uint32. This supports testing.
+func InfeItemTypeFromBytes(typeBytes [4]byte) InfeItemType {
+	// TODO(dustin): Add test
+
+	return InfeItemType(bmfcommon.DefaultEndianness.Uint32(typeBytes[:]))
+}
+
 // EqualsName encodes the integer back to the original byte-order, convert to a
 // string, and compare. The item-type can be interpreted as both an integer and
 // a string.

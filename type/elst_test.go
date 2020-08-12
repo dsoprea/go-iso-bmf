@@ -35,6 +35,46 @@ func TestElstBox_Entries(t *testing.T) {
 	}
 }
 
+func TestElstEntry_SegmentDuration(t *testing.T) {
+	ee := &elstEntry{
+		segmentDuration: 11,
+	}
+
+	if ee.SegmentDuration() != 11 {
+		t.Fatalf("SegmentDuration() is not correct.")
+	}
+}
+
+func TestElstEntry_MediaTime(t *testing.T) {
+	ee := &elstEntry{
+		mediaTime: 11,
+	}
+
+	if ee.MediaTime() != 11 {
+		t.Fatalf("MediaTime() is not correct.")
+	}
+}
+
+func TestElstEntry_MediaRate(t *testing.T) {
+	ee := &elstEntry{
+		mediaRate: 11,
+	}
+
+	if ee.MediaRate() != 11 {
+		t.Fatalf("MediaRate() is not correct.")
+	}
+}
+
+func TestElstEntry_MediaRateFraction(t *testing.T) {
+	ee := &elstEntry{
+		mediaRateFraction: 11,
+	}
+
+	if ee.MediaRateFraction() != 11 {
+		t.Fatalf("MediaRateFraction() is not correct.")
+	}
+}
+
 func TestElstBoxFactory_Name(t *testing.T) {
 	name := elstBoxFactory{}.Name()
 

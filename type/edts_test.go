@@ -1,6 +1,7 @@
 package bmftype
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/dsoprea/go-logging"
@@ -8,6 +9,17 @@ import (
 
 	"github.com/dsoprea/go-iso-bmf/common"
 )
+
+func TestEdtsBox_SetLoadedBoxIndex(t *testing.T) {
+	lbi := make(bmfcommon.LoadedBoxIndex)
+
+	edts := new(EdtsBox)
+	edts.SetLoadedBoxIndex(lbi)
+
+	if reflect.DeepEqual(edts.LoadedBoxIndex, lbi) != true {
+		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
+	}
+}
 
 func TestEdtsBoxFactory_Name(t *testing.T) {
 	ebf := edtsBoxFactory{}
