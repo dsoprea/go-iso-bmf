@@ -2,6 +2,7 @@ package bmfcommon
 
 import (
 	"fmt"
+	"io"
 
 	"encoding/binary"
 
@@ -79,7 +80,7 @@ func (box Box) Index() FullBoxIndex {
 	return box.resource.Index()
 }
 
-// ReadBytesAt reads a box at n and offset.
+// ReadBytesAt returns N bytes from offset.
 func (box Box) ReadBytesAt(offset int64, n int64) (b []byte, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
@@ -91,6 +92,21 @@ func (box Box) ReadBytesAt(offset int64, n int64) (b []byte, err error) {
 	log.PanicIf(err)
 
 	return b, nil
+}
+
+// CopyBytesAt copies the N bytes from the given offset and writes them to the
+// given writer.
+func (box Box) CopyBytesAt(offset int64, n int64, w io.Writer) (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	err = box.resource.copyBytesAt(offset, n, w)
+	log.PanicIf(err)
+
+	return nil
 }
 
 // ReadBoxes bridges to the lower-level function that knows how to extract child-

@@ -71,6 +71,23 @@ func (f *BmfResource) readBytesAt(offset int64, n int64) (b []byte, err error) {
 	return b, nil
 }
 
+// copyBytesAt seeksand then copies N bytes from the resource to the writer.
+func (f *BmfResource) copyBytesAt(offset int64, n int64, w io.Writer) (err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
+	_, err = f.rs.Seek(offset, io.SeekStart)
+	log.PanicIf(err)
+
+	_, err = io.CopyN(w, f.rs, n)
+	log.PanicIf(err)
+
+	return nil
+}
+
 // readBaseBox reads a box from an offset.
 func (f *BmfResource) readBaseBox(offset int64) (box Box, err error) {
 	defer func() {

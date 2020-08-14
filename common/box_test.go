@@ -118,6 +118,28 @@ func TestBox_ReadBytesAt(t *testing.T) {
 	}
 }
 
+func TestBox_CopyBytesAt(t *testing.T) {
+	data := []byte{
+		0, 0, 0, 0,
+		1, 2, 3, 4, 5,
+		0, 0, 0, 0, 0,
+	}
+
+	sb := rifs.NewSeekableBufferWithBytes(data)
+
+	resource := NewBmfResource(sb, 0)
+	box := NewBox("name", 1, 2, 3, resource)
+
+	b := new(bytes.Buffer)
+
+	err := box.CopyBytesAt(4, 5, b)
+	log.PanicIf(err)
+
+	if bytes.Equal(b.Bytes(), data[4:9]) != true {
+		t.Fatalf("Extracted data not correct.")
+	}
+}
+
 func TestBox_ReadBoxes(t *testing.T) {
 	ClearRegistrations()
 	defer ClearRegistrations()

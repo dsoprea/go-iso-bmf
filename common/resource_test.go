@@ -111,6 +111,27 @@ func TestBmfResource_readBytesAt_MiddleToEnd(t *testing.T) {
 	}
 }
 
+func TestBmfResource_copyBytesAt(t *testing.T) {
+	data := []byte{
+		0, 0, 0, 0,
+		1, 2, 3, 4, 5,
+		0, 0, 0, 0, 0,
+	}
+
+	sb := rifs.NewSeekableBufferWithBytes(data)
+
+	resource := NewBmfResource(sb, 0)
+
+	b := new(bytes.Buffer)
+
+	err := resource.copyBytesAt(5, 5, b)
+	log.PanicIf(err)
+
+	if bytes.Equal(b.Bytes(), data[5:10]) != true {
+		t.Fatalf("Copied bytes not correct.")
+	}
+}
+
 func TestBmfResource_readBaseBox_32(t *testing.T) {
 	var buffer []byte
 	PushBox(&buffer, "abcd", []byte{6, 7, 8, 9})
