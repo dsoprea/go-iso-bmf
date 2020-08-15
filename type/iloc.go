@@ -27,6 +27,14 @@ var (
 	ErrLocationItemNotFound = errors.New("no location record for item")
 )
 
+// IlocIntegerWidth describes how many bytes an integer will be.
+type IlocIntegerWidth uint8
+
+// IsValid returns whether the IIW describes a valid number of bytes.
+func (iiw IlocIntegerWidth) IsValid() bool {
+	return iiw == 0 || iiw == 4 || iiw == 8
+}
+
 // IlocBox is the "Item Location" box.
 type IlocBox struct {
 	bmfcommon.Box
@@ -91,7 +99,7 @@ func (iloc IlocBox) Dump() (err error) {
 
 		iinfCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iinf", 0}]
 		if found == false {
-			log.Panicf("Could not find IINF box from ILOC box dump")
+			log.Panicf("Could not find IINF box (ILOC/Dump)")
 		}
 
 		iinf := iinfCommonBox.(*IinfBox)
@@ -161,7 +169,7 @@ func (iloc IlocBox) writeItemExtents(itemId int, outPath string) (err error) {
 
 	iinfCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iinf", 0}]
 	if found == false {
-		log.Panicf("Could not find IINF box from ILOC box dump")
+		log.Panicf("Could not find IINF box (ILOC/writeItemExtents)")
 	}
 
 	iinf := iinfCommonBox.(*IinfBox)
@@ -250,8 +258,11 @@ type IlocItem struct {
 	itemId             uint32
 	constructionMethod uint16
 	dataReferenceIndex uint16
-	baseOffset         []byte
-	extents            []IlocExtent
+
+	// NOTE(dustin): It's not clear what the baseOffset is used for since the extent-offsets seem to already be absolute and sufficient.
+	baseOffset []byte
+
+	extents []IlocExtent
 }
 
 // Extents returns all extents for item's data.
@@ -269,16 +280,58 @@ func (ii IlocItem) String() string {
 	return fmt.Sprintf("IlocItem<%s>", ii.InlineString())
 }
 
-// IlocIntegerWidth describes how many bytes an integer will be.
-type IlocIntegerWidth uint8
+// readExtent reads one entry for the current item. One item potentially has many
+// entries.
+func (factory ilocBoxFactory) readExtent(r io.Reader, version byte, offsetSize, lengthSize, indexSize IlocIntegerWidth) (ie IlocExtent, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
 
-// IsValid returns whether the IIW describes a valid number of bytes.
-func (iiw IlocIntegerWidth) IsValid() bool {
-	return iiw == 0 || iiw == 4 || iiw == 8
+	if (version == 1 || version == 2) && indexSize > 0 {
+		if indexSize == 4 {
+			var extentIndex uint32
+
+			err := binary.Read(r, bmfcommon.DefaultEndianness, &extentIndex)
+			log.PanicIf(err)
+
+			ie.extentIndex = uint64(extentIndex)
+		} else if indexSize == 8 {
+			err := binary.Read(r, bmfcommon.DefaultEndianness, &ie.extentIndex)
+			log.PanicIf(err)
+		}
+	}
+
+	if offsetSize == 4 {
+		var extentOffset uint32
+
+		err := binary.Read(r, bmfcommon.DefaultEndianness, &extentOffset)
+		log.PanicIf(err)
+
+		ie.extentOffset = uint64(extentOffset)
+	} else if offsetSize == 8 {
+		err := binary.Read(r, bmfcommon.DefaultEndianness, &ie.extentOffset)
+		log.PanicIf(err)
+	}
+
+	if lengthSize == 4 {
+		var extentLength uint32
+
+		err := binary.Read(r, bmfcommon.DefaultEndianness, &extentLength)
+		log.PanicIf(err)
+
+		ie.extentLength = uint64(extentLength)
+	} else if lengthSize == 8 {
+		err := binary.Read(r, bmfcommon.DefaultEndianness, &ie.extentLength)
+		log.PanicIf(err)
+	}
+
+	return ie, nil
 }
 
 // readItem parses one item out of the stream. These belong to the ILOC record.
-func (factory ilocBoxFactory) readItem(br *bufio.Reader, version byte, baseOffsetSize IlocIntegerWidth, offsetSize, lengthSize, indexSize IlocIntegerWidth) (ii IlocItem, err error) {
+func (factory ilocBoxFactory) readItem(r io.Reader, version byte, baseOffsetSize IlocIntegerWidth, offsetSize, lengthSize, indexSize IlocIntegerWidth) (ii IlocItem, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -290,12 +343,12 @@ func (factory ilocBoxFactory) readItem(br *bufio.Reader, version byte, baseOffse
 	if version < 2 {
 		var itemId16 uint16
 
-		err := binary.Read(br, bmfcommon.DefaultEndianness, &itemId16)
+		err := binary.Read(r, bmfcommon.DefaultEndianness, &itemId16)
 		log.PanicIf(err)
 
 		ii.itemId = uint32(itemId16)
 	} else if version == 2 {
-		err := binary.Read(br, bmfcommon.DefaultEndianness, &ii.itemId)
+		err := binary.Read(r, bmfcommon.DefaultEndianness, &ii.itemId)
 		log.PanicIf(err)
 	} else {
 		log.Panicf("version (%d) not supported", version)
@@ -303,8 +356,12 @@ func (factory ilocBoxFactory) readItem(br *bufio.Reader, version byte, baseOffse
 
 	// constructionMethod
 
-	if version == 1 || version == 2 {
-		err = binary.Read(br, bmfcommon.DefaultEndianness, &ii.constructionMethod)
+	if version == 0 {
+		// It should *already be* (0), but we're choosing to do something here
+		// rather than nothing.
+		ii.constructionMethod = 0
+	} else if version == 1 || version == 2 {
+		err = binary.Read(r, bmfcommon.DefaultEndianness, &ii.constructionMethod)
 		log.PanicIf(err)
 	} else {
 		log.Panicf("version (%d) not supported", version)
@@ -312,21 +369,21 @@ func (factory ilocBoxFactory) readItem(br *bufio.Reader, version byte, baseOffse
 
 	// dataReferenceIndex
 
-	err = binary.Read(br, bmfcommon.DefaultEndianness, &ii.dataReferenceIndex)
+	err = binary.Read(r, bmfcommon.DefaultEndianness, &ii.dataReferenceIndex)
 	log.PanicIf(err)
 
 	// baseOffset
 
 	ii.baseOffset = make([]byte, baseOffsetSize)
 
-	_, err = io.ReadFull(br, ii.baseOffset)
+	_, err = io.ReadFull(r, ii.baseOffset)
 	log.PanicIf(err)
 
 	// extentCount
 
 	var extentCount uint16
 
-	err = binary.Read(br, bmfcommon.DefaultEndianness, &extentCount)
+	err = binary.Read(r, bmfcommon.DefaultEndianness, &extentCount)
 	log.PanicIf(err)
 
 	// Load the extents.
@@ -334,63 +391,13 @@ func (factory ilocBoxFactory) readItem(br *bufio.Reader, version byte, baseOffse
 	ii.extents = make([]IlocExtent, int(extentCount))
 
 	for j := 0; j < int(extentCount); j++ {
-		ie, err := factory.readEntry(br, version, offsetSize, lengthSize, indexSize)
+		ie, err := factory.readExtent(r, version, offsetSize, lengthSize, indexSize)
 		log.PanicIf(err)
 
 		ii.extents[j] = ie
 	}
 
 	return ii, nil
-}
-
-// readEntry reads one entry for the current item. One item potentially has many
-// entries.
-func (factory ilocBoxFactory) readEntry(br *bufio.Reader, version byte, offsetSize, lengthSize, indexSize IlocIntegerWidth) (ie IlocExtent, err error) {
-	defer func() {
-		if errRaw := recover(); errRaw != nil {
-			err = log.Wrap(errRaw.(error))
-		}
-	}()
-
-	if (version == 1 || version == 2) && indexSize > 0 {
-		if indexSize == 4 {
-			var extentIndex uint32
-
-			err := binary.Read(br, bmfcommon.DefaultEndianness, &extentIndex)
-			log.PanicIf(err)
-
-			ie.extentIndex = uint64(extentIndex)
-		} else if indexSize == 8 {
-			err := binary.Read(br, bmfcommon.DefaultEndianness, &ie.extentIndex)
-			log.PanicIf(err)
-		}
-	}
-
-	if offsetSize == 4 {
-		var extentOffset uint32
-
-		err := binary.Read(br, bmfcommon.DefaultEndianness, &extentOffset)
-		log.PanicIf(err)
-
-		ie.extentOffset = uint64(extentOffset)
-	} else if offsetSize == 8 {
-		err := binary.Read(br, bmfcommon.DefaultEndianness, &ie.extentOffset)
-		log.PanicIf(err)
-	}
-
-	if lengthSize == 4 {
-		var extentLength uint32
-
-		err := binary.Read(br, bmfcommon.DefaultEndianness, &extentLength)
-		log.PanicIf(err)
-
-		ie.extentLength = uint64(extentLength)
-	} else if lengthSize == 8 {
-		err := binary.Read(br, bmfcommon.DefaultEndianness, &ie.extentLength)
-		log.PanicIf(err)
-	}
-
-	return ie, nil
 }
 
 // New returns a new value instance.
@@ -401,14 +408,12 @@ func (factory ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, ch
 		}
 	}()
 
-	// TODO(dustin): Add test
-
 	data, err := box.ReadBoxData()
 	log.PanicIf(err)
 
 	version := data[0]
 
-	if version != 1 && version != 2 {
+	if version > 2 {
 		log.Panicf("version of ILOC not supported: (%d)", version)
 	}
 

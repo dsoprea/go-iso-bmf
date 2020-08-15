@@ -692,3 +692,844 @@ func TestIlocIntegerWidth_IsValid_3(t *testing.T) {
 		t.Fatalf("IsValid() for (3) not false.")
 	}
 }
+
+func TestIlocBoxFactory_readExtent_version0_uint32(t *testing.T) {
+	var data []byte
+
+	extentOffset := uint32(11)
+	extentLength := uint32(22)
+	writeIlocExtentVersion032bitBytes(&data, extentOffset, extentLength)
+
+	b := bytes.NewBuffer(data)
+
+	version := byte(0)
+
+	offsetSize := IlocIntegerWidth(4)
+	lengthSize := IlocIntegerWidth(4)
+	indexSize := IlocIntegerWidth(4)
+
+	factory := ilocBoxFactory{}
+
+	ie, err := factory.readExtent(b, version, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	expected := IlocExtent{
+		extentIndex:  0,
+		extentOffset: uint64(extentOffset),
+		extentLength: uint64(extentLength),
+	}
+
+	if ie != expected {
+		t.Fatalf("IlocExtent not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readExtent_version0_uint64(t *testing.T) {
+	var data []byte
+
+	extentOffset := uint64(11)
+	bmfcommon.PushBytes(&data, extentOffset)
+
+	extentLength := uint64(22)
+	bmfcommon.PushBytes(&data, extentLength)
+
+	b := bytes.NewBuffer(data)
+
+	version := byte(0)
+
+	offsetSize := IlocIntegerWidth(8)
+	lengthSize := IlocIntegerWidth(8)
+	indexSize := IlocIntegerWidth(8)
+
+	factory := ilocBoxFactory{}
+
+	ie, err := factory.readExtent(b, version, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	expected := IlocExtent{
+		extentIndex:  0,
+		extentOffset: extentOffset,
+		extentLength: extentLength,
+	}
+
+	if ie != expected {
+		t.Fatalf("IlocExtent not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readExtent_version1_uint32(t *testing.T) {
+	var data []byte
+
+	extentIndex := uint32(33)
+	extentOffset := uint32(11)
+	extentLength := uint32(22)
+
+	writeIlocExtentVersion1OrVersion232bitBytes(&data, extentIndex, extentOffset, extentLength)
+
+	b := bytes.NewBuffer(data)
+
+	version := byte(1)
+
+	offsetSize := IlocIntegerWidth(4)
+	lengthSize := IlocIntegerWidth(4)
+	indexSize := IlocIntegerWidth(4)
+
+	factory := ilocBoxFactory{}
+
+	ie, err := factory.readExtent(b, version, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	expected := IlocExtent{
+		extentIndex:  uint64(extentIndex),
+		extentOffset: uint64(extentOffset),
+		extentLength: uint64(extentLength),
+	}
+
+	if ie != expected {
+		t.Fatalf("IlocExtent not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readExtent_version1_uint64(t *testing.T) {
+	var data []byte
+
+	extentIndex := uint64(33)
+	bmfcommon.PushBytes(&data, extentIndex)
+
+	extentOffset := uint64(11)
+	bmfcommon.PushBytes(&data, extentOffset)
+
+	extentLength := uint64(22)
+	bmfcommon.PushBytes(&data, extentLength)
+
+	b := bytes.NewBuffer(data)
+
+	version := byte(1)
+
+	offsetSize := IlocIntegerWidth(8)
+	lengthSize := IlocIntegerWidth(8)
+	indexSize := IlocIntegerWidth(8)
+
+	factory := ilocBoxFactory{}
+
+	ie, err := factory.readExtent(b, version, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	expected := IlocExtent{
+		extentIndex:  extentIndex,
+		extentOffset: extentOffset,
+		extentLength: extentLength,
+	}
+
+	if ie != expected {
+		t.Fatalf("IlocExtent not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readExtent_version2_uint32(t *testing.T) {
+	var data []byte
+
+	extentIndex := uint32(33)
+	extentOffset := uint32(11)
+	extentLength := uint32(22)
+
+	writeIlocExtentVersion1OrVersion232bitBytes(&data, extentIndex, extentOffset, extentLength)
+
+	b := bytes.NewBuffer(data)
+
+	version := byte(1)
+
+	offsetSize := IlocIntegerWidth(4)
+	lengthSize := IlocIntegerWidth(4)
+	indexSize := IlocIntegerWidth(4)
+
+	factory := ilocBoxFactory{}
+
+	ie, err := factory.readExtent(b, version, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	expected := IlocExtent{
+		extentIndex:  uint64(extentIndex),
+		extentOffset: uint64(extentOffset),
+		extentLength: uint64(extentLength),
+	}
+
+	if ie != expected {
+		t.Fatalf("IlocExtent not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readExtent_version2_uint64(t *testing.T) {
+	var data []byte
+
+	extentIndex := uint64(33)
+	bmfcommon.PushBytes(&data, extentIndex)
+
+	extentOffset := uint64(11)
+	bmfcommon.PushBytes(&data, extentOffset)
+
+	extentLength := uint64(22)
+	bmfcommon.PushBytes(&data, extentLength)
+
+	b := bytes.NewBuffer(data)
+
+	version := byte(2)
+
+	offsetSize := IlocIntegerWidth(8)
+	lengthSize := IlocIntegerWidth(8)
+	indexSize := IlocIntegerWidth(8)
+
+	factory := ilocBoxFactory{}
+
+	ie, err := factory.readExtent(b, version, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	expected := IlocExtent{
+		extentIndex:  extentIndex,
+		extentOffset: extentOffset,
+		extentLength: extentLength,
+	}
+
+	if ie != expected {
+		t.Fatalf("IlocExtent not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readItem_Version0_NoExtents(t *testing.T) {
+	// Build stream.
+
+	var data []byte
+
+	itemId := uint16(11)
+	bmfcommon.PushBytes(&data, itemId)
+
+	dataReferenceIndex := uint16(22)
+	bmfcommon.PushBytes(&data, dataReferenceIndex)
+
+	baseOffset := uint32(0x1234)
+	bmfcommon.PushBytes(&data, baseOffset)
+
+	extentCount := uint16(0)
+	bmfcommon.PushBytes(&data, extentCount)
+
+	b := bytes.NewBuffer(data)
+
+	// Parse.
+
+	factory := ilocBoxFactory{}
+
+	version := byte(0)
+
+	baseOffsetSize := IlocIntegerWidth(4)
+	offsetSize := IlocIntegerWidth(4)
+	lengthSize := IlocIntegerWidth(4)
+	indexSize := IlocIntegerWidth(4)
+
+	ii, err := factory.readItem(b, version, baseOffsetSize, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	if ii.itemId != 11 {
+		t.Fatalf("itemId not correct.")
+	} else if ii.constructionMethod != 0 {
+		t.Fatalf("constructionMethod not correct.")
+	} else if ii.dataReferenceIndex != 22 {
+		t.Fatalf("dataReferenceIndex not correct.")
+	} else if bmfcommon.DefaultEndianness.Uint32(ii.baseOffset) != 0x1234 {
+		t.Fatalf("baseOffset not correct.")
+	} else if len(ii.extents) != 0 {
+		t.Fatalf("There should be no extents.")
+	}
+}
+
+func TestIlocBoxFactory_readItem_Version0_WithExtents(t *testing.T) {
+	// Build stream.
+
+	var data []byte
+
+	itemId := uint16(11)
+	dataReferenceIndex := uint16(22)
+	baseOffset := uint32(0x1234)
+
+	extents := []IlocExtent{
+		IlocExtent{extentOffset: 11, extentLength: 22},
+		IlocExtent{extentOffset: 33, extentLength: 44},
+	}
+
+	writeIlocItemVersion032bitBytes(&data, itemId, dataReferenceIndex, baseOffset, extents)
+
+	b := bytes.NewBuffer(data)
+
+	// Parse.
+
+	factory := ilocBoxFactory{}
+
+	version := byte(0)
+
+	baseOffsetSize := IlocIntegerWidth(4)
+	offsetSize := IlocIntegerWidth(4)
+	lengthSize := IlocIntegerWidth(4)
+	indexSize := IlocIntegerWidth(4)
+
+	ii, err := factory.readItem(b, version, baseOffsetSize, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	if ii.itemId != uint32(itemId) {
+		t.Fatalf("itemId not correct.")
+	} else if ii.constructionMethod != 0 {
+		t.Fatalf("constructionMethod not correct.")
+	} else if ii.dataReferenceIndex != dataReferenceIndex {
+		t.Fatalf("dataReferenceIndex not correct.")
+	} else if bmfcommon.DefaultEndianness.Uint32(ii.baseOffset) != baseOffset {
+		t.Fatalf("baseOffset not correct.")
+	} else if len(ii.extents) != 2 {
+		t.Fatalf("There should be no extents.")
+	}
+
+	ie1 := ii.extents[0]
+	ie2 := ii.extents[1]
+
+	if ie1.Offset() != extents[0].extentOffset {
+		t.Fatalf("First extent offset not correct.")
+	} else if ie1.Length() != extents[0].extentLength {
+		t.Fatalf("First extent length not correct.")
+	} else if ie2.Offset() != extents[1].extentOffset {
+		t.Fatalf("Second extent offset not correct.")
+	} else if ie2.Length() != extents[1].extentLength {
+		t.Fatalf("Second extent length not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readItem_Version1_WithExtents(t *testing.T) {
+	// Build stream.
+
+	var data []byte
+
+	itemId := uint16(11)
+	bmfcommon.PushBytes(&data, itemId)
+
+	constructionMethod := uint16(55)
+	bmfcommon.PushBytes(&data, constructionMethod)
+
+	dataReferenceIndex := uint16(22)
+	bmfcommon.PushBytes(&data, dataReferenceIndex)
+
+	baseOffset := uint32(0x1234)
+	bmfcommon.PushBytes(&data, baseOffset)
+
+	extentCount := uint16(2)
+	bmfcommon.PushBytes(&data, extentCount)
+
+	extentIndex0 := uint32(55)
+	extentOffset0 := uint32(11)
+	extentLength0 := uint32(22)
+	extentIndex1 := uint32(66)
+	extentOffset1 := uint32(33)
+	extentLength1 := uint32(44)
+
+	writeIlocExtentVersion1OrVersion232bitBytes(&data, extentIndex0, extentOffset0, extentLength0)
+	writeIlocExtentVersion1OrVersion232bitBytes(&data, extentIndex1, extentOffset1, extentLength1)
+
+	b := bytes.NewBuffer(data)
+
+	// Parse.
+
+	factory := ilocBoxFactory{}
+
+	version := byte(1)
+
+	baseOffsetSize := IlocIntegerWidth(4)
+	offsetSize := IlocIntegerWidth(4)
+	lengthSize := IlocIntegerWidth(4)
+	indexSize := IlocIntegerWidth(4)
+
+	ii, err := factory.readItem(b, version, baseOffsetSize, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	if ii.itemId != uint32(itemId) {
+		t.Fatalf("itemId not correct.")
+	} else if ii.constructionMethod != constructionMethod {
+		t.Fatalf("constructionMethod not correct.")
+	} else if ii.dataReferenceIndex != dataReferenceIndex {
+		t.Fatalf("dataReferenceIndex not correct.")
+	} else if bmfcommon.DefaultEndianness.Uint32(ii.baseOffset) != baseOffset {
+		t.Fatalf("baseOffset not correct.")
+	} else if len(ii.extents) != 2 {
+		t.Fatalf("There should be no extents.")
+	}
+
+	ie1 := ii.extents[0]
+	ie2 := ii.extents[1]
+
+	if ie1.Index() != uint64(extentIndex0) {
+		t.Fatalf("First extent index not correct.")
+	} else if ie1.Offset() != uint64(extentOffset0) {
+		t.Fatalf("First extent offset not correct.")
+	} else if ie1.Length() != uint64(extentLength0) {
+		t.Fatalf("First extent length not correct.")
+	} else if ie2.Index() != uint64(extentIndex1) {
+		t.Fatalf("Second extent index not correct.")
+	} else if ie2.Offset() != uint64(extentOffset1) {
+		t.Fatalf("Second extent offset not correct.")
+	} else if ie2.Length() != uint64(extentLength1) {
+		t.Fatalf("Second extent length not correct.")
+	}
+}
+
+func TestIlocBoxFactory_readItem_Version2_WithExtents(t *testing.T) {
+	// Build stream.
+
+	var data []byte
+
+	itemId := uint32(11)
+	bmfcommon.PushBytes(&data, itemId)
+
+	constructionMethod := uint16(55)
+	bmfcommon.PushBytes(&data, constructionMethod)
+
+	dataReferenceIndex := uint16(22)
+	bmfcommon.PushBytes(&data, dataReferenceIndex)
+
+	baseOffset := uint32(0x1234)
+	bmfcommon.PushBytes(&data, baseOffset)
+
+	extentCount := uint16(2)
+	bmfcommon.PushBytes(&data, extentCount)
+
+	extentIndex0 := uint32(55)
+	extentOffset0 := uint32(11)
+	extentLength0 := uint32(22)
+	extentIndex1 := uint32(66)
+	extentOffset1 := uint32(33)
+	extentLength1 := uint32(44)
+
+	writeIlocExtentVersion1OrVersion232bitBytes(&data, extentIndex0, extentOffset0, extentLength0)
+	writeIlocExtentVersion1OrVersion232bitBytes(&data, extentIndex1, extentOffset1, extentLength1)
+
+	b := bytes.NewBuffer(data)
+
+	// Parse.
+
+	factory := ilocBoxFactory{}
+
+	version := byte(2)
+
+	baseOffsetSize := IlocIntegerWidth(4)
+	offsetSize := IlocIntegerWidth(4)
+	lengthSize := IlocIntegerWidth(4)
+	indexSize := IlocIntegerWidth(4)
+
+	ii, err := factory.readItem(b, version, baseOffsetSize, offsetSize, lengthSize, indexSize)
+	log.PanicIf(err)
+
+	if ii.itemId != uint32(itemId) {
+		t.Fatalf("itemId not correct.")
+	} else if ii.constructionMethod != constructionMethod {
+		t.Fatalf("constructionMethod not correct.")
+	} else if ii.dataReferenceIndex != dataReferenceIndex {
+		t.Fatalf("dataReferenceIndex not correct.")
+	} else if bmfcommon.DefaultEndianness.Uint32(ii.baseOffset) != baseOffset {
+		t.Fatalf("baseOffset not correct.")
+	} else if len(ii.extents) != 2 {
+		t.Fatalf("There should be no extents.")
+	}
+
+	ie1 := ii.extents[0]
+	ie2 := ii.extents[1]
+
+	if ie1.Index() != uint64(extentIndex0) {
+		t.Fatalf("First extent index not correct.")
+	} else if ie1.Offset() != uint64(extentOffset0) {
+		t.Fatalf("First extent offset not correct.")
+	} else if ie1.Length() != uint64(extentLength0) {
+		t.Fatalf("First extent length not correct.")
+	} else if ie2.Index() != uint64(extentIndex1) {
+		t.Fatalf("Second extent index not correct.")
+	} else if ie2.Offset() != uint64(extentOffset1) {
+		t.Fatalf("Second extent offset not correct.")
+	} else if ie2.Length() != uint64(extentLength1) {
+		t.Fatalf("Second extent length not correct.")
+	}
+}
+
+func TestIlocBoxFactory_New_Version0_NoItems(t *testing.T) {
+	// Build stream.
+
+	var data []byte
+
+	version := byte(0)
+	bmfcommon.PushBytes(&data, []byte{version, 0, 0, 0})
+
+	offsetSize := 4
+	lengthSize := 4
+	baseOffsetSize := 4
+
+	packedSize1 := (uint8(offsetSize) << 4) + uint8(lengthSize)
+	bmfcommon.PushBytes(&data, packedSize1)
+
+	packedSize2 := (uint8(baseOffsetSize) << 4)
+	bmfcommon.PushBytes(&data, packedSize2)
+
+	itemCount := uint16(0)
+	bmfcommon.PushBytes(&data, itemCount)
+
+	var b []byte
+	bmfcommon.PushBox(&b, "iloc", data)
+
+	// Parse.
+
+	sb := rifs.NewSeekableBufferWithBytes(b)
+
+	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+
+	box, err := file.ReadBaseBox(0)
+	log.PanicIf(err)
+
+	cb, _, err := ilocBoxFactory{}.New(box)
+	log.PanicIf(err)
+
+	iloc := cb.(*IlocBox)
+
+	if iloc.offsetSize != 4 {
+		t.Fatalf("offsetSize not correct.")
+	} else if iloc.lengthSize != 4 {
+		t.Fatalf("lengthSize not correct.")
+	} else if iloc.baseOffsetSize != 4 {
+		t.Fatalf("baseOffsetSize not correct.")
+	} else if iloc.indexSize != 0 {
+		t.Fatalf("indexSize not correct.")
+	} else if len(iloc.items) != 0 {
+		t.Fatalf("items should be empty.")
+	} else if len(iloc.itemsIndex) != 0 {
+		t.Fatalf("itemsIndex should be empty.")
+	}
+}
+
+func TestIlocBoxFactory_New_Version0_WithItems(t *testing.T) {
+	// Build stream.
+
+	var data []byte
+
+	version := byte(0)
+	bmfcommon.PushBytes(&data, []byte{version, 0, 0, 0})
+
+	offsetSize := 4
+	lengthSize := 4
+	baseOffsetSize := 4
+
+	packedSize1 := (uint8(offsetSize) << 4) + uint8(lengthSize)
+	bmfcommon.PushBytes(&data, packedSize1)
+
+	packedSize2 := (uint8(baseOffsetSize) << 4)
+	bmfcommon.PushBytes(&data, packedSize2)
+
+	itemCount := uint16(2)
+	bmfcommon.PushBytes(&data, itemCount)
+
+	// Add item 1.
+
+	// TODO(dustin): !! Test these values.
+	itemId := uint16(11)
+	dataReferenceIndex := uint16(22)
+	baseOffset := uint32(0x1234)
+
+	extents11 := []IlocExtent{
+		IlocExtent{extentOffset: 11, extentLength: 22},
+		IlocExtent{extentOffset: 33, extentLength: 44},
+	}
+
+	writeIlocItemVersion032bitBytes(&data, itemId, dataReferenceIndex, baseOffset, extents11)
+
+	// Add item 1.
+
+	// TODO(dustin): !! Test these values.
+	itemId = uint16(22)
+	dataReferenceIndex = uint16(33)
+	baseOffset = uint32(0x5678)
+
+	extents22 := []IlocExtent{
+		IlocExtent{extentOffset: 55, extentLength: 66},
+		IlocExtent{extentOffset: 77, extentLength: 88},
+	}
+
+	writeIlocItemVersion032bitBytes(&data, itemId, dataReferenceIndex, baseOffset, extents22)
+
+	// Push to stream.
+
+	var b []byte
+	bmfcommon.PushBox(&b, "iloc", data)
+
+	// Parse.
+
+	sb := rifs.NewSeekableBufferWithBytes(b)
+
+	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+
+	box, err := file.ReadBaseBox(0)
+	log.PanicIf(err)
+
+	cb, _, err := ilocBoxFactory{}.New(box)
+	log.PanicIf(err)
+
+	iloc := cb.(*IlocBox)
+
+	if iloc.offsetSize != 4 {
+		t.Fatalf("offsetSize not correct.")
+	} else if iloc.lengthSize != 4 {
+		t.Fatalf("lengthSize not correct.")
+	} else if iloc.baseOffsetSize != 4 {
+		t.Fatalf("baseOffsetSize not correct.")
+	} else if iloc.indexSize != 0 {
+		t.Fatalf("indexSize not correct.")
+	} else if len(iloc.items) != 2 {
+		t.Fatalf("items should be empty.")
+	} else if len(iloc.itemsIndex) != 2 {
+		t.Fatalf("itemsIndex should be empty.")
+	}
+
+	ii11, err := iloc.GetWithId(11)
+	log.PanicIf(err)
+
+	recoveredExtents11 := ii11.Extents()
+
+	if len(recoveredExtents11) != 2 {
+		t.Fatalf("Expected two extents in first item.")
+	} else if reflect.DeepEqual(recoveredExtents11, extents11) != true {
+		t.Fatalf("Two extents in first item are not correct.")
+	}
+
+	ii22, err := iloc.GetWithId(22)
+	log.PanicIf(err)
+
+	recoveredExtents22 := ii22.Extents()
+
+	if len(recoveredExtents22) != 2 {
+		t.Fatalf("Expected two extents in second item.")
+	} else if reflect.DeepEqual(recoveredExtents22, extents22) != true {
+		t.Fatalf("Two extents in second item are not correct.")
+	}
+}
+
+func TestIlocBoxFactory_New_Version1_WithItems(t *testing.T) {
+	// Build stream.
+
+	var data []byte
+
+	version := byte(1)
+	bmfcommon.PushBytes(&data, []byte{version, 0, 0, 0})
+
+	offsetSize := 4
+	lengthSize := 4
+	baseOffsetSize := 4
+	indexSize := 4
+
+	packedSize1 := (uint8(offsetSize) << 4) + uint8(lengthSize)
+	bmfcommon.PushBytes(&data, packedSize1)
+
+	packedSize2 := (uint8(baseOffsetSize) << 4) + uint8(indexSize)
+	bmfcommon.PushBytes(&data, packedSize2)
+
+	itemCount := uint16(2)
+	bmfcommon.PushBytes(&data, itemCount)
+
+	// Add item 1.
+
+	// TODO(dustin): !! Test these values.
+	itemId := uint16(11)
+	constructionMethod := uint16(33)
+	dataReferenceIndex := uint16(22)
+	baseOffset := uint32(0x1234)
+
+	extents11 := []IlocExtent{
+		IlocExtent{extentIndex: 55, extentOffset: 11, extentLength: 22},
+		IlocExtent{extentIndex: 66, extentOffset: 33, extentLength: 44},
+	}
+
+	writeIlocItemVersion132bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents11)
+
+	// Add item 1.
+
+	// TODO(dustin): !! Test these values.
+	itemId = uint16(22)
+	constructionMethod = uint16(33)
+	dataReferenceIndex = uint16(33)
+	baseOffset = uint32(0x5678)
+
+	extents22 := []IlocExtent{
+		IlocExtent{extentOffset: 55, extentLength: 66},
+		IlocExtent{extentOffset: 77, extentLength: 88},
+	}
+
+	writeIlocItemVersion132bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents22)
+
+	// Push to stream.
+
+	var b []byte
+	bmfcommon.PushBox(&b, "iloc", data)
+
+	// Parse.
+
+	sb := rifs.NewSeekableBufferWithBytes(b)
+
+	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+
+	box, err := file.ReadBaseBox(0)
+	log.PanicIf(err)
+
+	cb, _, err := ilocBoxFactory{}.New(box)
+	log.PanicIf(err)
+
+	iloc := cb.(*IlocBox)
+
+	if iloc.offsetSize != 4 {
+		t.Fatalf("offsetSize not correct.")
+	} else if iloc.lengthSize != 4 {
+		t.Fatalf("lengthSize not correct.")
+	} else if iloc.baseOffsetSize != 4 {
+		t.Fatalf("baseOffsetSize not correct.")
+	} else if iloc.indexSize != 4 {
+		t.Fatalf("indexSize not correct.")
+	} else if len(iloc.items) != 2 {
+		t.Fatalf("items should be empty.")
+	} else if len(iloc.itemsIndex) != 2 {
+		t.Fatalf("itemsIndex should be empty.")
+	}
+
+	ii11, err := iloc.GetWithId(11)
+	log.PanicIf(err)
+
+	recoveredExtents11 := ii11.Extents()
+
+	if len(recoveredExtents11) != 2 {
+		t.Fatalf("Expected two extents in first item.")
+	} else if reflect.DeepEqual(recoveredExtents11, extents11) != true {
+		t.Fatalf("Two extents in first item are not correct.")
+	}
+
+	ii22, err := iloc.GetWithId(22)
+	log.PanicIf(err)
+
+	recoveredExtents22 := ii22.Extents()
+
+	if len(recoveredExtents22) != 2 {
+		t.Fatalf("Expected two extents in second item.")
+	} else if reflect.DeepEqual(recoveredExtents22, extents22) != true {
+		t.Fatalf("Two extents in second item are not correct.")
+	}
+}
+
+func TestIlocBoxFactory_New_Version2_WithItems(t *testing.T) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+			log.PrintError(err)
+
+			t.Fatalf("Test failed.")
+		}
+	}()
+
+	// Build stream.
+
+	var data []byte
+
+	version := byte(2)
+	bmfcommon.PushBytes(&data, []byte{version, 0, 0, 0})
+
+	offsetSize := 4
+	lengthSize := 4
+	baseOffsetSize := 4
+	indexSize := 4
+
+	packedSize1 := (uint8(offsetSize) << 4) + uint8(lengthSize)
+	bmfcommon.PushBytes(&data, packedSize1)
+
+	packedSize2 := (uint8(baseOffsetSize) << 4) + uint8(indexSize)
+	bmfcommon.PushBytes(&data, packedSize2)
+
+	itemCount := uint32(2)
+	bmfcommon.PushBytes(&data, itemCount)
+
+	// Add item 1.
+
+	// TODO(dustin): !! Test these values.
+	itemId := uint32(11)
+	constructionMethod := uint16(33)
+	dataReferenceIndex := uint16(22)
+	baseOffset := uint32(0x1234)
+
+	extents11 := []IlocExtent{
+		IlocExtent{extentIndex: 55, extentOffset: 11, extentLength: 22},
+		IlocExtent{extentIndex: 66, extentOffset: 33, extentLength: 44},
+	}
+
+	writeIlocItemVersion232bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents11)
+
+	// Add item 1.
+
+	// TODO(dustin): !! Test these values.
+	itemId = uint32(22)
+	constructionMethod = uint16(33)
+	dataReferenceIndex = uint16(33)
+	baseOffset = uint32(0x5678)
+
+	extents22 := []IlocExtent{
+		IlocExtent{extentOffset: 55, extentLength: 66},
+		IlocExtent{extentOffset: 77, extentLength: 88},
+	}
+
+	writeIlocItemVersion232bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents22)
+
+	// Push to stream.
+
+	var b []byte
+	bmfcommon.PushBox(&b, "iloc", data)
+
+	// Parse.
+
+	sb := rifs.NewSeekableBufferWithBytes(b)
+
+	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+
+	box, err := file.ReadBaseBox(0)
+	log.PanicIf(err)
+
+	cb, _, err := ilocBoxFactory{}.New(box)
+	log.PanicIf(err)
+
+	iloc := cb.(*IlocBox)
+
+	if iloc.offsetSize != 4 {
+		t.Fatalf("offsetSize not correct.")
+	} else if iloc.lengthSize != 4 {
+		t.Fatalf("lengthSize not correct.")
+	} else if iloc.baseOffsetSize != 4 {
+		t.Fatalf("baseOffsetSize not correct.")
+	} else if iloc.indexSize != 4 {
+		t.Fatalf("indexSize not correct.")
+	} else if len(iloc.items) != 2 {
+		t.Fatalf("items should be empty.")
+	} else if len(iloc.itemsIndex) != 2 {
+		t.Fatalf("itemsIndex should be empty.")
+	}
+
+	ii11, err := iloc.GetWithId(11)
+	log.PanicIf(err)
+
+	recoveredExtents11 := ii11.Extents()
+
+	if len(recoveredExtents11) != 2 {
+		t.Fatalf("Expected two extents in first item.")
+	} else if reflect.DeepEqual(recoveredExtents11, extents11) != true {
+		t.Fatalf("Two extents in first item are not correct.")
+	}
+
+	ii22, err := iloc.GetWithId(22)
+	log.PanicIf(err)
+
+	recoveredExtents22 := ii22.Extents()
+
+	if len(recoveredExtents22) != 2 {
+		t.Fatalf("Expected two extents in second item.")
+	} else if reflect.DeepEqual(recoveredExtents22, extents22) != true {
+		t.Fatalf("Two extents in second item are not correct.")
+	}
+}
