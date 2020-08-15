@@ -138,7 +138,9 @@ func PushBox(buffer *[]byte, name string, data interface{}) {
 func PushBytes(buffer *[]byte, x interface{}) {
 	var encoded []byte
 
-	if u16, ok := x.(uint16); ok == true {
+	if u8, ok := x.(uint8); ok == true {
+		*buffer = append(*buffer, u8)
+	} else if u16, ok := x.(uint16); ok == true {
 		encoded = make([]byte, 2)
 
 		DefaultEndianness.PutUint16(

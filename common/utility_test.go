@@ -81,6 +81,36 @@ func TestPushBox_Multiple(t *testing.T) {
 	}
 }
 
+func TestPushBytes_8_ToEmpty(t *testing.T) {
+	value := uint8(0x12)
+
+	var b []byte
+	PushBytes(&b, value)
+
+	if len(b) != 1 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	if b[0] != value {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
+func TestPushBytes_8_ToNonEmpty(t *testing.T) {
+	value := uint8(0x12)
+
+	b := make([]byte, 4)
+	PushBytes(&b, value)
+
+	if len(b) != 5 {
+		t.Fatalf("Length not correct: (%d)", len(b))
+	}
+
+	if b[4] != value {
+		t.Fatalf("Bytes not correct: %x", b)
+	}
+}
+
 func TestPushBytes_16_ToEmpty(t *testing.T) {
 	value := uint16(1234)
 
