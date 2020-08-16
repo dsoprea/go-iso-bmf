@@ -43,7 +43,7 @@ func (pitmBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		}
 	}()
 
-	data, err := box.ReadBoxData()
+	data, err := box.Data()
 	log.PanicIf(err)
 
 	version := data[0]

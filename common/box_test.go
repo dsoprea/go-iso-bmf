@@ -187,7 +187,7 @@ func TestBox_ReadBoxes(t *testing.T) {
 	}
 }
 
-func TestBox_ReadBoxData(t *testing.T) {
+func TestBox_Data(t *testing.T) {
 	// Load stream.
 
 	ClearRegistrations()
@@ -213,7 +213,7 @@ func TestBox_ReadBoxData(t *testing.T) {
 	log.PanicIf(err)
 
 	entries1 := resource.LoadedBoxIndex["tb2 "]
-	recovered1, err := entries1[0].ReadBoxData()
+	recovered1, err := entries1[0].Data()
 	log.PanicIf(err)
 
 	if bytes.Equal(recovered1, data2) != true {
@@ -221,7 +221,7 @@ func TestBox_ReadBoxData(t *testing.T) {
 	}
 
 	entries2 := resource.LoadedBoxIndex["tb1 "]
-	recovered2, err := entries2[0].ReadBoxData()
+	recovered2, err := entries2[0].Data()
 	log.PanicIf(err)
 
 	if len(recovered2) != 0 {
@@ -229,14 +229,14 @@ func TestBox_ReadBoxData(t *testing.T) {
 	}
 }
 
-func TestBox_ReadBoxData_TooSmall(t *testing.T) {
+func TestBox_Data_TooSmall(t *testing.T) {
 	box := Box{
 		name:       "test",
 		size:       4,
 		headerSize: 8,
 	}
 
-	_, err := box.ReadBoxData()
+	_, err := box.Data()
 	if err == nil {
 		t.Fatalf("Expected error.")
 	} else if err.Error() != "box [test] total-size (4) is smaller then box header-size (8)" {

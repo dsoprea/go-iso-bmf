@@ -84,10 +84,8 @@ func ChildBoxes(bci BoxChildIndexer, name string) (boxes []CommonBox) {
 
 // CommonBox is one parsed box.
 type CommonBox interface {
-	// TODO(dustin): Rename to Data()
-
-	// ReadBoxData returns the bytes that were encapsulated in this box.
-	ReadBoxData() (data []byte, err error)
+	// Data returns the bytes that were encapsulated in this box.
+	Data() (data []byte, err error)
 
 	// Name returns the name of the box-type.
 	Name() string

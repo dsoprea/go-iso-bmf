@@ -127,8 +127,8 @@ func (box Box) ReadBoxes(startDisplace int, parent CommonBox) (boxes Boxes, err 
 	return boxes, err
 }
 
-// ReadBoxData reads the box data from an bmfcommon box.
-func (box Box) ReadBoxData() (data []byte, err error) {
+// Data reads the box data from an bmfcommon box.
+func (box Box) Data() (data []byte, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))

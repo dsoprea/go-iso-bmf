@@ -167,7 +167,7 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		}
 	}()
 
-	data, err := box.ReadBoxData()
+	data, err := box.Data()
 	log.PanicIf(err)
 
 	infe := &InfeBox{

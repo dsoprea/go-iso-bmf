@@ -59,7 +59,7 @@ func (fb *FtypBox) parse() (err error) {
 		}
 	}()
 
-	data, err := fb.ReadBoxData()
+	data, err := fb.Data()
 	log.PanicIf(err)
 
 	fb.majorBrand = string(data[0:4])

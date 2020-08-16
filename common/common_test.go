@@ -78,7 +78,7 @@ func (testBox2Factory) New(box Box) (cb CommonBox, childBoxSeriesOffset int, err
 		Box: box,
 	}
 
-	data, err := tb2.ReadBoxData()
+	data, err := tb2.Data()
 	log.PanicIf(err)
 
 	tb2.string1 = string(data[0:4])

@@ -124,7 +124,7 @@ func (iinfBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, skipBytes 
 		}
 	}()
 
-	data, err := box.ReadBoxData()
+	data, err := box.Data()
 	log.PanicIf(err)
 
 	version := data[0]

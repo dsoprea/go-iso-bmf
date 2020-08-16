@@ -58,7 +58,7 @@ func (b *MdhdBox) parse() (err error) {
 		}
 	}()
 
-	data, err := b.ReadBoxData()
+	data, err := b.Data()
 	log.PanicIf(err)
 
 	b.version = data[0]

@@ -89,7 +89,7 @@ func (b *TkhdBox) parse(timeScale uint64) (err error) {
 		}
 	}()
 
-	data, err := b.ReadBoxData()
+	data, err := b.Data()
 	log.PanicIf(err)
 
 	b.version = data[0]

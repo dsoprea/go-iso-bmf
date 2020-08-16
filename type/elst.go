@@ -65,7 +65,7 @@ func (b *ElstBox) parse() (err error) {
 		}
 	}()
 
-	data, err := b.ReadBoxData()
+	data, err := b.Data()
 	log.PanicIf(err)
 
 	b.version = bmfcommon.DefaultEndianness.Uint32(data[0:4])
