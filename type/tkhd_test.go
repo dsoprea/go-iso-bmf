@@ -103,8 +103,8 @@ func TestTkhdBox_Height(t *testing.T) {
 }
 
 func TestTkhdBox_InlineString(t *testing.T) {
-	timeScale := uint32(1)
-	duration := uint32(60)
+	timeScale := uint64(1)
+	duration := uint64(60)
 
 	sts := bmfcommon.NewStandard32TimeSupport(
 		0,
@@ -204,8 +204,8 @@ func TestTkhdBoxFactory_New(t *testing.T) {
 
 	// Register an MVHD so the TKHD factory can find it.
 
-	timeScale := uint32(60)
-	duration := uint32(60)
+	timeScale := uint64(60)
+	duration := uint64(60)
 
 	sts := bmfcommon.NewStandard32TimeSupport(
 		0,

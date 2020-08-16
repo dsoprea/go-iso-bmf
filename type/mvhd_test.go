@@ -85,8 +85,8 @@ func TestMvhdBox_Volume(t *testing.T) {
 }
 
 func TestMvhdBox_InlineString(t *testing.T) {
-	timeScale := uint32(1)
-	duration := uint32(60)
+	timeScale := uint64(1)
+	duration := uint64(60)
 
 	sts := bmfcommon.NewStandard32TimeSupport(
 		0,

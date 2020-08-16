@@ -23,14 +23,14 @@ type Standard32TimeSupport struct {
 
 	// scaledDuration is the duration expressed as a number of ticks (scaled
 	// per timeScale).
-	scaledDuration uint32
+	scaledDuration uint64
 
 	// timeScale is the number of ticks per second.
-	timeScale uint32
+	timeScale uint64
 }
 
 // NewStandard32TimeSupport returns a new Standard32TimeSupport struct.
-func NewStandard32TimeSupport(creationEpoch, modificationEpoch uint64, scaledDuration, timeScale uint32) Standard32TimeSupport {
+func NewStandard32TimeSupport(creationEpoch, modificationEpoch, scaledDuration, timeScale uint64) Standard32TimeSupport {
 	return Standard32TimeSupport{
 		creationEpoch:     creationEpoch,
 		modificationEpoch: modificationEpoch,
@@ -62,7 +62,7 @@ func (sts Standard32TimeSupport) HasModificationTime() bool {
 }
 
 // TimeScale returns the time-scale.
-func (sts Standard32TimeSupport) TimeScale() uint32 {
+func (sts Standard32TimeSupport) TimeScale() uint64 {
 	return sts.timeScale
 }
 
@@ -73,7 +73,7 @@ func (sts Standard32TimeSupport) HasDuration() bool {
 
 // ScaledDuration returns the duration in timescale units (divide this number by
 // the time-scale to get the number of seconds).
-func (sts Standard32TimeSupport) ScaledDuration() uint32 {
+func (sts Standard32TimeSupport) ScaledDuration() uint64 {
 	if sts.HasDuration() == false {
 		log.Panicf("duration not set (scaled-duration)")
 	}
@@ -131,7 +131,7 @@ func NowTime() time.Time {
 
 // GetDurationString Helper function to print a duration value in the form
 // H:MM:SS.MS .
-func GetDurationString(duration uint32, timescale uint32) string {
+func GetDurationString(duration uint64, timescale uint64) string {
 
 	durationSec := float64(duration) / float64(timescale)
 

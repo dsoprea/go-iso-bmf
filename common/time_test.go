@@ -8,8 +8,8 @@ import (
 func TestNewStandard32TimeSupport(t *testing.T) {
 	creationEpoch := uint64(1)
 	modificationEpoch := uint64(2)
-	scaledDuration := uint32(3)
-	timeScale := uint32(4)
+	scaledDuration := uint64(3)
+	timeScale := uint64(4)
 
 	sts := NewStandard32TimeSupport(creationEpoch, modificationEpoch, scaledDuration, timeScale)
 
@@ -121,7 +121,7 @@ func TestStandard32TimeSupport_HasDuration_False(t *testing.T) {
 }
 
 func TestStandard32TimeSupport_HasDuration_True(t *testing.T) {
-	timeScale := uint32(60)
+	timeScale := uint64(60)
 
 	sts := Standard32TimeSupport{
 		timeScale:      timeScale,
@@ -134,7 +134,7 @@ func TestStandard32TimeSupport_HasDuration_True(t *testing.T) {
 }
 
 func TestStandard32TimeSupport_Duration(t *testing.T) {
-	timeScale := uint32(60)
+	timeScale := uint64(60)
 
 	sts := Standard32TimeSupport{
 		timeScale:      timeScale,
@@ -151,7 +151,7 @@ func TestStandard32TimeSupport_InlineString(t *testing.T) {
 	creationEpoch := uint64(1)
 	modificationEpoch := creationEpoch + 1
 
-	timeScale := uint32(60)
+	timeScale := uint64(60)
 
 	sts := Standard32TimeSupport{
 		creationEpoch:     creationEpoch,

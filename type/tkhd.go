@@ -78,7 +78,7 @@ func (tb *TkhdBox) InlineString() string {
 		tb.Standard32TimeSupport.InlineString())
 }
 
-func (b *TkhdBox) parse(timeScale uint32) (err error) {
+func (b *TkhdBox) parse(timeScale uint64) (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -126,8 +126,8 @@ func (b *TkhdBox) parse(timeScale uint32) (err error) {
 	b.Standard32TimeSupport = bmfcommon.NewStandard32TimeSupport(
 		uint64(creationEpoch),
 		uint64(modificationEpoch),
-		duration,
-		timeScale)
+		uint64(duration),
+		uint64(timeScale))
 
 	return nil
 }

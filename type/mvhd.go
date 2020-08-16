@@ -120,8 +120,8 @@ func (b *MvhdBox) parse() (err error) {
 	b.Standard32TimeSupport = bmfcommon.NewStandard32TimeSupport(
 		creationEpoch,
 		modificationEpoch,
-		uint32(duration),
-		uint32(timeScale))
+		duration,
+		timeScale)
 
 	return nil
 }

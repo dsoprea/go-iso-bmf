@@ -126,7 +126,7 @@ func TestMdhdBox_HasDuration_False(t *testing.T) {
 }
 
 func TestMdhdBox_HasDuration_True(t *testing.T) {
-	timeScale := uint32(60)
+	timeScale := uint64(60)
 
 	mb := MdhdBox{
 		Standard32TimeSupport: bmfcommon.NewStandard32TimeSupport(0, 0, timeScale*10, timeScale),
@@ -138,7 +138,7 @@ func TestMdhdBox_HasDuration_True(t *testing.T) {
 }
 
 func TestMdhdBox_Duration(t *testing.T) {
-	timeScale := uint32(60)
+	timeScale := uint64(60)
 
 	mb := MdhdBox{
 		Standard32TimeSupport: bmfcommon.NewStandard32TimeSupport(0, 0, timeScale*10, timeScale),
@@ -178,7 +178,7 @@ func TestMdhdBox_String(t *testing.T) {
 
 	epoch := uint64(3677725917)
 
-	timeScale := uint32(60)
+	timeScale := uint64(60)
 
 	sts := bmfcommon.NewStandard32TimeSupport(
 		epoch,
@@ -206,7 +206,7 @@ func TestMdhdBox_InlineString(t *testing.T) {
 
 	epoch := uint64(3677725917)
 
-	timeScale := uint32(60)
+	timeScale := uint64(60)
 
 	mb := MdhdBox{
 		Box:                   box,

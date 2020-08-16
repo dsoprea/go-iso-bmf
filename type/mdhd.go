@@ -74,8 +74,8 @@ func (b *MdhdBox) parse() (err error) {
 	b.Standard32TimeSupport = bmfcommon.NewStandard32TimeSupport(
 		uint64(creationEpoch),
 		uint64(modificationEpoch),
-		duration,
-		timeScale)
+		uint64(duration),
+		uint64(timeScale))
 
 	b.language = bmfcommon.DefaultEndianness.Uint16(data[20:22])
 
