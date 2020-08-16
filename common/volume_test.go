@@ -26,11 +26,9 @@ func TestVolume_IsFullVolume(t *testing.T) {
 }
 
 func TestVolume_String_Fractional(t *testing.T) {
-	// NOTE(dustin): !! We don't know how to write this test, but we put this here to at least have something for the coverage. The "full volume" value is 0x0100, which equates to a rational of (1/0), and the "off" value is (0/0). So, assuming that a fractional value is between the two, we're not quite sure what to do.
+	v := Volume(0x1234)
 
-	v := Volume(uint16(0x2550))
-
-	if v.String() != "37/80 (0.5%)" {
+	if v.String() != "0.3%" {
 		t.Fatalf("String() was not correct: [%s]", v.String())
 	}
 }

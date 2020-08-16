@@ -19,17 +19,11 @@ func (volume Volume) IsFullVolume() bool {
 
 // String returns a human representation of the volume.
 func (volume Volume) String() string {
-
-	// TODO(dustin): Add test once we better understand how to represent a fractional value.
-
 	if volume.IsFullVolume() == true {
 		return "FULL"
 	} else if volume == 0 {
 		return "OFF"
 	}
 
-	fp16 := volume.Decode()
-	numerator, denominator := fp16.Rational()
-
-	return fmt.Sprintf("%d/%d (%.1f%%)", numerator, denominator, fp16.Float())
+	return fmt.Sprintf("%.1f%%", volume.Decode().Float())
 }

@@ -1,6 +1,7 @@
 package bmftype
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/dsoprea/go-logging"
@@ -8,6 +9,37 @@ import (
 
 	"github.com/dsoprea/go-iso-bmf/common"
 )
+
+func TestMoovBox_IsFragmented_True(t *testing.T) {
+	moov := &MoovBox{
+		isFragmented: true,
+	}
+
+	if moov.IsFragmented() != true {
+		t.Fatalf("IsFragmented() not correct.")
+	}
+}
+
+func TestMoovBox_IsFragmented_False(t *testing.T) {
+	moov := &MoovBox{
+		isFragmented: false,
+	}
+
+	if moov.IsFragmented() != false {
+		t.Fatalf("IsFragmented() not correct.")
+	}
+}
+
+func TestMoovBox_SetLoadedBoxIndex(t *testing.T) {
+	lbi := make(bmfcommon.LoadedBoxIndex)
+
+	moov := new(MoovBox)
+	moov.SetLoadedBoxIndex(lbi)
+
+	if reflect.DeepEqual(moov.LoadedBoxIndex, lbi) != true {
+		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
+	}
+}
 
 func TestMoovBoxFactory_Name(t *testing.T) {
 	name := moovBoxFactory{}.Name()

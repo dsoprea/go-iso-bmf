@@ -14,30 +14,21 @@ type MvhdRate uint32
 
 // Decode returns the deconstructed value.
 func (rate MvhdRate) Decode() bmfcommon.FixedPoint32 {
-
-	// TODO(dustin): Add test
-
 	return bmfcommon.Uint32ToFixedPoint32(uint32(rate), 16, 16)
 }
 
 // IsFullSpeed returns true if playback is running at normal speed.
 func (rate MvhdRate) IsFullSpeed() bool {
-
-	// TODO(dustin): Add test
-
 	return rate == 0x00010000
 }
 
 // String returns a human representation of the volume.
 func (rate MvhdRate) String() string {
-
-	// TODO(dustin): Add test
-
 	if rate.IsFullSpeed() == true {
 		return "NORMAL"
 	}
 
-	return fmt.Sprintf("%.5f", rate.Decode().Float())
+	return fmt.Sprintf("%.1f%%", rate.Decode().Float())
 }
 
 // MvhdBox is the "Movie Header" box.
@@ -98,8 +89,6 @@ func (b *MvhdBox) parse() (err error) {
 	if b.version != 0 {
 		log.Panicf("mvhd: only version (0) is supported")
 	}
-
-	// TODO(dustin): !! Note that there is a discrepancy of three bytes here. The first four bytes are probably, technically, the flags as in the other boxes (with the version being the first byte, also as in the other boxes).
 
 	creationEpoch := bmfcommon.DefaultEndianness.Uint32(data[4:8])
 	modificationEpoch := bmfcommon.DefaultEndianness.Uint32(data[8:12])

@@ -15,22 +15,16 @@ type PitmBox struct {
 	itemId uint32
 }
 
+// ItemId returns the primary item ID.
+func (pitm *PitmBox) ItemId() uint32 {
+	return pitm.itemId
+}
+
 // InlineString returns an undecorated string of field names and values.
 func (pitm *PitmBox) InlineString() string {
-
-	// TODO(dustin): Add test
-
 	return fmt.Sprintf(
 		"%s ID=(%d)",
 		pitm.Box.InlineString(), pitm.itemId)
-}
-
-// ItemId returns the primary item ID.
-func (pitm *PitmBox) ItemId() uint32 {
-
-	// TODO(dustin): Add test
-
-	return pitm.itemId
 }
 
 type pitmBoxFactory struct {
@@ -38,9 +32,6 @@ type pitmBoxFactory struct {
 
 // Name returns the name of the type.
 func (pitmBoxFactory) Name() string {
-
-	// TODO(dustin): Add test
-
 	return "pitm"
 }
 
@@ -52,8 +43,6 @@ func (pitmBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		}
 	}()
 
-	// TODO(dustin): Add test
-
 	data, err := box.ReadBoxData()
 	log.PanicIf(err)
 
@@ -64,8 +53,10 @@ func (pitmBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 	if version == 0 {
 		itemId16 := bmfcommon.DefaultEndianness.Uint16(data[4:6])
 		itemId = uint32(itemId16)
-	} else {
+	} else if version == 1 {
 		itemId = bmfcommon.DefaultEndianness.Uint32(data[4:8])
+	} else {
+		log.Panicf("version > 1 of PITM not supported")
 	}
 
 	pitm := &PitmBox{

@@ -14,7 +14,6 @@ import (
 type MoovBox struct {
 	bmfcommon.Box
 
-	// TODO(dustin): Add test for this.
 	isFragmented bool
 
 	// LoadedBoxIndex contains this box's children.
@@ -30,9 +29,6 @@ func (mv MoovBox) IsFragmented() bool {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (moov *MoovBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	moov.LoadedBoxIndex = lbi
 }
 

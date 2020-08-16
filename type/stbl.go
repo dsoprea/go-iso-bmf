@@ -18,9 +18,6 @@ type StblBox struct {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (stbl *StblBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	stbl.LoadedBoxIndex = lbi
 }
 

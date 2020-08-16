@@ -17,10 +17,12 @@ type StsdBox struct {
 	bmfcommon.LoadedBoxIndex
 }
 
+// Version() returns the version of the record.
 func (sb *StsdBox) Version() byte {
 	return sb.version
 }
 
+// Flags returns the flags.
 func (sb *StsdBox) Flags() uint32 {
 	return sb.flags
 }
@@ -45,9 +47,6 @@ func (b *StsdBox) parse() (err error) {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (stsd *StsdBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	stsd.LoadedBoxIndex = lbi
 }
 

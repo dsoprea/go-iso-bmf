@@ -25,9 +25,6 @@ type TrakBox struct {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (trak *TrakBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	trak.LoadedBoxIndex = lbi
 }
 
@@ -46,6 +43,8 @@ func (trakBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
+
+	// TODO(dustin): Return to this once we have a sample.
 
 	trakBox := &TrakBox{
 		Box: box,

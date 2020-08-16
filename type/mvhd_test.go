@@ -10,6 +10,40 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
+func TestMvhdRate_Decode(t *testing.T) {
+	mr := MvhdRate(0x12345678)
+	fp32 := mr.Decode()
+
+	n, d := fp32.Rational()
+
+	if n != 0x1234 {
+		t.Fatalf("Numerator not correct.")
+	} else if d != 0x5678 {
+		t.Fatalf("Denominator not correct.")
+	}
+}
+
+func TestMvhdRate_String(t *testing.T) {
+	mr := MvhdRate(0x12345678)
+	if mr.String() != "0.2%" {
+		t.Fatalf("String() not correct: [%s]", mr.String())
+	}
+}
+
+func TestMvhdRate_IsFullSpeed_False(t *testing.T) {
+	mr := MvhdRate(0x12345678)
+	if mr.IsFullSpeed() != false {
+		t.Fatalf("IsFullSpeed() should be false.")
+	}
+}
+
+func TestMvhdRate_IsFullSpeed_True(t *testing.T) {
+	mr := MvhdRate(0x00010000)
+	if mr.IsFullSpeed() != true {
+		t.Fatalf("IsFullSpeed() should be true.")
+	}
+}
+
 func TestMvhdBox_Flags(t *testing.T) {
 	mb := MvhdBox{
 		flags: 11,

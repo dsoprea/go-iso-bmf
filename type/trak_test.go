@@ -1,6 +1,7 @@
 package bmftype
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/dsoprea/go-logging"
@@ -8,6 +9,17 @@ import (
 
 	"github.com/dsoprea/go-iso-bmf/common"
 )
+
+func TestTrakBox_SetLoadedBoxIndex(t *testing.T) {
+	lbi := make(bmfcommon.LoadedBoxIndex)
+
+	trak := new(TrakBox)
+	trak.SetLoadedBoxIndex(lbi)
+
+	if reflect.DeepEqual(trak.LoadedBoxIndex, lbi) != true {
+		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
+	}
+}
 
 func TestTrakBoxFactory_Name(t *testing.T) {
 	name := trakBoxFactory{}.Name()

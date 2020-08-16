@@ -21,9 +21,6 @@ type MinfBox struct {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (minf *MinfBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	minf.LoadedBoxIndex = lbi
 }
 

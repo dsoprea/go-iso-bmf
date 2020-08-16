@@ -16,18 +16,22 @@ type VmhdBox struct {
 	opColor      uint16
 }
 
+// Version returns the version of the record.
 func (vb *VmhdBox) Version() byte {
 	return vb.version
 }
 
+// Flags returns the flags.
 func (vb *VmhdBox) Flags() uint32 {
 	return vb.flags
 }
 
+// GraphicsMode returns the graphics mode.
 func (vb *VmhdBox) GraphicsMode() uint16 {
 	return vb.graphicsMode
 }
 
+// OpColor returns the op color.
 func (vb *VmhdBox) OpColor() uint16 {
 	return vb.opColor
 }

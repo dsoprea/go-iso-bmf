@@ -16,18 +16,22 @@ type SttsBox struct {
 	sampleDeltas []uint32
 }
 
+// Version returns the version of the record.
 func (sb *SttsBox) Version() byte {
 	return sb.version
 }
 
+// Flags returns the flags.
 func (sb *SttsBox) Flags() uint32 {
 	return sb.flags
 }
 
+// SampleCounts returns the samples counts.
 func (sb *SttsBox) SampleCounts() []uint32 {
 	return sb.sampleCounts
 }
 
+// SampleDeltas returns the sample deltas.
 func (sb *SttsBox) SampleDeltas() []uint32 {
 	return sb.sampleDeltas
 }

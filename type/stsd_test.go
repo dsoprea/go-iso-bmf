@@ -1,6 +1,7 @@
 package bmftype
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/dsoprea/go-logging"
@@ -8,6 +9,17 @@ import (
 
 	"github.com/dsoprea/go-iso-bmf/common"
 )
+
+func TestStsdBox_SetLoadedBoxIndex(t *testing.T) {
+	lbi := make(bmfcommon.LoadedBoxIndex)
+
+	stsd := new(StsdBox)
+	stsd.SetLoadedBoxIndex(lbi)
+
+	if reflect.DeepEqual(stsd.LoadedBoxIndex, lbi) != true {
+		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
+	}
+}
 
 func TestStsdBox_Version(t *testing.T) {
 	sb := StsdBox{

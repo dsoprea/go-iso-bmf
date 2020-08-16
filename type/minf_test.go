@@ -1,6 +1,7 @@
 package bmftype
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/dsoprea/go-logging"
@@ -8,6 +9,17 @@ import (
 
 	"github.com/dsoprea/go-iso-bmf/common"
 )
+
+func TestMinfBox_SetLoadedBoxIndex(t *testing.T) {
+	lbi := make(bmfcommon.LoadedBoxIndex)
+
+	minf := new(MinfBox)
+	minf.SetLoadedBoxIndex(lbi)
+
+	if reflect.DeepEqual(minf.LoadedBoxIndex, lbi) != true {
+		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
+	}
+}
 
 func TestMinfBoxFactory_Name(t *testing.T) {
 	name := minfBoxFactory{}.Name()
