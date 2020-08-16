@@ -61,8 +61,6 @@ func (b *MdhdBox) parse() (err error) {
 	data, err := b.ReadBoxData()
 	log.PanicIf(err)
 
-	// TODO(dustin): In the past, we've made some changes regarding the overlap between the "version" byte and whatever comes behind it. However, this box decodes incorrect in several respects if we "fix" it.
-
 	b.version = data[0]
 	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])
 

@@ -10,9 +10,6 @@ import (
 
 // DumpBytes prints a list of hex-encoded bytes.
 func DumpBytes(data []byte) {
-
-	// TODO(dustin): Add test
-
 	fmt.Printf("DUMP:\n")
 	mod := 20
 	gappedat := 5

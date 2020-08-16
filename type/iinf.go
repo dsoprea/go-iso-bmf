@@ -54,7 +54,7 @@ func (iinf *IinfBox) loadItem(infe *InfeBox) {
 	itemId := infe.ItemId()
 
 	if _, found := iinf.itemsById[itemId]; found == true {
-		log.Panicf("item ID (%d) occurs more than once", itemId)
+		log.Panicf("item with ID (%d) occurs more than once", itemId)
 	} else {
 		iinf.itemsById[itemId] = infe
 	}

@@ -71,7 +71,87 @@ func TestIinfBox_loadItem(t *testing.T) {
 	}
 }
 
-func TestIinfBox_GetItemWithId(t *testing.T) {
+func TestIinfBox_loadItem_DuplicateId(t *testing.T) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+
+			if err.Error() != "item with ID (11) occurs more than once" {
+				log.Panic(err)
+			}
+		} else {
+			t.Fatalf("Expected error.")
+		}
+	}()
+
+	iinf := newIinfBox(bmfcommon.Box{})
+
+	// Add first item.
+
+	iit1 := InfeItemTypeFromBytes([4]byte{'a', 'b', 'c', 'd'})
+
+	infe1 := &InfeBox{
+		itemId:   11,
+		itemType: iit1,
+		itemName: "abc",
+	}
+
+	iinf.loadItem(infe1)
+
+	// Add second item.
+
+	iit2 := InfeItemTypeFromBytes([4]byte{'e', 'f', 'g', 'h'})
+
+	infe2 := &InfeBox{
+		itemId:   11,
+		itemType: iit2,
+		itemName: "def",
+	}
+
+	iinf.loadItem(infe2)
+}
+
+func TestIinfBox_loadItem_DuplicateName(t *testing.T) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err := errRaw.(error)
+
+			if err.Error() != "item with name [abc] occurs more than once" {
+				log.Panic(err)
+			}
+		} else {
+			t.Fatalf("Expected error.")
+		}
+	}()
+
+	iinf := newIinfBox(bmfcommon.Box{})
+
+	// Add first item.
+
+	iit1 := InfeItemTypeFromBytes([4]byte{'a', 'b', 'c', 'd'})
+
+	infe1 := &InfeBox{
+		itemId:   11,
+		itemType: iit1,
+		itemName: "abc",
+	}
+
+	iinf.loadItem(infe1)
+
+	// Add second item.
+
+	iit2 := InfeItemTypeFromBytes([4]byte{'e', 'f', 'g', 'h'})
+
+	infe2 := &InfeBox{
+		itemId:   22,
+		itemType: iit2,
+		itemName: "abc",
+	}
+
+	iinf.loadItem(infe2)
+}
+
+func TestIinfBox_GetItemWithId_Hit(t *testing.T) {
 	iinf := newIinfBox(bmfcommon.Box{})
 
 	// Add first item.
@@ -112,6 +192,29 @@ func TestIinfBox_GetItemWithId(t *testing.T) {
 
 	if recoveredInfe2 != infe2 {
 		t.Fatalf("Second item not correct.")
+	}
+}
+
+func TestIinfBox_GetItemWithId_Miss(t *testing.T) {
+	iinf := newIinfBox(bmfcommon.Box{})
+
+	// Add first item.
+
+	iit1 := InfeItemTypeFromBytes([4]byte{'a', 'b', 'c', 'd'})
+
+	infe1 := &InfeBox{
+		itemId:   11,
+		itemType: iit1,
+		itemName: "abc",
+	}
+
+	iinf.loadItem(infe1)
+
+	_, err := iinf.GetItemWithId(22)
+	if err == nil {
+		t.Fatalf("Expected error.")
+	} else if log.Is(err, ErrNoItemsFound) != true {
+		log.Panic(err)
 	}
 }
 
@@ -156,6 +259,29 @@ func TestIinfBox_GetItemWithName(t *testing.T) {
 
 	if recoveredInfe2 != infe2 {
 		t.Fatalf("Second item not correct.")
+	}
+}
+
+func TestIinfBox_GetItemWithName_Miss(t *testing.T) {
+	iinf := newIinfBox(bmfcommon.Box{})
+
+	// Add first item.
+
+	iit1 := InfeItemTypeFromBytes([4]byte{'a', 'b', 'c', 'd'})
+
+	infe1 := &InfeBox{
+		itemId:   11,
+		itemType: iit1,
+		itemName: "abc",
+	}
+
+	iinf.loadItem(infe1)
+
+	_, err := iinf.GetItemWithName("def")
+	if err == nil {
+		t.Fatalf("Expected error.")
+	} else if log.Is(err, ErrNoItemsFound) != true {
+		log.Panic(err)
 	}
 }
 
@@ -215,10 +341,46 @@ func TestIinfBoxFactory_New_Version0(t *testing.T) {
 	var data []byte
 
 	// Version.
-	bmfcommon.PushBytes(&data, []byte{0, 0, 0, 0})
+	version := uint8(0)
+	bmfcommon.PushBytes(&data, []byte{version, 0, 0, 0})
 
 	// Entry count.
 	bmfcommon.PushBytes(&data, uint16(11))
+
+	var b []byte
+	bmfcommon.PushBox(&b, "iinf", data)
+
+	// Parse.
+
+	sb := rifs.NewSeekableBufferWithBytes(b)
+
+	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	log.PanicIf(err)
+
+	box, err := file.ReadBaseBox(0)
+	log.PanicIf(err)
+
+	cb, _, err := iinfBoxFactory{}.New(box)
+	log.PanicIf(err)
+
+	iinf := cb.(*IinfBox)
+
+	if iinf.entryCount != 11 {
+		t.Fatalf("entryCount not correct.")
+	}
+}
+
+func TestIinfBoxFactory_New_Version1(t *testing.T) {
+	// Load
+
+	var data []byte
+
+	// Version.
+	version := uint8(1)
+	bmfcommon.PushBytes(&data, []byte{version, 0, 0, 0})
+
+	// Entry count.
+	bmfcommon.PushBytes(&data, uint32(11))
 
 	var b []byte
 	bmfcommon.PushBox(&b, "iinf", data)

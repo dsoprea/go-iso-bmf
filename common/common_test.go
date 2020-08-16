@@ -100,9 +100,6 @@ type testBox3 struct {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (tb3 *testBox3) SetLoadedBoxIndex(lbi LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	tb3.LoadedBoxIndex = lbi
 }
 
