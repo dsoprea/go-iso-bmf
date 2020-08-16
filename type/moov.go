@@ -64,6 +64,9 @@ func (moovBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		Box: box,
 	}
 
+	err = moovBox.parse()
+	log.PanicIf(err)
+
 	return moovBox, 0, nil
 }
 
