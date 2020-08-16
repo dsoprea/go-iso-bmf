@@ -1,7 +1,11 @@
 package bmftype
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+
+	"encoding/binary"
 
 	"github.com/dsoprea/go-logging"
 
@@ -89,45 +93,113 @@ func (b *TkhdBox) parse(timeScale uint64) (err error) {
 	log.PanicIf(err)
 
 	b.version = data[0]
+	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])
 
-	// TODO(dustin): Version 1 is 64-bit. Come back to this.
-	if b.version > 0 {
+	s := bytes.NewBuffer(data[4:])
+
+	var creationEpoch uint64
+	var modificationEpoch uint64
+	var duration uint64
+
+	if b.version == 0 {
+		var creationEpoch32 uint32
+
+		err := binary.Read(s, bmfcommon.DefaultEndianness, &creationEpoch32)
+		log.PanicIf(err)
+
+		creationEpoch = uint64(creationEpoch32)
+
+		var modificationEpoch32 uint32
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &modificationEpoch32)
+		log.PanicIf(err)
+
+		modificationEpoch = uint64(modificationEpoch32)
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &b.trackId)
+		log.PanicIf(err)
+
+		var reserved4 uint32
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &reserved4)
+		log.PanicIf(err)
+
+		var duration32 uint32
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &duration32)
+		log.PanicIf(err)
+
+		duration = uint64(duration32)
+	} else if b.version == 1 {
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &creationEpoch)
+		log.PanicIf(err)
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &modificationEpoch)
+		log.PanicIf(err)
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &b.trackId)
+		log.PanicIf(err)
+
+		var reserved4 uint32
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &reserved4)
+		log.PanicIf(err)
+
+		err = binary.Read(s, bmfcommon.DefaultEndianness, &duration)
+		log.PanicIf(err)
+	} else {
 		log.Panicf("tkhd: version (%d) not supported", b.version)
 	}
 
-	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])
+	var reserved8 uint64
 
-	creationEpoch := bmfcommon.DefaultEndianness.Uint32(data[4:8])
-	modificationEpoch := bmfcommon.DefaultEndianness.Uint32(data[8:12])
+	err = binary.Read(s, bmfcommon.DefaultEndianness, &reserved8)
+	log.PanicIf(err)
 
-	b.trackId = bmfcommon.DefaultEndianness.Uint32(data[12:16])
+	err = binary.Read(s, bmfcommon.DefaultEndianness, &b.layer)
+	log.PanicIf(err)
 
-	// There are four reserved bytes here.
+	err = binary.Read(s, bmfcommon.DefaultEndianness, &b.alternateGroup)
+	log.PanicIf(err)
 
-	duration := bmfcommon.DefaultEndianness.Uint32(data[20:24])
+	err = binary.Read(s, bmfcommon.DefaultEndianness, &b.volume)
+	log.PanicIf(err)
 
-	b.layer = bmfcommon.DefaultEndianness.Uint16(data[32:34])
-	b.alternateGroup = bmfcommon.DefaultEndianness.Uint16(data[34:36])
-	b.volume = bmfcommon.Volume(bmfcommon.DefaultEndianness.Uint16(data[36:38]))
-	b.matrix = data[40:76]
+	var reserved2 uint16
 
-	widthRaw := bmfcommon.DefaultEndianness.Uint32(data[76:80])
+	err = binary.Read(s, bmfcommon.DefaultEndianness, &reserved2)
+	log.PanicIf(err)
+
+	b.matrix = make([]byte, 36)
+
+	_, err = io.ReadFull(s, b.matrix)
+	log.PanicIf(err)
+
+	var widthRaw uint32
+
+	err = binary.Read(s, bmfcommon.DefaultEndianness, &widthRaw)
+	log.PanicIf(err)
+
 	widthFp32 := bmfcommon.Uint32ToFixedPoint32(widthRaw, 16, 16)
 
 	// The numerator is the width. The denominator is often (always?) zero.
 	b.width, _ = widthFp32.Rational()
 
-	heightRaw := bmfcommon.DefaultEndianness.Uint32(data[80:84])
+	var heightRaw uint32
+
+	err = binary.Read(s, bmfcommon.DefaultEndianness, &heightRaw)
+	log.PanicIf(err)
+
 	heightFp32 := bmfcommon.Uint32ToFixedPoint32(heightRaw, 16, 16)
 
 	// The numerator is the width. The denominator is often (always?) zero.
 	b.height, _ = heightFp32.Rational()
 
 	b.Standard32TimeSupport = bmfcommon.NewStandard32TimeSupport(
-		uint64(creationEpoch),
-		uint64(modificationEpoch),
-		uint64(duration),
-		uint64(timeScale))
+		creationEpoch,
+		modificationEpoch,
+		duration,
+		timeScale)
 
 	return nil
 }
