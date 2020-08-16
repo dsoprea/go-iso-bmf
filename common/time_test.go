@@ -6,8 +6,8 @@ import (
 )
 
 func TestNewStandard32TimeSupport(t *testing.T) {
-	creationEpoch := uint32(1)
-	modificationEpoch := uint32(2)
+	creationEpoch := uint64(1)
+	modificationEpoch := uint64(2)
 	scaledDuration := uint32(3)
 	timeScale := uint32(4)
 
@@ -148,7 +148,7 @@ func TestStandard32TimeSupport_Duration(t *testing.T) {
 }
 
 func TestStandard32TimeSupport_InlineString(t *testing.T) {
-	creationEpoch := uint32(1)
+	creationEpoch := uint64(1)
 	modificationEpoch := creationEpoch + 1
 
 	timeScale := uint32(60)
@@ -182,7 +182,7 @@ func TestTimeToEpoch(t *testing.T) {
 func TestEpochToTime(t *testing.T) {
 	originalTime := time.Unix(1, 0).UTC()
 
-	epoch := uint32(2082844801)
+	epoch := uint64(2082844801)
 
 	recovered := EpochToTime(epoch)
 	if recovered != originalTime {

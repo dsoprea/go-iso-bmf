@@ -16,10 +16,10 @@ var (
 // functionality.
 type Standard32TimeSupport struct {
 	// creationEpoch is the creation time expressed as an MP4 epoch.
-	creationEpoch uint32
+	creationEpoch uint64
 
 	// modificationEpoch is the modification time expressed as an MP4 epoch.
-	modificationEpoch uint32
+	modificationEpoch uint64
 
 	// scaledDuration is the duration expressed as a number of ticks (scaled
 	// per timeScale).
@@ -30,7 +30,7 @@ type Standard32TimeSupport struct {
 }
 
 // NewStandard32TimeSupport returns a new Standard32TimeSupport struct.
-func NewStandard32TimeSupport(creationEpoch, modificationEpoch, scaledDuration, timeScale uint32) Standard32TimeSupport {
+func NewStandard32TimeSupport(creationEpoch, modificationEpoch uint64, scaledDuration, timeScale uint32) Standard32TimeSupport {
 	return Standard32TimeSupport{
 		creationEpoch:     creationEpoch,
 		modificationEpoch: modificationEpoch,
@@ -110,14 +110,14 @@ func (sts Standard32TimeSupport) InlineString() string {
 }
 
 // TimeToEpoch returns the number of seconds since the MP4 epoch.
-func TimeToEpoch(t time.Time) uint32 {
+func TimeToEpoch(t time.Time) uint64 {
 	d := t.Sub(epochTime)
 
-	return uint32(math.Floor(float64(d.Seconds())))
+	return uint64(math.Floor(float64(d.Seconds())))
 }
 
 // EpochToTime returns a the given MP4 epoch as a `time.Time`.
-func EpochToTime(epoch uint32) time.Time {
+func EpochToTime(epoch uint64) time.Time {
 	duration := time.Second * time.Duration(epoch)
 	t := epochTime.Add(duration)
 

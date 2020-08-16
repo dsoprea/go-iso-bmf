@@ -124,8 +124,8 @@ func (b *TkhdBox) parse(timeScale uint32) (err error) {
 	b.height, _ = heightFp32.Rational()
 
 	b.Standard32TimeSupport = bmfcommon.NewStandard32TimeSupport(
-		creationEpoch,
-		modificationEpoch,
+		uint64(creationEpoch),
+		uint64(modificationEpoch),
 		duration,
 		timeScale)
 

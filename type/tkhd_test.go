@@ -151,10 +151,11 @@ func TestTkhdBoxFactory_New(t *testing.T) {
 	now := bmfcommon.NowTime()
 
 	creationEpoch := bmfcommon.TimeToEpoch(now)
-	bmfcommon.PushBytes(&data, creationEpoch)
+	creationEpoch32 := uint32(creationEpoch)
+	bmfcommon.PushBytes(&data, creationEpoch32)
 
-	modificationEpoch := creationEpoch + 1
-	bmfcommon.PushBytes(&data, modificationEpoch)
+	modificationEpoch32 := creationEpoch32 + 1
+	bmfcommon.PushBytes(&data, modificationEpoch32)
 
 	// trackId
 	bmfcommon.PushBytes(&data, uint32(0x11))

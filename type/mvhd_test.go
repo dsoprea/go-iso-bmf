@@ -122,14 +122,15 @@ func TestMvhdBoxFactory_New(t *testing.T) {
 
 	// creation and modified epochs
 
-	epoch := uint32(3677725917)
+	epoch := uint64(3677725917)
 	baseTime := bmfcommon.EpochToTime(epoch)
 
 	// creation epoch
-	bmfcommon.PushBytes(&data, epoch)
+	epoch32 := uint32(epoch)
+	bmfcommon.PushBytes(&data, epoch32)
 
 	// modification epoch
-	bmfcommon.PushBytes(&data, epoch+1)
+	bmfcommon.PushBytes(&data, epoch32+1)
 
 	// timeScale
 	bmfcommon.PushBytes(&data, uint32(30))
