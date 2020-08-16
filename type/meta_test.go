@@ -10,28 +10,28 @@ import (
 	"github.com/dsoprea/go-iso-bmf/common"
 )
 
-func TestMdiaBox_SetLoadedBoxIndex(t *testing.T) {
+func TestMetaBox_SetLoadedBoxIndex(t *testing.T) {
 	lbi := make(bmfcommon.LoadedBoxIndex)
 
-	mdia := new(MdiaBox)
-	mdia.SetLoadedBoxIndex(lbi)
+	meta := new(MetaBox)
+	meta.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(mdia.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(meta.LoadedBoxIndex, lbi) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }
 
-func TestMdiaBoxFactory_Name(t *testing.T) {
-	name := mdiaBoxFactory{}.Name()
+func TestMetaBoxFactory_Name(t *testing.T) {
+	name := metaBoxFactory{}.Name()
 
-	if name != "mdia" {
+	if name != "meta" {
 		t.Fatalf("Name() not correct.")
 	}
 }
 
-func TestMdiaBoxFactory_New(t *testing.T) {
+func TestMetaBoxFactory_New(t *testing.T) {
 	b := []byte{}
-	bmfcommon.PushBox(&b, "mdia", nil)
+	bmfcommon.PushBox(&b, "meta", nil)
 
 	// Parse.
 
@@ -42,13 +42,13 @@ func TestMdiaBoxFactory_New(t *testing.T) {
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
 
-	cb, _, err := mdiaBoxFactory{}.New(box)
+	cb, _, err := metaBoxFactory{}.New(box)
 	log.PanicIf(err)
 
 	// Nothing else we can validate.
-	_, ok := cb.(*MdiaBox)
+	_, ok := cb.(*MetaBox)
 
 	if ok != true {
-		t.Fatalf("Expected an 'mdia' box.")
+		t.Fatalf("Expected an 'meta' box.")
 	}
 }

@@ -150,7 +150,7 @@ func TestMdhdBox_Duration(t *testing.T) {
 	}
 }
 
-func TestMdhdBox_LanguageString(t *testing.T) {
+func TestMdhdBox_Language(t *testing.T) {
 
 	mb := MdhdBox{
 		// 00100 00101 00110
@@ -169,7 +169,7 @@ func TestMdhdBox_getLanguageString(t *testing.T) {
 	l := mb.getLanguageString(0b001000010100110)
 
 	if l != "def" {
-		t.Fatalf("Language() not correct: (%d) [%s]", len(l), l)
+		t.Fatalf("getLanguageString() not correct: (%d) [%s]", len(l), l)
 	}
 }
 

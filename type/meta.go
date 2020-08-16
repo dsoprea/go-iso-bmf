@@ -19,9 +19,6 @@ type MetaBox struct {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (meta *MetaBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	meta.LoadedBoxIndex = lbi
 }
 
@@ -30,9 +27,6 @@ type metaBoxFactory struct {
 
 // Name returns the name of the type.
 func (metaBoxFactory) Name() string {
-
-	// TODO(dustin): Add test
-
 	return "meta"
 }
 
@@ -43,10 +37,6 @@ func (metaBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
-
-	// TODO(dustin): Add test
-
-	// Boxes follow the four-bytes with the version/flags.
 
 	metaBox := &MetaBox{
 		Box: box,

@@ -64,6 +64,8 @@ func (irefBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 
 	version := data[0]
 
+	// TODO(dustin): Circle back to this when we have sample data.
+
 	iref := &IrefBox{
 		Box:     box,
 		version: version,

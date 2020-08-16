@@ -22,9 +22,6 @@ type MdiaBox struct {
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
 func (mdia *MdiaBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-
-	// TODO(dustin): !! Add test
-
 	mdia.LoadedBoxIndex = lbi
 }
 
