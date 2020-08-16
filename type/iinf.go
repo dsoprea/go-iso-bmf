@@ -62,14 +62,12 @@ func (iinf *IinfBox) loadItem(infe *InfeBox) {
 	// Load by-name index.
 
 	key := infe.itemName
-	if key == "" {
-		log.Panicf("INFE item-name is empty.")
-	}
-
-	if _, found := iinf.itemsByName[key]; found == true {
-		log.Panicf("item with name [%s] occurs more than once", key)
-	} else {
-		iinf.itemsByName[key] = infe
+	if key != "" {
+		if _, found := iinf.itemsByName[key]; found == true {
+			log.Panicf("item with name [%s] occurs more than once", key)
+		} else {
+			iinf.itemsByName[key] = infe
+		}
 	}
 }
 
