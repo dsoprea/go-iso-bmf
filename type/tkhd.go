@@ -91,8 +91,8 @@ func (b *TkhdBox) parse(timeScale uint32) (err error) {
 	b.version = data[0]
 
 	// TODO(dustin): Version 1 is 64-bit. Come back to this.
-	if b.version != 0 {
-		log.Panicf("tkhd: only version (0) is supported")
+	if b.version > 0 {
+		log.Panicf("tkhd: version (%d) not supported", b.version)
 	}
 
 	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])

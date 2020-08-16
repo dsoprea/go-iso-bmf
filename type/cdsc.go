@@ -86,7 +86,7 @@ func (cdscBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		fromItemId = bmfcommon.DefaultEndianness.Uint32(data[offset : offset+4])
 		offset += 4
 	} else {
-		log.Panicf("version (%d) not supported for IREF (1)", irefVersion)
+		log.Panicf("iref: version (%d) not supported (1)", irefVersion)
 	}
 
 	referenceCount := bmfcommon.DefaultEndianness.Uint16(data[offset : offset+2])
@@ -107,7 +107,7 @@ func (cdscBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 			toItemId = bmfcommon.DefaultEndianness.Uint32(data[offset : offset+4])
 			offset += 4
 		} else {
-			log.Panicf("version (%d) not supported for IREF (1)", irefVersion)
+			log.Panicf("iref: version (%d) not supported (2)", irefVersion)
 		}
 
 		toItemIds[i] = toItemId

@@ -177,7 +177,7 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 
 	if infe.version > 3 {
 		// NOTE(dustin): The spec implies that we'll maintain a lot of the structure below in future versions, but, obviously, new versions will carry changes and we are cynical that what we'd have would still work.
-		log.Panicf("versions > 3 are not yet supported: (%d)", infe.version)
+		log.Panicf("infe: version (%d) not supported", infe.version)
 	}
 
 	b := bytes.NewBuffer(data[4:])
@@ -199,7 +199,7 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		log.PanicIf(err)
 
 		if infe.itemProtectionIndex != 0 {
-			log.Panicf("protection not currently supported; please create an issue: (%d)", infe.itemProtectionIndex)
+			log.Panicf("infe: protection not currently supported; please create an issue: (%d)", infe.itemProtectionIndex)
 		}
 
 		// itemName
@@ -243,7 +243,7 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 			err := binary.Read(br, bmfcommon.DefaultEndianness, &infe.itemId)
 			log.PanicIf(err)
 		} else {
-			log.Panicf("version (%d) of INFE not supported", infe.version)
+			log.Panicf("infe: version (%d) not supported", infe.version)
 		}
 
 		// itemProtectionIndex

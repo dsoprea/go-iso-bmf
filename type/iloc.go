@@ -353,7 +353,7 @@ func (factory ilocBoxFactory) readItem(r io.Reader, version byte, baseOffsetSize
 		err := binary.Read(r, bmfcommon.DefaultEndianness, &ii.itemId)
 		log.PanicIf(err)
 	} else {
-		log.Panicf("version (%d) not supported", version)
+		log.Panicf("iloc: version (%d) not supported (2)", version)
 	}
 
 	// constructionMethod
@@ -366,7 +366,7 @@ func (factory ilocBoxFactory) readItem(r io.Reader, version byte, baseOffsetSize
 		err = binary.Read(r, bmfcommon.DefaultEndianness, &ii.constructionMethod)
 		log.PanicIf(err)
 	} else {
-		log.Panicf("version (%d) not supported", version)
+		log.Panicf("iloc: version (%d) not supported (3)", version)
 	}
 
 	// dataReferenceIndex
@@ -416,7 +416,7 @@ func (factory ilocBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, ch
 	version := data[0]
 
 	if version > 2 {
-		log.Panicf("version of ILOC not supported: (%d)", version)
+		log.Panicf("iloc: version (%d) not supported (1)", version)
 	}
 
 	b := bytes.NewBuffer(data[4:])

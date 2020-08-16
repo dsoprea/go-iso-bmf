@@ -56,7 +56,7 @@ func (pitmBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 	} else if version == 1 {
 		itemId = bmfcommon.DefaultEndianness.Uint32(data[4:8])
 	} else {
-		log.Panicf("version > 1 of PITM not supported")
+		log.Panicf("pitm: version (%d) not supported", version)
 	}
 
 	pitm := &PitmBox{

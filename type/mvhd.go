@@ -85,24 +85,43 @@ func (b *MvhdBox) parse() (err error) {
 
 	b.version = data[0]
 
-	// TODO(dustin): Version 1 is 64-bit. Come back to this.
-	if b.version != 0 {
-		log.Panicf("mvhd: only version (0) is supported")
+	var creationEpoch uint64
+	var modificationEpoch uint64
+	var timeScale uint64
+	var duration uint64
+
+	if b.version == 0 {
+		creationEpoch32 := bmfcommon.DefaultEndianness.Uint32(data[4:8])
+		creationEpoch = uint64(creationEpoch32)
+
+		modificationEpoch32 := bmfcommon.DefaultEndianness.Uint32(data[8:12])
+		modificationEpoch = uint64(modificationEpoch32)
+
+		timeScale32 := bmfcommon.DefaultEndianness.Uint32(data[12:16])
+		timeScale = uint64(timeScale32)
+
+		duration32 := bmfcommon.DefaultEndianness.Uint32(data[16:20])
+		duration = uint64(duration32)
+
+		b.rate = MvhdRate(bmfcommon.DefaultEndianness.Uint32(data[20:24]))
+		b.volume = bmfcommon.Volume(bmfcommon.DefaultEndianness.Uint16(data[24:26]))
+	} else if b.version == 1 {
+		creationEpoch = bmfcommon.DefaultEndianness.Uint64(data[4:12])
+		modificationEpoch = bmfcommon.DefaultEndianness.Uint64(data[12:20])
+		timeScale = bmfcommon.DefaultEndianness.Uint64(data[20:28])
+		duration = bmfcommon.DefaultEndianness.Uint64(data[28:36])
+
+		b.rate = MvhdRate(bmfcommon.DefaultEndianness.Uint32(data[36:40]))
+		b.volume = bmfcommon.Volume(bmfcommon.DefaultEndianness.Uint16(data[40:42]))
+	} else {
+		log.Panicf("mvhd: version (%d) not supported", b.version)
 	}
 
-	creationEpoch := bmfcommon.DefaultEndianness.Uint32(data[4:8])
-	modificationEpoch := bmfcommon.DefaultEndianness.Uint32(data[8:12])
-	timeScale := bmfcommon.DefaultEndianness.Uint32(data[12:16])
-	duration := bmfcommon.DefaultEndianness.Uint32(data[16:20])
-
 	b.Standard32TimeSupport = bmfcommon.NewStandard32TimeSupport(
-		uint64(creationEpoch),
-		uint64(modificationEpoch),
-		duration,
-		timeScale)
-
-	b.rate = MvhdRate(bmfcommon.DefaultEndianness.Uint32(data[20:24]))
-	b.volume = bmfcommon.Volume(bmfcommon.DefaultEndianness.Uint16(data[24:26]))
+		creationEpoch,
+		modificationEpoch,
+		uint32(duration),
+		uint32(timeScale))
 
 	return nil
 }

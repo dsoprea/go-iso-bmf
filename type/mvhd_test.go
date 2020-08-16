@@ -114,11 +114,12 @@ func TestMvhdBoxFactory_Name(t *testing.T) {
 	}
 }
 
-func TestMvhdBoxFactory_New(t *testing.T) {
+func TestMvhdBoxFactory_New_Version0(t *testing.T) {
 	var data []byte
 
 	// flags
-	bmfcommon.PushBytes(&data, uint32(0x00000011))
+	version := uint8(0)
+	bmfcommon.PushBytes(&data, []byte{version, 0x0, 0x0, 0x11})
 
 	// creation and modified epochs
 
@@ -163,6 +164,83 @@ func TestMvhdBoxFactory_New(t *testing.T) {
 	mb := cb.(*MvhdBox)
 
 	if mb.Version() != 0 {
+		t.Fatalf("Version() not correct: (0x%02x)", mb.Version())
+	}
+
+	if mb.CreationTime() != baseTime {
+		t.Fatalf("CreationTime() not correct: [%s] != [%s]", mb.CreationTime(), baseTime)
+	}
+
+	if mb.ModificationTime() != baseTime.Add(1*time.Second) {
+		t.Fatalf("ModificationTime() not correct: %s", mb.ModificationTime())
+	}
+
+	if mb.TimeScale() != 30 {
+		t.Fatalf("TimeScale() not correct.")
+	}
+
+	if mb.ScaledDuration() != 300 {
+		t.Fatalf("ScaledDuration() not correct.")
+	}
+
+	if mb.Rate() != 22 {
+		t.Fatalf("Rate() not correct: (%d)", mb.Rate())
+	}
+
+	if mb.Volume() != 33 {
+		t.Fatalf("Volume() not correct.")
+	}
+}
+
+func TestMvhdBoxFactory_New_Version1(t *testing.T) {
+	var data []byte
+
+	// flags
+	version := uint8(1)
+	bmfcommon.PushBytes(&data, []byte{version, 0x0, 0x0, 0x11})
+
+	// creation and modified epochs
+
+	epoch := uint64(3677725917)
+	baseTime := bmfcommon.EpochToTime(epoch)
+
+	// creation epoch
+	bmfcommon.PushBytes(&data, epoch)
+
+	// modification epoch
+	bmfcommon.PushBytes(&data, epoch+1)
+
+	// timeScale
+	bmfcommon.PushBytes(&data, uint64(30))
+
+	// scaledDuration
+	bmfcommon.PushBytes(&data, uint64(300))
+
+	// rate
+	bmfcommon.PushBytes(&data, uint32(22))
+
+	// volume
+	bmfcommon.PushBytes(&data, uint16(33))
+
+	b := []byte{}
+	bmfcommon.PushBox(&b, "mvhd", data)
+
+	// Parse.
+
+	sb := rifs.NewSeekableBufferWithBytes(b)
+
+	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	log.PanicIf(err)
+
+	box, err := file.ReadBaseBox(0)
+	log.PanicIf(err)
+
+	cb, _, err := mvhdBoxFactory{}.New(box)
+	log.PanicIf(err)
+
+	mb := cb.(*MvhdBox)
+
+	if mb.Version() != 1 {
 		t.Fatalf("Version() not correct: (0x%02x)", mb.Version())
 	}
 

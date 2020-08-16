@@ -64,14 +64,26 @@ func (b *HdlrBox) parse() (err error) {
 	b.version = data[0]
 	b.flags = bmfcommon.DefaultEndianness.Uint32(data[0:4])
 
-	// TODO(dustin): Skipping over data, here?
+	// Bytes 4:8 are for "pre_defined", which is not further described in the
+	// specification and is assumed to be analogous to reserved bytes.
 
 	b.handler = string(data[8:12])
 
-	// TODO(dustin): Skipping over data, here?
+	// Skip twelve bytes of reserved data, here.
 
-	boxDataSize := b.Size() - b.HeaderSize()
-	b.hdlrName = string(data[24:boxDataSize])
+	var hdlrNameBytes []byte
+	for i := 24; i < len(data); i++ {
+		if data[i] == 0 {
+			hdlrNameBytes = data[24:i]
+			break
+		}
+	}
+
+	if hdlrNameBytes == nil {
+		log.Panicf("hdlrName is unterminated")
+	}
+
+	b.hdlrName = string(hdlrNameBytes)
 
 	return nil
 }

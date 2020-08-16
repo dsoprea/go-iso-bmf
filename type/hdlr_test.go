@@ -100,18 +100,18 @@ func TestHdlrBoxFactory_New(t *testing.T) {
 	// Reserved spacing.
 	bmfcommon.PushBytes(&hdlrBoxData, uint32(0))
 
-	// Handler name
+	// Handler type
 	bmfcommon.PushBytes(&hdlrBoxData, []byte{'a', 'b', 'c', 'd'})
 
 	// Reserved spacing.
-	// TODO(dustin): This is probably data that we need to add support for.
+
 	bmfcommon.PushBytes(&hdlrBoxData, uint32(0))
 	bmfcommon.PushBytes(&hdlrBoxData, uint32(0))
 	bmfcommon.PushBytes(&hdlrBoxData, uint32(0))
 
-	// handler name (all remaining)
-	// TODO(dustin): Update this comment to not be a duplicate.
-	bmfcommon.PushBytes(&hdlrBoxData, []byte{'t', 'e', 's', 't', 'n', 'a', 'm', 'e'})
+	// handler name (all remaining bytes)
+	handlerName := "testname\000"
+	bmfcommon.PushBytes(&hdlrBoxData, []byte(handlerName))
 
 	b := []byte{}
 	bmfcommon.PushBox(&b, "hdlr", hdlrBoxData)
@@ -147,11 +147,11 @@ func TestHdlrBoxFactory_New(t *testing.T) {
 		t.Fatalf("HdlrName() not correct.")
 	}
 
-	if hb.String() != "hdlr<NAME=[hdlr] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=(8)[testname]>" {
+	if hb.String() != "hdlr<NAME=[hdlr] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(41) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=(8)[testname]>" {
 		t.Fatalf("String() not correct: [%s]", hb.String())
 	}
 
-	if hb.InlineString() != "NAME=[hdlr] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(40) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=(8)[testname]" {
+	if hb.InlineString() != "NAME=[hdlr] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(41) VER=(0x11) FLAGS=(0x11223344) HANDLER=[abcd] HDLR-NAME=(8)[testname]" {
 		t.Fatalf("InlineString() not correct: [%s]", hb.InlineString())
 	}
 }
