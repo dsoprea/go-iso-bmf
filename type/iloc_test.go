@@ -89,6 +89,7 @@ func TestIlocBox_Dump(t *testing.T) {
 	infe11 := &InfeBox{
 		itemId:   11,
 		itemType: infeType11,
+		itemName: "abc",
 	}
 
 	iinf.loadItem(infe11)
@@ -98,6 +99,7 @@ func TestIlocBox_Dump(t *testing.T) {
 	infe22 := &InfeBox{
 		itemId:   22,
 		itemType: infeType22,
+		itemName: "def",
 	}
 
 	iinf.loadItem(infe22)
@@ -254,6 +256,7 @@ func TestIlocBox_writeItemExtents(t *testing.T) {
 	infe11 := &InfeBox{
 		itemId:   11,
 		itemType: infeType11,
+		itemName: "abc",
 	}
 
 	iinf.loadItem(infe11)
@@ -263,6 +266,7 @@ func TestIlocBox_writeItemExtents(t *testing.T) {
 	infe22 := &InfeBox{
 		itemId:   22,
 		itemType: infeType22,
+		itemName: "def",
 	}
 
 	iinf.loadItem(infe22)
@@ -433,6 +437,7 @@ func TestIlocBox_WriteExtents(t *testing.T) {
 	infe11 := &InfeBox{
 		itemId:   11,
 		itemType: infeType11,
+		itemName: "abc",
 	}
 
 	iinf.loadItem(infe11)
@@ -442,6 +447,7 @@ func TestIlocBox_WriteExtents(t *testing.T) {
 	infe22 := &InfeBox{
 		itemId:   22,
 		itemType: infeType22,
+		itemName: "def",
 	}
 
 	iinf.loadItem(infe22)

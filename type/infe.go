@@ -20,8 +20,6 @@ type InfeItemType uint32
 
 // InfeItemTypeFromBytes converts four-bytes to a uint32. This supports testing.
 func InfeItemTypeFromBytes(typeBytes [4]byte) InfeItemType {
-	// TODO(dustin): Add test
-
 	return InfeItemType(bmfcommon.DefaultEndianness.Uint32(typeBytes[:]))
 }
 
@@ -29,16 +27,10 @@ func InfeItemTypeFromBytes(typeBytes [4]byte) InfeItemType {
 // string, and compare. The item-type can be interpreted as both an integer and
 // a string.
 func (iit InfeItemType) EqualsName(s string) bool {
-
-	// TODO(dustin): Add test
-
 	return s == iit.string()
 }
 
 func (iit InfeItemType) string() string {
-
-	// TODO(dustin): Add test
-
 	b := make([]byte, 4)
 	bmfcommon.DefaultEndianness.PutUint32(b, uint32(iit))
 
@@ -47,26 +39,17 @@ func (iit InfeItemType) string() string {
 
 // IsMime returns true if MIME.
 func (iit InfeItemType) IsMime() bool {
-
-	// TODO(dustin): Add test
-
 	return iit.EqualsName("mime")
 }
 
 // IsUri returns true if URI.
 func (iit InfeItemType) IsUri() bool {
-
-	// TODO(dustin): Add test
-
 	return iit.EqualsName("uri ")
 }
 
 // String returns the ASCII equivalent if all printable characters or else the
 // hex representation.
 func (iit InfeItemType) String() string {
-
-	// TODO(dustin): Add test
-
 	s := iit.string()
 
 	for _, r := range s {
@@ -80,24 +63,15 @@ func (iit InfeItemType) String() string {
 
 // InfeBox is the ItemInfoEntry box.
 type InfeBox struct {
-
-	// TODO(dustin): Split this into a composition of different pieces of the appropriate versions.
-
 	// Box is the base inner box.
 	bmfcommon.Box
 
-	// TODO(dustin): Finish adding accessors
-
-	version byte
-
-	itemId uint32
-
-	// TODO(dustin): This indicates that some protection might obscure metadata access.
+	version             byte
+	itemId              uint32
 	itemProtectionIndex uint16
-
-	itemName        string
-	contentType     string
-	contentEncoding string
+	itemName            string
+	contentType         string
+	contentEncoding     string
 
 	extensionType uint32
 
@@ -108,25 +82,47 @@ type InfeBox struct {
 
 // ItemId returns the ID of the item.
 func (infe *InfeBox) ItemId() uint32 {
-
-	// TODO(dustin): Add test
-
 	return infe.itemId
+}
+
+// ItemProtectionIndex returns the item protection index, which supports
+// protecting the values.
+func (infe *InfeBox) ItemProtectionIndex() uint16 {
+	return infe.itemProtectionIndex
+}
+
+// ItemName returns the item name.
+func (infe *InfeBox) ItemName() string {
+	return infe.itemName
+}
+
+// ContentType returns the content type (if a MIME type).
+func (infe *InfeBox) ContentType() string {
+	return infe.contentType
+}
+
+// ContentEncoding returns the content encoding (if a MIME type).
+func (infe *InfeBox) ContentEncoding() string {
+	return infe.contentEncoding
+}
+
+// ExtensionType returns the extension type.
+func (infe *InfeBox) ExtensionType() uint32 {
+	return infe.extensionType
 }
 
 // ItemType returns the item-type.
 func (infe *InfeBox) ItemType() InfeItemType {
-
-	// TODO(dustin): Add test
-
 	return infe.itemType
+}
+
+// ItemUriType returns the URI type (if a URI).
+func (infe *InfeBox) ItemUriType() string {
+	return infe.itemUriType
 }
 
 // InlineString returns an undecorated string of field names and values.
 func (infe *InfeBox) InlineString() string {
-
-	// TODO(dustin): Add test
-
 	var extTypePhrase string
 
 	if infe.version == 1 {
@@ -160,9 +156,6 @@ type infeBoxFactory struct {
 
 // Name returns the name of the type.
 func (infeBoxFactory) Name() string {
-
-	// TODO(dustin): Add test
-
 	return "infe"
 }
 
@@ -174,8 +167,6 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		}
 	}()
 
-	// TODO(dustin): Add test
-
 	data, err := box.ReadBoxData()
 	log.PanicIf(err)
 
@@ -184,9 +175,9 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 		version: data[0],
 	}
 
-	if infe.version > 2 {
-		// TODO(dustin): !! Circle back
-		log.Panicf("versions > 2 are not yet supported: (%d)", infe.version)
+	if infe.version > 3 {
+		// NOTE(dustin): The spec implies that we'll maintain a lot of the structure below in future versions, but, obviously, new versions will carry changes and we are cynical that what we'd have would still work.
+		log.Panicf("versions > 3 are not yet supported: (%d)", infe.version)
 	}
 
 	b := bytes.NewBuffer(data[4:])
@@ -206,6 +197,10 @@ func (infeBoxFactory) New(box bmfcommon.Box) (cb bmfcommon.CommonBox, childBoxSe
 
 		err = binary.Read(br, bmfcommon.DefaultEndianness, &infe.itemProtectionIndex)
 		log.PanicIf(err)
+
+		if infe.itemProtectionIndex != 0 {
+			log.Panicf("protection not currently supported; please create an issue: (%d)", infe.itemProtectionIndex)
+		}
 
 		// itemName
 

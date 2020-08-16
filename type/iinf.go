@@ -12,7 +12,7 @@ import (
 var (
 	// ErrNoItemsFound indicates that no items were found in the metadata with
 	// the given name/ID.
-	ErrNoItemsFound = errors.New("no items found")
+	ErrNoItemsFound = errors.New("item not found")
 )
 
 // IinfBox is the "Item Info" box.
@@ -61,7 +61,10 @@ func (iinf *IinfBox) loadItem(infe *InfeBox) {
 
 	// Load by-name index.
 
-	key := infe.ItemType().String()
+	key := infe.itemName
+	if key == "" {
+		log.Panicf("INFE item-name is empty.")
+	}
 
 	if _, found := iinf.itemsByName[key]; found == true {
 		log.Panicf("item with name [%s] occurs more than once", key)

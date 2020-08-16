@@ -33,6 +33,7 @@ func TestIinfBox_loadItem(t *testing.T) {
 	infe1 := &InfeBox{
 		itemId:   11,
 		itemType: iit1,
+		itemName: "abc",
 	}
 
 	iinf.loadItem(infe1)
@@ -44,6 +45,7 @@ func TestIinfBox_loadItem(t *testing.T) {
 	infe2 := &InfeBox{
 		itemId:   22,
 		itemType: iit2,
+		itemName: "def",
 	}
 
 	iinf.loadItem(infe2)
@@ -62,9 +64,9 @@ func TestIinfBox_loadItem(t *testing.T) {
 		t.Fatalf("Second item ID not found.")
 	}
 
-	if _, found := iinf.itemsByName["abcd"]; found != true {
+	if _, found := iinf.itemsByName["abc"]; found != true {
 		t.Fatalf("First item name not found.")
-	} else if _, found := iinf.itemsByName["efgh"]; found != true {
+	} else if _, found := iinf.itemsByName["def"]; found != true {
 		t.Fatalf("Second item name not found.")
 	}
 }
@@ -79,6 +81,7 @@ func TestIinfBox_GetItemWithId(t *testing.T) {
 	infe1 := &InfeBox{
 		itemId:   11,
 		itemType: iit1,
+		itemName: "abc",
 	}
 
 	iinf.loadItem(infe1)
@@ -90,6 +93,7 @@ func TestIinfBox_GetItemWithId(t *testing.T) {
 	infe2 := &InfeBox{
 		itemId:   22,
 		itemType: iit2,
+		itemName: "def",
 	}
 
 	iinf.loadItem(infe2)
@@ -121,6 +125,7 @@ func TestIinfBox_GetItemWithName(t *testing.T) {
 	infe1 := &InfeBox{
 		itemId:   11,
 		itemType: iit1,
+		itemName: "abc",
 	}
 
 	iinf.loadItem(infe1)
@@ -132,20 +137,21 @@ func TestIinfBox_GetItemWithName(t *testing.T) {
 	infe2 := &InfeBox{
 		itemId:   22,
 		itemType: iit2,
+		itemName: "def",
 	}
 
 	iinf.loadItem(infe2)
 
 	// Validate.
 
-	recoveredInfe1, err := iinf.GetItemWithName("abcd")
+	recoveredInfe1, err := iinf.GetItemWithName("abc")
 	log.PanicIf(err)
 
 	if recoveredInfe1 != infe1 {
 		t.Fatalf("First item not correct.")
 	}
 
-	recoveredInfe2, err := iinf.GetItemWithName("efgh")
+	recoveredInfe2, err := iinf.GetItemWithName("def")
 	log.PanicIf(err)
 
 	if recoveredInfe2 != infe2 {
@@ -163,6 +169,7 @@ func TestIinfBox_InlineString(t *testing.T) {
 	infe1 := &InfeBox{
 		itemId:   11,
 		itemType: iit1,
+		itemName: "abc",
 	}
 
 	iinf.loadItem(infe1)
@@ -174,6 +181,7 @@ func TestIinfBox_InlineString(t *testing.T) {
 	infe2 := &InfeBox{
 		itemId:   22,
 		itemType: iit2,
+		itemName: "def",
 	}
 
 	iinf.loadItem(infe2)

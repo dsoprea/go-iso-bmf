@@ -39,6 +39,8 @@ func (iiw IlocIntegerWidth) IsValid() bool {
 type IlocBox struct {
 	bmfcommon.Box
 
+	// TODO(dustin): Finish adding accessors
+
 	version byte
 
 	offsetSize     IlocIntegerWidth
