@@ -6,9 +6,9 @@
 
 # Overview
 
-This project parses a baseline ISO 14496-12 Base Media Format stream. MP4, HEIF/HEIC, and [many other media formats](https://en.wikipedia.org/wiki/ISO/IEC_base_media_file_format) extend the BMF format. However, the standard is difficult to read and the format difficult to parse. This project allows you to abstract all of that away as well as to provide a roadmap for interested parties to understand the BMF. There is very complete unit-test coverage and the implementation takes advantage of the recursive nature of the format, thus making it **simpler than all other implementations** existing at the time that this project was delivered.
+This project parses a [ISO 14496-12 Base Media Format](assets/bmf_c068960_ISO_IEC_14496-12_2015.pdf) stream. MP4, HEIF/HEIC, and [many other media formats](https://en.wikipedia.org/wiki/ISO/IEC_base_media_file_format) extend the BMF format. However, the standard is difficult to read and the format difficult to parse. This project allows you to abstract all of that away as well as to provide a roadmap for interested parties to understand the BMF. There is very complete unit-test coverage and the implementation takes advantage of the recursive nature of the format, thus making it **simpler than all other implementations** existing at the time that this project was delivered.
 
-This project primarily hosts only the box-types defined in the BMF specification, which are, in general, applicable to allow formats. **To extend this project for additional boxes defined in specific formats, simply import this project and register factories for those box-types.**
+This project primarily hosts only the box-types defined in the [BMF specification](assets/bmf_c068960_ISO_IEC_14496-12_2015.pdf), which are, in general, applicable to allow formats. **To extend this project for additional boxes defined in specific formats, simply import this project and register factories for those box-types.**
 
 
 # Commands
