@@ -107,7 +107,9 @@ func TestBox_ReadBytesAt(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, 0)
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
+
 	box := NewBox("name", 1, 2, 3, resource)
 
 	extracted, err := box.ReadBytesAt(4, 5)
@@ -127,12 +129,14 @@ func TestBox_CopyBytesAt(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, 0)
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
+
 	box := NewBox("name", 1, 2, 3, resource)
 
 	b := new(bytes.Buffer)
 
-	err := box.CopyBytesAt(4, 5, b)
+	err = box.CopyBytesAt(4, 5, b)
 	log.PanicIf(err)
 
 	if bytes.Equal(b.Bytes(), data[4:9]) != true {
@@ -157,7 +161,10 @@ func TestBox_ReadBoxes(t *testing.T) {
 	pushTestBox1(&b)
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
-	resource := NewBmfResource(sb, 0)
+
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
+
 	box := NewBox("root", 0, int64(len(b)), 0, resource)
 
 	boxes, err := box.ReadBoxes(0, nil)
@@ -201,7 +208,9 @@ func TestBox_ReadBoxData(t *testing.T) {
 	// Parse.
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
-	resource := NewBmfResource(sb, int64(len(b)))
+
+	resource, err := NewBmfResource(sb, int64(len(b)))
+	log.PanicIf(err)
 
 	entries1 := resource.LoadedBoxIndex["tb2 "]
 	recovered1, err := entries1[0].ReadBoxData()

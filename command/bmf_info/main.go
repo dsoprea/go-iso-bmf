@@ -53,7 +53,8 @@ func main() {
 
 	size := s.Size()
 
-	file := bmfcommon.NewBmfResource(f, size)
+	file, err := bmfcommon.NewBmfResource(f, size)
+	log.PanicIf(err)
 
 	fmt.Printf("Tree:\n")
 	fmt.Printf("\n")

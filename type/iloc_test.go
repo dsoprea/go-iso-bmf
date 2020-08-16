@@ -114,7 +114,8 @@ func TestIlocBox_Dump(t *testing.T) {
 		22: IlocItem{itemId: 22, extents: extents2},
 	}
 
-	resource := bmfcommon.NewBmfResource(nil, 0)
+	resource, err := bmfcommon.NewBmfResource(nil, 0)
+	log.PanicIf(err)
 
 	// Load the IINF in the index so that the ILOC can find it.
 
@@ -141,7 +142,10 @@ func TestIlocBox_writeItemExtent(t *testing.T) {
 	}
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
-	resource := bmfcommon.NewBmfResource(sb, 0)
+
+	resource, err := bmfcommon.NewBmfResource(sb, 0)
+	log.PanicIf(err)
+
 	box := bmfcommon.NewBox("", 0, 0, 0, resource)
 
 	iloc := &IlocBox{
@@ -202,7 +206,10 @@ func TestIlocBox_writeItemExtents(t *testing.T) {
 	}
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
-	resource := bmfcommon.NewBmfResource(sb, 0)
+
+	resource, err := bmfcommon.NewBmfResource(sb, 0)
+	log.PanicIf(err)
+
 	box := bmfcommon.NewBox("", 0, 0, 0, resource)
 
 	// Establish first ILOC item and its extents.
@@ -383,7 +390,10 @@ func TestIlocBox_WriteExtents(t *testing.T) {
 	}
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
-	resource := bmfcommon.NewBmfResource(sb, 0)
+
+	resource, err := bmfcommon.NewBmfResource(sb, 0)
+	log.PanicIf(err)
+
 	box := bmfcommon.NewBox("", 0, 0, 0, resource)
 
 	// Establish first ILOC item and its extents.
@@ -1185,7 +1195,8 @@ func TestIlocBoxFactory_New_Version0_NoItems(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
@@ -1268,7 +1279,8 @@ func TestIlocBoxFactory_New_Version0_WithItems(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
@@ -1376,7 +1388,8 @@ func TestIlocBoxFactory_New_Version1_WithItems(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)
@@ -1493,7 +1506,8 @@ func TestIlocBoxFactory_New_Version2_WithItems(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)
 	log.PanicIf(err)

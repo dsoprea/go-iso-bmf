@@ -25,11 +25,17 @@ type BmfResource struct {
 }
 
 // NewBmfResource returns a new BmfResource struct.
-func NewBmfResource(rs io.ReadSeeker, size int64) *BmfResource {
+func NewBmfResource(rs io.ReadSeeker, size int64) (resource *BmfResource, err error) {
+	defer func() {
+		if errRaw := recover(); errRaw != nil {
+			err = log.Wrap(errRaw.(error))
+		}
+	}()
+
 	// This has all [known] boxes encountered in the stream.
 	fullBoxIndex := make(FullBoxIndex)
 
-	resource := &BmfResource{
+	resource = &BmfResource{
 		rs:           rs,
 		fullBoxIndex: fullBoxIndex,
 	}
@@ -44,7 +50,7 @@ func NewBmfResource(rs io.ReadSeeker, size int64) *BmfResource {
 	// This has the root boxes from the stream.
 	resource.LoadedBoxIndex = boxes.Index()
 
-	return resource
+	return resource, nil
 }
 
 // Index returns the complete index of the boxes found in the parsed file.

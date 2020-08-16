@@ -32,7 +32,8 @@ func TestNewBmfResource(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 	size := int64(len(b))
 
-	resource := NewBmfResource(sb, size)
+	resource, err := NewBmfResource(sb, size)
+	log.PanicIf(err)
 
 	// Validate
 
@@ -47,7 +48,8 @@ func TestBmfResource_Index(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 	size := int64(len(b))
 
-	resource := NewBmfResource(sb, size)
+	resource, err := NewBmfResource(sb, size)
+	log.PanicIf(err)
 
 	if reflect.DeepEqual(resource.fullBoxIndex, resource.Index()) != true {
 		t.Fatalf("Index() does not return inner index field.")
@@ -63,7 +65,8 @@ func TestBmfResource_readBytesAt_Front(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, 0)
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
 
 	recovered, err := resource.readBytesAt(4, 5)
 	log.PanicIf(err)
@@ -82,7 +85,8 @@ func TestBmfResource_readBytesAt_Middle(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, 0)
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
 
 	recovered, err := resource.readBytesAt(5, 5)
 	log.PanicIf(err)
@@ -101,7 +105,8 @@ func TestBmfResource_readBytesAt_MiddleToEnd(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, 0)
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
 
 	recovered, err := resource.readBytesAt(4, 10)
 	log.PanicIf(err)
@@ -120,11 +125,12 @@ func TestBmfResource_copyBytesAt(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, 0)
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
 
 	b := new(bytes.Buffer)
 
-	err := resource.copyBytesAt(5, 5, b)
+	err = resource.copyBytesAt(5, 5, b)
 	log.PanicIf(err)
 
 	if bytes.Equal(b.Bytes(), data[5:10]) != true {
@@ -137,7 +143,9 @@ func TestBmfResource_readBaseBox_32(t *testing.T) {
 	PushBox(&buffer, "abcd", []byte{6, 7, 8, 9})
 
 	sb := rifs.NewSeekableBufferWithBytes(buffer)
-	resource := NewBmfResource(sb, int64(len(buffer)))
+
+	resource, err := NewBmfResource(sb, int64(len(buffer)))
+	log.PanicIf(err)
 
 	box, err := resource.readBaseBox(0)
 	log.PanicIf(err)
@@ -154,7 +162,9 @@ func TestBmfResource_readBaseBox_64(t *testing.T) {
 	PushBox(&buffer, "abcd", Data64BitDescribed{6, 7, 8, 9})
 
 	sb := rifs.NewSeekableBufferWithBytes(buffer)
-	resource := NewBmfResource(sb, int64(len(buffer)))
+
+	resource, err := NewBmfResource(sb, int64(len(buffer)))
+	log.PanicIf(err)
 
 	box, err := resource.readBaseBox(0)
 	log.PanicIf(err)
@@ -175,7 +185,8 @@ func TestBmfResource_readBaseBox_Front(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, int64(len(data)))
+	resource, err := NewBmfResource(sb, int64(len(data)))
+	log.PanicIf(err)
 
 	box, err := resource.readBaseBox(0)
 	log.PanicIf(err)
@@ -200,7 +211,8 @@ func TestBmfResource_readBaseBox_Middle(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, int64(len(data)))
+	resource, err := NewBmfResource(sb, int64(len(data)))
+	log.PanicIf(err)
 
 	box, err := resource.readBaseBox(12)
 	log.PanicIf(err)
@@ -217,7 +229,9 @@ func TestBmfResource_ReadBaseBox_32(t *testing.T) {
 	PushBox(&buffer, "abcd", []byte{6, 7, 8, 9})
 
 	sb := rifs.NewSeekableBufferWithBytes(buffer)
-	resource := NewBmfResource(sb, int64(len(buffer)))
+
+	resource, err := NewBmfResource(sb, int64(len(buffer)))
+	log.PanicIf(err)
 
 	box, err := resource.ReadBaseBox(0)
 	log.PanicIf(err)
@@ -234,7 +248,9 @@ func TestBmfResource_ReadBaseBox_64(t *testing.T) {
 	PushBox(&buffer, "abcd", Data64BitDescribed{6, 7, 8, 9})
 
 	sb := rifs.NewSeekableBufferWithBytes(buffer)
-	resource := NewBmfResource(sb, int64(len(buffer)))
+
+	resource, err := NewBmfResource(sb, int64(len(buffer)))
+	log.PanicIf(err)
 
 	box, err := resource.ReadBaseBox(0)
 	log.PanicIf(err)
@@ -255,7 +271,8 @@ func TestBmfResource_ReadBaseBox_Front(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, int64(len(data)))
+	resource, err := NewBmfResource(sb, int64(len(data)))
+	log.PanicIf(err)
 
 	box, err := resource.ReadBaseBox(0)
 	log.PanicIf(err)
@@ -280,7 +297,8 @@ func TestBmfResource_ReadBaseBox_Middle(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource := NewBmfResource(sb, int64(len(data)))
+	resource, err := NewBmfResource(sb, int64(len(data)))
+	log.PanicIf(err)
 
 	box, err := resource.ReadBaseBox(12)
 	log.PanicIf(err)
@@ -316,7 +334,8 @@ func TestReadBox(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 	size := int64(len(b))
 
-	resource := NewBmfResource(sb, size)
+	resource, err := NewBmfResource(sb, size)
+	log.PanicIf(err)
 
 	cb1, known1, err := readBox(resource, nil, 0)
 	log.PanicIf(err)
@@ -356,9 +375,10 @@ func TestReadBox_InvalidBoxName(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource := NewBmfResource(sb, 0)
+	resource, err := NewBmfResource(sb, 0)
+	log.PanicIf(err)
 
-	_, _, err := readBox(resource, nil, 0)
+	_, _, err = readBox(resource, nil, 0)
 	if err == nil {
 		t.Fatalf("Expected error.")
 	} else if err.Error() != "box starting at offset (0x0000000000000000) looks like garbage" {
@@ -387,7 +407,8 @@ func TestReadBox_WithChildBoxes(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 	size := int64(len(b))
 
-	resource := NewBmfResource(sb, size)
+	resource, err := NewBmfResource(sb, size)
+	log.PanicIf(err)
 
 	cb, _, err := readBox(resource, nil, 0)
 	log.PanicIf(err)
@@ -437,7 +458,8 @@ func TestReadBoxes(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 	size := int64(len(b))
 
-	resource := NewBmfResource(sb, size)
+	resource, err := NewBmfResource(sb, size)
+	log.PanicIf(err)
 
 	boxes, err := readBoxes(resource, nil, 0, size)
 	log.PanicIf(err)

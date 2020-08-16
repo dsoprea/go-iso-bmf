@@ -61,7 +61,8 @@ func TestIrefBoxFactory_New(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
 	// Use zero length to prevent immediate parsing.
-	resource := bmfcommon.NewBmfResource(sb, 0)
+	resource, err := bmfcommon.NewBmfResource(sb, 0)
+	log.PanicIf(err)
 
 	headerSize := int64(8)
 	box := bmfcommon.NewBox("iref", 0, headerSize+int64(len(data)), headerSize, resource)
