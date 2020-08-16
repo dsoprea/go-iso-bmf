@@ -58,10 +58,10 @@ func TestIlocBox_GetWithId(t *testing.T) {
 
 func TestIlocBox_sortedItemIds(t *testing.T) {
 	itemsIndex := map[uint32]IlocItem{
-		11: IlocItem{},
-		22: IlocItem{},
-		33: IlocItem{},
-		44: IlocItem{},
+		11: {},
+		22: {},
+		33: {},
+		44: {},
 	}
 
 	iloc := &IlocBox{
@@ -106,12 +106,12 @@ func TestIlocBox_Dump(t *testing.T) {
 
 	// Build ILOC
 
-	extents1 := []IlocExtent{IlocExtent{extentOffset: 11110, extentLength: 11111}}
-	extents2 := []IlocExtent{IlocExtent{extentOffset: 22220, extentLength: 22221}}
+	extents1 := []IlocExtent{{extentOffset: 11110, extentLength: 11111}}
+	extents2 := []IlocExtent{{extentOffset: 22220, extentLength: 22221}}
 
 	itemsIndex := map[uint32]IlocItem{
-		11: IlocItem{itemId: 11, extents: extents1},
-		22: IlocItem{itemId: 22, extents: extents2},
+		11: {itemId: 11, extents: extents1},
+		22: {itemId: 22, extents: extents2},
 	}
 
 	resource, err := bmfcommon.NewBmfResource(nil, 0)
@@ -562,7 +562,7 @@ func TestIlocBox_InlineString(t *testing.T) {
 		lengthSize:     22,
 		baseOffsetSize: 33,
 		indexSize:      44,
-		items:          []IlocItem{IlocItem{}, IlocItem{}},
+		items:          []IlocItem{{}, {}},
 	}
 
 	if iloc.InlineString() != "NAME=[] PARENT=[ROOT] START=(0x0000000000000000) SIZE=(0) OFFSET-SIZE=(11) LENGTH-SIZE=(22) BASE-OFFSET-SIZE=(33) INDEX-SIZE=(44) ITEMS=(2)" {
@@ -662,7 +662,7 @@ func TestIlocItem_InlineString(t *testing.T) {
 		dataReferenceIndex: 33,
 		baseOffset:         []byte{1, 2, 3, 4},
 
-		extents: []IlocExtent{IlocExtent{}, IlocExtent{}},
+		extents: []IlocExtent{{}, {}},
 	}
 
 	if ii.InlineString() != "ID=(11) DATA-REF-INDEX=(33) BASE-OFFSET=(0x01020304) EXTENT-COUNT=(2)" {
@@ -677,7 +677,7 @@ func TestIlocItem_String(t *testing.T) {
 		dataReferenceIndex: 33,
 		baseOffset:         []byte{1, 2, 3, 4},
 
-		extents: []IlocExtent{IlocExtent{}, IlocExtent{}},
+		extents: []IlocExtent{{}, {}},
 	}
 
 	if ii.String() != "IlocItem<ID=(11) DATA-REF-INDEX=(33) BASE-OFFSET=(0x01020304) EXTENT-COUNT=(2)>" {
@@ -967,8 +967,8 @@ func TestIlocBoxFactory_readItem_Version0_WithExtents(t *testing.T) {
 	baseOffset := uint32(0x1234)
 
 	extents := []IlocExtent{
-		IlocExtent{extentOffset: 11, extentLength: 22},
-		IlocExtent{extentOffset: 33, extentLength: 44},
+		{extentOffset: 11, extentLength: 22},
+		{extentOffset: 33, extentLength: 44},
 	}
 
 	writeIlocItemVersion032bitBytes(&data, itemId, dataReferenceIndex, baseOffset, extents)
@@ -1250,8 +1250,8 @@ func TestIlocBoxFactory_New_Version0_WithItems(t *testing.T) {
 	baseOffset := uint32(0x1234)
 
 	extents11 := []IlocExtent{
-		IlocExtent{extentOffset: 11, extentLength: 22},
-		IlocExtent{extentOffset: 33, extentLength: 44},
+		{extentOffset: 11, extentLength: 22},
+		{extentOffset: 33, extentLength: 44},
 	}
 
 	writeIlocItemVersion032bitBytes(&data, itemId, dataReferenceIndex, baseOffset, extents11)
@@ -1264,8 +1264,8 @@ func TestIlocBoxFactory_New_Version0_WithItems(t *testing.T) {
 	baseOffset = uint32(0x5678)
 
 	extents22 := []IlocExtent{
-		IlocExtent{extentOffset: 55, extentLength: 66},
-		IlocExtent{extentOffset: 77, extentLength: 88},
+		{extentOffset: 55, extentLength: 66},
+		{extentOffset: 77, extentLength: 88},
 	}
 
 	writeIlocItemVersion032bitBytes(&data, itemId, dataReferenceIndex, baseOffset, extents22)
@@ -1358,8 +1358,8 @@ func TestIlocBoxFactory_New_Version1_WithItems(t *testing.T) {
 	baseOffset := uint32(0x1234)
 
 	extents11 := []IlocExtent{
-		IlocExtent{extentIndex: 55, extentOffset: 11, extentLength: 22},
-		IlocExtent{extentIndex: 66, extentOffset: 33, extentLength: 44},
+		{extentIndex: 55, extentOffset: 11, extentLength: 22},
+		{extentIndex: 66, extentOffset: 33, extentLength: 44},
 	}
 
 	writeIlocItemVersion132bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents11)
@@ -1373,8 +1373,8 @@ func TestIlocBoxFactory_New_Version1_WithItems(t *testing.T) {
 	baseOffset = uint32(0x5678)
 
 	extents22 := []IlocExtent{
-		IlocExtent{extentOffset: 55, extentLength: 66},
-		IlocExtent{extentOffset: 77, extentLength: 88},
+		{extentOffset: 55, extentLength: 66},
+		{extentOffset: 77, extentLength: 88},
 	}
 
 	writeIlocItemVersion132bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents22)
@@ -1476,8 +1476,8 @@ func TestIlocBoxFactory_New_Version2_WithItems(t *testing.T) {
 	baseOffset := uint32(0x1234)
 
 	extents11 := []IlocExtent{
-		IlocExtent{extentIndex: 55, extentOffset: 11, extentLength: 22},
-		IlocExtent{extentIndex: 66, extentOffset: 33, extentLength: 44},
+		{extentIndex: 55, extentOffset: 11, extentLength: 22},
+		{extentIndex: 66, extentOffset: 33, extentLength: 44},
 	}
 
 	writeIlocItemVersion232bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents11)
@@ -1491,8 +1491,8 @@ func TestIlocBoxFactory_New_Version2_WithItems(t *testing.T) {
 	baseOffset = uint32(0x5678)
 
 	extents22 := []IlocExtent{
-		IlocExtent{extentOffset: 55, extentLength: 66},
-		IlocExtent{extentOffset: 77, extentLength: 88},
+		{extentOffset: 55, extentLength: 66},
+		{extentOffset: 77, extentLength: 88},
 	}
 
 	writeIlocItemVersion232bitBytes(&data, itemId, constructionMethod, dataReferenceIndex, baseOffset, extents22)
