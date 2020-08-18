@@ -69,13 +69,14 @@ func main() {
 
 	ilocCommonBox, found := fbi[bmfcommon.IndexedBoxEntry{"meta.iloc", 0}]
 	if found == false {
-		log.Panicf("Could not find ILOC in index.")
+		fmt.Printf("No ILOC box found. No extents will be written.\n")
+		fmt.Printf("\n")
+	} else {
+		iloc := ilocCommonBox.(*bmftype.IlocBox)
+
+		err = iloc.Dump()
+		log.PanicIf(err)
 	}
-
-	iloc := ilocCommonBox.(*bmftype.IlocBox)
-
-	err = iloc.Dump()
-	log.PanicIf(err)
 
 	fmt.Printf("Index:\n")
 	fmt.Printf("\n")
