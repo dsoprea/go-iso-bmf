@@ -239,6 +239,10 @@ func readBoxes(f *BmfResource, parent CommonBox, start int64, totalSize int64) (
 
 		if known == true {
 			boxes = append(boxes, cb)
+		} else {
+			// We insert nil entries to maintain the integrity of the child
+			// list.
+			boxes = append(boxes, nil)
 		}
 
 		name := cb.Name()

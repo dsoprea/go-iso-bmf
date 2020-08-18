@@ -164,6 +164,10 @@ func (boxes Boxes) Index() (index LoadedBoxIndex) {
 	index = make(LoadedBoxIndex)
 
 	for _, box := range boxes {
+		if box == nil {
+			continue
+		}
+
 		name := box.Name()
 		if existing, found := index[name]; found == true {
 			index[name] = append(existing, box)
