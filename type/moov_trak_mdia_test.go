@@ -11,12 +11,12 @@ import (
 )
 
 func TestMdiaBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	mdia := new(MdiaBox)
 	mdia.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(mdia.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(mdia.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }

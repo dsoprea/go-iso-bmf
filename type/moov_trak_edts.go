@@ -17,8 +17,9 @@ type EdtsBox struct {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (edts *EdtsBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	edts.LoadedBoxIndex = lbi
+func (edts *EdtsBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	edts.LoadedBoxIndex = fbi
 }
 
 type edtsBoxFactory struct {

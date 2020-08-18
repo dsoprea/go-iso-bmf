@@ -215,9 +215,7 @@ func readBox(f *BmfResource, parent CommonBox, offset int64) (cb CommonBox, know
 		log.PanicIf(err)
 
 		cbis := cb.(ChildBoxIndexSetter)
-
-		fbi := boxes.Index()
-		cbis.SetLoadedBoxIndex(fbi)
+		cbis.SetLoadedBoxIndex(boxes)
 	}
 
 	return cb, true, nil

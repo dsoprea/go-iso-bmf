@@ -127,5 +127,5 @@ type ChildBoxIndexSetter interface {
 	// SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 	// and the children have been parsed. This allows parent boxes to be
 	// registered before the child boxes can look for them.
-	SetLoadedBoxIndex(lbi LoadedBoxIndex)
+	SetLoadedBoxIndex(boxes Boxes)
 }

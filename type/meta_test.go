@@ -11,12 +11,12 @@ import (
 )
 
 func TestMetaBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	meta := new(MetaBox)
 	meta.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(meta.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(meta.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }

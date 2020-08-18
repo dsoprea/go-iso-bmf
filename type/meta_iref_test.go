@@ -31,12 +31,12 @@ func TestIrefBox_InlineString(t *testing.T) {
 }
 
 func TestIrefBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	iref := new(IrefBox)
 	iref.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(iref.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(iref.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }

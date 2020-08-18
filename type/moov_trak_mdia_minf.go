@@ -20,8 +20,9 @@ type MinfBox struct {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (minf *MinfBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	minf.LoadedBoxIndex = lbi
+func (minf *MinfBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	minf.LoadedBoxIndex = fbi
 }
 
 type minfBoxFactory struct {

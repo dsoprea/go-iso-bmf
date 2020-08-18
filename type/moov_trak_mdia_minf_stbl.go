@@ -17,8 +17,9 @@ type StblBox struct {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (stbl *StblBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	stbl.LoadedBoxIndex = lbi
+func (stbl *StblBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	stbl.LoadedBoxIndex = fbi
 }
 
 type stblBoxFactory struct {

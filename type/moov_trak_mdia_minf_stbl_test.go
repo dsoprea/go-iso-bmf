@@ -11,12 +11,12 @@ import (
 )
 
 func TestStblBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	stbl := new(StblBox)
 	stbl.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(stbl.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(stbl.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }

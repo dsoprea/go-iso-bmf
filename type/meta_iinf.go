@@ -102,8 +102,9 @@ func (iinf *IinfBox) InlineString() string {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (iinf *IinfBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	iinf.LoadedBoxIndex = lbi
+func (iinf *IinfBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	iinf.LoadedBoxIndex = fbi
 }
 
 type iinfBoxFactory struct {

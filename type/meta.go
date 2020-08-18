@@ -18,8 +18,9 @@ type MetaBox struct {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (meta *MetaBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	meta.LoadedBoxIndex = lbi
+func (meta *MetaBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	meta.LoadedBoxIndex = fbi
 }
 
 type metaBoxFactory struct {

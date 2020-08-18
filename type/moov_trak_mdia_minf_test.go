@@ -11,12 +11,12 @@ import (
 )
 
 func TestMinfBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	minf := new(MinfBox)
 	minf.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(minf.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(minf.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }

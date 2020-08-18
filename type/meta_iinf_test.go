@@ -318,12 +318,12 @@ func TestIinfBox_InlineString(t *testing.T) {
 }
 
 func TestIinfBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	iinf := new(IinfBox)
 	iinf.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(iinf.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(iinf.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }

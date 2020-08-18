@@ -99,8 +99,8 @@ type testBox3 struct {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (tb3 *testBox3) SetLoadedBoxIndex(lbi LoadedBoxIndex) {
-	tb3.LoadedBoxIndex = lbi
+func (tb3 *testBox3) SetLoadedBoxIndex(boxes Boxes) {
+	tb3.LoadedBoxIndex = boxes.Index()
 }
 
 type testBox3Factory struct {

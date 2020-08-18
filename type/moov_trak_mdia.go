@@ -21,8 +21,9 @@ type MdiaBox struct {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (mdia *MdiaBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	mdia.LoadedBoxIndex = lbi
+func (mdia *MdiaBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	mdia.LoadedBoxIndex = fbi
 }
 
 type mdiaBoxFactory struct {

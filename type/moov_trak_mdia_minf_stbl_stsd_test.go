@@ -11,12 +11,12 @@ import (
 )
 
 func TestStsdBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	stsd := new(StsdBox)
 	stsd.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(stsd.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(stsd.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }

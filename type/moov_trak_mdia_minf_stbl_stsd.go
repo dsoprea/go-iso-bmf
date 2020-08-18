@@ -46,8 +46,9 @@ func (b *StsdBox) parse() (err error) {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (stsd *StsdBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	stsd.LoadedBoxIndex = lbi
+func (stsd *StsdBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	stsd.LoadedBoxIndex = fbi
 }
 
 type stsdBoxFactory struct {

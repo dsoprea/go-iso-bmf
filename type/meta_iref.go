@@ -36,8 +36,9 @@ func (iref *IrefBox) InlineString() string {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (iref *IrefBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	iref.LoadedBoxIndex = lbi
+func (iref *IrefBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	iref.LoadedBoxIndex = fbi
 }
 
 type irefBoxFactory struct {

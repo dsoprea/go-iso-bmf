@@ -28,8 +28,9 @@ func (mv MoovBox) IsFragmented() bool {
 // SetLoadedBoxIndex sets the child boxes after a box has been manufactured
 // and the children have been parsed. This allows parent boxes to be
 // registered before the child boxes can look for them.
-func (moov *MoovBox) SetLoadedBoxIndex(lbi bmfcommon.LoadedBoxIndex) {
-	moov.LoadedBoxIndex = lbi
+func (moov *MoovBox) SetLoadedBoxIndex(boxes bmfcommon.Boxes) {
+	fbi := boxes.Index()
+	moov.LoadedBoxIndex = fbi
 }
 
 func (b *MoovBox) parse() (err error) {

@@ -11,12 +11,12 @@ import (
 )
 
 func TestTrakBox_SetLoadedBoxIndex(t *testing.T) {
-	lbi := make(bmfcommon.LoadedBoxIndex)
+	lbi := make(bmfcommon.Boxes, 0)
 
 	trak := new(TrakBox)
 	trak.SetLoadedBoxIndex(lbi)
 
-	if reflect.DeepEqual(trak.LoadedBoxIndex, lbi) != true {
+	if reflect.DeepEqual(trak.LoadedBoxIndex, lbi.Index()) != true {
 		t.Fatalf("SetLoadedBoxIndex() did not set the LBI correctly.")
 	}
 }
