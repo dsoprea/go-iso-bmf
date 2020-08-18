@@ -14,7 +14,7 @@ import (
 )
 
 type parameters struct {
-	Filepath  string `short:"f" long:"filepath" required:"true" description:"File-path of image"`
+	Filepath  string `short:"f" long:"filepath" required:"true" description:"File-path"`
 	IsVerbose bool   `short:"v" long:"verbose" description:"Print logging"`
 }
 
@@ -71,10 +71,10 @@ func main() {
 	log.PanicIf(err)
 
 	fmt.Printf("\n")
-	fmt.Printf("Writing extents to [%s].\n", tempPath)
+	fmt.Printf("Writing items to [%s].\n", tempPath)
 	fmt.Printf("\n")
 
-	err = iloc.WriteExtents(tempPath)
+	err = iloc.Write(tempPath)
 	log.PanicIf(err)
 
 	fmt.Printf("\n")

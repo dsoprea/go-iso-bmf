@@ -121,29 +121,17 @@ func (iloc IlocBox) Dump() (err error) {
 	return nil
 }
 
-func (iloc IlocBox) writeItemExtent(itemId int, infe *InfeBox, ie IlocExtent, extentNumber int, outPath string) (err error) {
+func (iloc IlocBox) writeItemExtent(itemId int, infe *InfeBox, ie IlocExtent, extentNumber int, w io.Writer) (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
 		}
 	}()
 
-	infePhrase := infe.ItemType().String()
-
 	offset := int64(ie.Offset())
 	length := int64(ie.Length())
 
-	filename := fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
-	filepath := path.Join(outPath, filename)
-
-	fmt.Printf("Writing [%s] (%d bytes).\n", filepath, ie.Length())
-
-	f, err := os.Create(filepath)
-	log.PanicIf(err)
-
-	defer f.Close()
-
-	err = iloc.CopyBytesAt(offset, length, f)
+	err = iloc.CopyBytesAt(offset, length, w)
 	log.PanicIf(err)
 
 	return nil
@@ -162,6 +150,13 @@ func (iloc IlocBox) writeItemExtents(itemId int, outPath string) (err error) {
 	ii, err := iloc.GetWithId(uint32(itemId))
 	log.PanicIf(err)
 
+	extents := ii.Extents()
+
+	if len(extents) == 0 {
+		ilocLogger.Warningf(nil, "Item (%d) does not have any extents. Skipping.", itemId)
+		return nil
+	}
+
 	// Get IINF box so that we can get the INFE box for this item (so we can
 	// get its type).
 
@@ -179,16 +174,33 @@ func (iloc IlocBox) writeItemExtents(itemId int, outPath string) (err error) {
 	infe, err := iinf.GetItemWithId(uint32(itemId))
 	log.PanicIf(err)
 
-	for i, ie := range ii.Extents() {
-		err := iloc.writeItemExtent(itemId, infe, ie, i, outPath)
+	infePhrase := infe.ItemType().String()
+
+	filename := fmt.Sprintf("data.%d.%s", itemId, infePhrase)
+	filepath := path.Join(outPath, filename)
+
+	f, err := os.Create(filepath)
+	log.PanicIf(err)
+
+	defer f.Close()
+
+	fmt.Printf("Writing item with ID (%d): [%s]\n", itemId, filepath)
+
+	for i, ie := range extents {
+		fmt.Printf("- %d: %d bytes\n", i, ie.Length())
+
+		err := iloc.writeItemExtent(itemId, infe, ie, i, f)
 		log.PanicIf(err)
 	}
+
+	fmt.Printf("\n")
 
 	return nil
 }
 
-// WriteExtents writes each of the extents out to files for surgical debugging.
-func (iloc IlocBox) WriteExtents(outPath string) (err error) {
+// Write loops over each of the items and dumps the data for any of them that
+// have extents.
+func (iloc IlocBox) Write(outPath string) (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))

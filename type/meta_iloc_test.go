@@ -165,28 +165,15 @@ func TestIlocBox_writeItemExtent(t *testing.T) {
 		extentLength: 4,
 	}
 
-	tempPath, err := ioutil.TempDir("", "")
-	log.PanicIf(err)
-
-	defer os.RemoveAll(tempPath)
-
 	itemId := 11
 	extentNumber := 0
 
-	err = iloc.writeItemExtent(itemId, infe, ie, extentNumber, tempPath)
+	outBuffer := new(bytes.Buffer)
+
+	err = iloc.writeItemExtent(itemId, infe, ie, extentNumber, outBuffer)
 	log.PanicIf(err)
 
-	// Confirm that the file exists.
-
-	infePhrase := infe.ItemType().String()
-
-	filename := fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
-	filepath := path.Join(tempPath, filename)
-
-	recoveredData, err := ioutil.ReadFile(filepath)
-	log.PanicIf(err)
-
-	if bytes.Equal(recoveredData, b[extentOffset:]) != true {
+	if bytes.Equal(outBuffer.Bytes(), b[extentOffset:]) != true {
 		t.Fatalf("Data not correct.")
 	}
 }
@@ -310,33 +297,16 @@ func TestIlocBox_writeItemExtents(t *testing.T) {
 	// Test first extent of the first write.
 
 	itemId := 11
-	extentNumber := 0
 	infePhrase := infe11.ItemType().String()
 
-	filename := fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
+	filename := fmt.Sprintf("data.%d.%s", itemId, infePhrase)
 	filepath := path.Join(tempPath, filename)
 
 	recoveredData1, err := ioutil.ReadFile(filepath)
 	log.PanicIf(err)
 
-	if bytes.Equal(recoveredData1, b[extentOffset1:extentOffset1+4]) != true {
+	if bytes.Equal(recoveredData1, b[extentOffset1:extentOffset1+8]) != true {
 		t.Fatalf("Extent 1 data not correct.")
-	}
-
-	// Test second extent of the first write.
-
-	itemId = 11
-	extentNumber = 1
-	infePhrase = infe11.ItemType().String()
-
-	filename = fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
-	filepath = path.Join(tempPath, filename)
-
-	recoveredData2, err := ioutil.ReadFile(filepath)
-	log.PanicIf(err)
-
-	if bytes.Equal(recoveredData2, b[extentOffset2:extentOffset2+4]) != true {
-		t.Fatalf("Extent 2 data not correct.")
 	}
 
 	err = iloc.writeItemExtents(22, tempPath)
@@ -345,37 +315,20 @@ func TestIlocBox_writeItemExtents(t *testing.T) {
 	// Test first extent of the second write.
 
 	itemId = 22
-	extentNumber = 0
 	infePhrase = infe22.ItemType().String()
 
-	filename = fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
+	filename = fmt.Sprintf("data.%d.%s", itemId, infePhrase)
 	filepath = path.Join(tempPath, filename)
 
 	recoveredData3, err := ioutil.ReadFile(filepath)
 	log.PanicIf(err)
 
-	if bytes.Equal(recoveredData3, b[extentOffset3:extentOffset3+4]) != true {
-		t.Fatalf("Extent 3 data not correct:.")
-	}
-
-	// Test second extent of the second write.
-
-	itemId = 22
-	extentNumber = 1
-	infePhrase = infe22.ItemType().String()
-
-	filename = fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
-	filepath = path.Join(tempPath, filename)
-
-	recoveredData4, err := ioutil.ReadFile(filepath)
-	log.PanicIf(err)
-
-	if bytes.Equal(recoveredData4, b[extentOffset4:extentOffset4+4]) != true {
-		t.Fatalf("Extent 4 data not correct.")
+	if bytes.Equal(recoveredData3, b[extentOffset3:extentOffset3+8]) != true {
+		t.Fatalf("Extent 3 data not correct.")
 	}
 }
 
-func TestIlocBox_WriteExtents(t *testing.T) {
+func TestIlocBox_Write(t *testing.T) {
 	// Establish base box.
 
 	b := []byte{
@@ -488,71 +441,37 @@ func TestIlocBox_WriteExtents(t *testing.T) {
 
 	defer os.RemoveAll(tempPath)
 
-	err = iloc.WriteExtents(tempPath)
+	err = iloc.Write(tempPath)
 	log.PanicIf(err)
 
 	// Test first extent of the first write.
 
 	itemId := 11
-	extentNumber := 0
 	infePhrase := infe11.ItemType().String()
 
-	filename := fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
+	filename := fmt.Sprintf("data.%d.%s", itemId, infePhrase)
 	filepath := path.Join(tempPath, filename)
 
 	recoveredData1, err := ioutil.ReadFile(filepath)
 	log.PanicIf(err)
 
-	if bytes.Equal(recoveredData1, b[extentOffset1:extentOffset1+4]) != true {
+	if bytes.Equal(recoveredData1, b[extentOffset1:extentOffset1+8]) != true {
 		t.Fatalf("Extent 1 data not correct.")
-	}
-
-	// Test second extent of the first write.
-
-	itemId = 11
-	extentNumber = 1
-	infePhrase = infe11.ItemType().String()
-
-	filename = fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
-	filepath = path.Join(tempPath, filename)
-
-	recoveredData2, err := ioutil.ReadFile(filepath)
-	log.PanicIf(err)
-
-	if bytes.Equal(recoveredData2, b[extentOffset2:extentOffset2+4]) != true {
-		t.Fatalf("Extent 2 data not correct.")
 	}
 
 	// Test first extent of the second write.
 
 	itemId = 22
-	extentNumber = 0
 	infePhrase = infe22.ItemType().String()
 
-	filename = fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
+	filename = fmt.Sprintf("data.%d.%s", itemId, infePhrase)
 	filepath = path.Join(tempPath, filename)
 
 	recoveredData3, err := ioutil.ReadFile(filepath)
 	log.PanicIf(err)
 
-	if bytes.Equal(recoveredData3, b[extentOffset3:extentOffset3+4]) != true {
-		t.Fatalf("Extent 3 data not correct:.")
-	}
-
-	// Test second extent of the second write.
-
-	itemId = 22
-	extentNumber = 1
-	infePhrase = infe22.ItemType().String()
-
-	filename = fmt.Sprintf("extent.%d.%d.%s", itemId, extentNumber, infePhrase)
-	filepath = path.Join(tempPath, filename)
-
-	recoveredData4, err := ioutil.ReadFile(filepath)
-	log.PanicIf(err)
-
-	if bytes.Equal(recoveredData4, b[extentOffset4:extentOffset4+4]) != true {
-		t.Fatalf("Extent 4 data not correct.")
+	if bytes.Equal(recoveredData3, b[extentOffset3:extentOffset3+8]) != true {
+		t.Fatalf("Extent 3 data not correct.")
 	}
 }
 
