@@ -12,7 +12,7 @@ func dump(box interface{}, level int) {
 
 	switch t := box.(type) {
 	case BoxChildIndexer:
-		_, isRoot := t.(*BmfResource)
+		_, isRoot := t.(*Resource)
 
 		if isRoot == true {
 			fmt.Printf("%s> [ROOT]\n", indent)

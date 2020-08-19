@@ -35,7 +35,7 @@ func TestEdtsBoxFactory_New(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)

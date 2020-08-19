@@ -52,7 +52,7 @@ func TestPitmBoxFactory_New_Version0(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file, err := bmfcommon.NewBmfResource(sb, 0)
+	file, err := bmfcommon.NewResource(sb, 0)
 	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)
@@ -84,7 +84,7 @@ func TestPitmBoxFactory_New_Version1(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file, err := bmfcommon.NewBmfResource(sb, 0)
+	file, err := bmfcommon.NewResource(sb, 0)
 	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)

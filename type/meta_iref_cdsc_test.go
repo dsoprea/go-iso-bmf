@@ -42,7 +42,7 @@ func TestCdscBox_New_Version0_WithReferences(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
 	// Use zero length to prevent immediate parsing.
-	resource, err := bmfcommon.NewBmfResource(sb, 0)
+	resource, err := bmfcommon.NewResource(sb, 0)
 	log.PanicIf(err)
 
 	iref := &IrefBox{
@@ -96,7 +96,7 @@ func TestCdscBox_New_Version1_WithReferences(t *testing.T) {
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
 	// Use zero length to prevent immediate parsing.
-	resource, err := bmfcommon.NewBmfResource(sb, 0)
+	resource, err := bmfcommon.NewResource(sb, 0)
 	log.PanicIf(err)
 
 	iref := &IrefBox{

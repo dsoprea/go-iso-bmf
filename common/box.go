@@ -24,13 +24,13 @@ type Box struct {
 	start      int64
 	size       int64
 	headerSize int64
-	resource   *BmfResource
+	resource   *Resource
 
 	parent CommonBox
 }
 
 // NewBox returns a new Box struct.
-func NewBox(name string, start, size, headerSize int64, resource *BmfResource) Box {
+func NewBox(name string, start, size, headerSize int64, resource *Resource) Box {
 	return Box{
 		name:       name,
 		start:      start,

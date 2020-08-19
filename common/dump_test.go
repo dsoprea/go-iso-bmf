@@ -27,7 +27,7 @@ func TestDump_Unexported_BoxChildIndexer_Root(t *testing.T) {
 		"abc": []CommonBox{&testBox1{}},
 	}
 
-	br := &BmfResource{
+	br := &Resource{
 		LoadedBoxIndex: lbi,
 	}
 

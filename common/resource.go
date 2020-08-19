@@ -12,8 +12,8 @@ var (
 	resourceLogger = log.NewLogger("bmfcommon.resource")
 )
 
-// BmfResource defines a file structure.
-type BmfResource struct {
+// Resource defines a file structure.
+type Resource struct {
 	rs           io.ReadSeeker
 	isFragmented bool
 
@@ -24,8 +24,8 @@ type BmfResource struct {
 	LoadedBoxIndex
 }
 
-// NewBmfResource returns a new BmfResource struct.
-func NewBmfResource(rs io.ReadSeeker, size int64) (resource *BmfResource, err error) {
+// NewResource returns a new Resource struct.
+func NewResource(rs io.ReadSeeker, size int64) (resource *Resource, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -35,7 +35,7 @@ func NewBmfResource(rs io.ReadSeeker, size int64) (resource *BmfResource, err er
 	// This has all [known] boxes encountered in the stream.
 	fullBoxIndex := make(FullBoxIndex)
 
-	resource = &BmfResource{
+	resource = &Resource{
 		rs:           rs,
 		fullBoxIndex: fullBoxIndex,
 	}
@@ -54,12 +54,12 @@ func NewBmfResource(rs io.ReadSeeker, size int64) (resource *BmfResource, err er
 }
 
 // Index returns the complete index of the boxes found in the parsed file.
-func (f *BmfResource) Index() FullBoxIndex {
+func (f *Resource) Index() FullBoxIndex {
 	return f.fullBoxIndex
 }
 
 // readBytesAt reads a box at n and offset.
-func (f *BmfResource) readBytesAt(offset int64, n int64) (b []byte, err error) {
+func (f *Resource) readBytesAt(offset int64, n int64) (b []byte, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -78,7 +78,7 @@ func (f *BmfResource) readBytesAt(offset int64, n int64) (b []byte, err error) {
 }
 
 // copyBytesAt seeksand then copies N bytes from the resource to the writer.
-func (f *BmfResource) copyBytesAt(offset int64, n int64, w io.Writer) (err error) {
+func (f *Resource) copyBytesAt(offset int64, n int64, w io.Writer) (err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -95,7 +95,7 @@ func (f *BmfResource) copyBytesAt(offset int64, n int64, w io.Writer) (err error
 }
 
 // readBaseBox reads a box from an offset.
-func (f *BmfResource) readBaseBox(offset int64) (box Box, err error) {
+func (f *Resource) readBaseBox(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -169,7 +169,7 @@ func (f *BmfResource) readBaseBox(offset int64) (box Box, err error) {
 }
 
 // ReadBaseBox reads the base box at the given offset. Supports testing.
-func (f *BmfResource) ReadBaseBox(offset int64) (box Box, err error) {
+func (f *Resource) ReadBaseBox(offset int64) (box Box, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -182,7 +182,7 @@ func (f *BmfResource) ReadBaseBox(offset int64) (box Box, err error) {
 	return box, nil
 }
 
-func readBox(f *BmfResource, parent CommonBox, offset int64) (cb CommonBox, known bool, err error) {
+func readBox(f *Resource, parent CommonBox, offset int64) (cb CommonBox, known bool, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))
@@ -221,7 +221,7 @@ func readBox(f *BmfResource, parent CommonBox, offset int64) (cb CommonBox, know
 	return cb, true, nil
 }
 
-func readBoxes(f *BmfResource, parent CommonBox, start int64, totalSize int64) (boxes Boxes, err error) {
+func readBoxes(f *Resource, parent CommonBox, start int64, totalSize int64) (boxes Boxes, err error) {
 	defer func() {
 		if errRaw := recover(); errRaw != nil {
 			err = log.Wrap(errRaw.(error))

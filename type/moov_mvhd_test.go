@@ -152,7 +152,7 @@ func TestMvhdBoxFactory_New_Version0(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)
@@ -229,7 +229,7 @@ func TestMvhdBoxFactory_New_Version1(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	file, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	file, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	box, err := file.ReadBaseBox(0)

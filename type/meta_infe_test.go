@@ -327,7 +327,7 @@ func TestInfeBox_New_Version0(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	resource, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	fbi := resource.Index()
@@ -438,7 +438,7 @@ func TestInfeBox_New_Version1(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	resource, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	fbi := resource.Index()
@@ -545,7 +545,7 @@ func TestInfeBox_New_Version3(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	resource, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	fbi := resource.Index()
@@ -652,7 +652,7 @@ func TestInfeBox_New_Version2_Mime(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	resource, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	fbi := resource.Index()
@@ -760,7 +760,7 @@ func TestInfeBox_New_Version2_Uri(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource, err := bmfcommon.NewBmfResource(sb, int64(len(b)))
+	resource, err := bmfcommon.NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	fbi := resource.Index()

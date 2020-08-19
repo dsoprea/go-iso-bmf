@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewBox(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	box := NewBox("name", 1, 2, 3, resource)
 
 	if box.name != "name" {
@@ -27,7 +27,7 @@ func TestNewBox(t *testing.T) {
 }
 
 func TestBox_InlineString(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	box := NewBox("name", 1, 2, 3, resource)
 
 	if box.InlineString() != "NAME=[name] PARENT=[ROOT] START=(0x0000000000000001) SIZE=(2)" {
@@ -36,7 +36,7 @@ func TestBox_InlineString(t *testing.T) {
 }
 
 func TestBox_Name(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	box := NewBox("name", 1, 2, 3, resource)
 
 	if box.Name() != "name" {
@@ -45,7 +45,7 @@ func TestBox_Name(t *testing.T) {
 }
 
 func TestBox_Start(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	box := NewBox("name", 1, 2, 3, resource)
 
 	if box.Start() != 1 {
@@ -54,7 +54,7 @@ func TestBox_Start(t *testing.T) {
 }
 
 func TestBox_Size(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	box := NewBox("name", 1, 2, 3, resource)
 
 	if box.Size() != 2 {
@@ -63,7 +63,7 @@ func TestBox_Size(t *testing.T) {
 }
 
 func TestBox_HeaderSize(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	box := NewBox("name", 1, 2, 3, resource)
 
 	if box.HeaderSize() != 3 {
@@ -72,7 +72,7 @@ func TestBox_HeaderSize(t *testing.T) {
 }
 
 func TestBox_Parent(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	parentBox := NewBox("parent", 1, 2, 3, resource)
 
 	tb := &testBox1{
@@ -88,7 +88,7 @@ func TestBox_Parent(t *testing.T) {
 }
 
 func TestBox_Index(t *testing.T) {
-	resource := &BmfResource{}
+	resource := &Resource{}
 	resource.fullBoxIndex = make(FullBoxIndex)
 
 	box := NewBox("name", 1, 2, 3, resource)
@@ -107,7 +107,7 @@ func TestBox_ReadBytesAt(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource, err := NewBmfResource(sb, 0)
+	resource, err := NewResource(sb, 0)
 	log.PanicIf(err)
 
 	box := NewBox("name", 1, 2, 3, resource)
@@ -129,7 +129,7 @@ func TestBox_CopyBytesAt(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(data)
 
-	resource, err := NewBmfResource(sb, 0)
+	resource, err := NewResource(sb, 0)
 	log.PanicIf(err)
 
 	box := NewBox("name", 1, 2, 3, resource)
@@ -162,7 +162,7 @@ func TestBox_ReadBoxes(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource, err := NewBmfResource(sb, 0)
+	resource, err := NewResource(sb, 0)
 	log.PanicIf(err)
 
 	box := NewBox("root", 0, int64(len(b)), 0, resource)
@@ -209,7 +209,7 @@ func TestBox_Data(t *testing.T) {
 
 	sb := rifs.NewSeekableBufferWithBytes(b)
 
-	resource, err := NewBmfResource(sb, int64(len(b)))
+	resource, err := NewResource(sb, int64(len(b)))
 	log.PanicIf(err)
 
 	entries1 := resource.LoadedBoxIndex["tb2 "]
@@ -245,7 +245,7 @@ func TestBox_Data_TooSmall(t *testing.T) {
 }
 
 func TestBoxes_Index(t *testing.T) {
-	resource := new(BmfResource)
+	resource := new(Resource)
 
 	box1 := NewBox("box1", 0, 0, 0, resource)
 	tb1 := &testBox1{

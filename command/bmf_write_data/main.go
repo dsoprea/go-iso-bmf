@@ -55,7 +55,7 @@ func main() {
 
 	size := s.Size()
 
-	file, err := bmfcommon.NewBmfResource(f, size)
+	file, err := bmfcommon.NewResource(f, size)
 	log.PanicIf(err)
 
 	fbi := file.Index()
